@@ -918,6 +918,7 @@ button { font-family: inherit; cursor: pointer; }
   font-size: 14.5px; font-weight: 500;
 }
 .picker-tool-btn:hover { background: rgba(255,255,255,.20); }
+a.picker-tool-btn { text-decoration: none; display: inline-flex; align-items: center; }
 .picker-note {
   margin: 16px 0 0; font-size: 13.5px; color: #BFE3C9;
   background: rgba(46,125,79,.18); border: 1px solid rgba(160,214,178,.35);

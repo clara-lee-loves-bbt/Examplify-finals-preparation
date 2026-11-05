@@ -17,6 +17,45 @@ no install, no network access.
 If you would rather edit the source and reload, open `index.html` instead; it
 loads `styles.css`, `app.js` and the `data/` files separately.
 
+## On-the-go practice (phone)
+
+**`practice.html`** is a separate, phone-first practice mode for revising on
+the move. It has a LeetCode-style problem list, no timer and instant marking,
+and it does not touch the Examplify exam clone. Open it from the picker
+(*On-the-go practice*) or directly.
+
+- **277 original questions** written for this mode, covering lectures 1–11. None
+  of them are copied from the past papers, tutorials or assignments. They come
+  in three types: multiple choice (tap to answer, marked at once), fill in the
+  blank (code with numbered blanks, plus a symbol row for phone keyboards) and
+  predict the output.
+- **Weighted towards what the finals test.** The 211 past-final questions were
+  classified by lecture, and the bank is weighted the same way: L3 sequences
+  and higher-order functions (46), L4 loops (34), L5 recursion (32) and L10
+  searching and sorting (29) are biggest, because L10 rose sharply in the last
+  two papers. L1, L2 and L8 were trimmed but keep their exam-relevant core
+  (scope, short-circuiting, memoisation).
+- **Lecture 9 onwards is flagged** with an orange *not revised yet* pill on
+  every question and list row. The *L1–8* / *L9–11* buttons filter by it.
+- **Marking.** Fill-in answers ignore spacing and quote style and accept the
+  common equivalent forms. If yours is equivalent but was not recognised, tap
+  *My answer is equivalent* to count it. Output answers ignore spacing around
+  brackets and commas, and line breaks. An error is answered by its name, e.g.
+  `TypeError`.
+- **Shuffle practice** draws from your current filters and favours questions
+  you have not tried and ones you got wrong. *Redo mistakes* and *Flagged* drill
+  just those. Progress, accuracy and a day streak are kept in the browser's
+  `localStorage`.
+- Code is syntax-highlighted and long lines wrap with a hanging indent, so
+  nothing needs horizontal scrolling. Light and dark themes are supported.
+
+Sources live in `practice/` (`index.html`, `practice.css`, `practice.js`,
+`questions/*.js`). `node build.js` bundles them into `practice.html`.
+`node tools/verify-practice.js` checks every question's structure and runs
+each answer through Python. It checks every output answer, every runnable MCQ
+key, every accepted fill-in answer (against its tests) and the extra asserts
+some questions carry.
+
 ## Papers
 
 Every source PDF has been split into its own exam. Nothing is combined, and
@@ -165,8 +204,9 @@ tools/validate-data.js  sanity-check the question data
 After editing `index.html`, `styles.css`, `app.js` or anything in `data/`:
 
 ```bash
-node build.js              # rebuild examplify.html
-node tools/validate-data.js   # verify every paper's data
+node build.js                    # rebuild examplify.html and practice.html
+node tools/validate-data.js      # verify every paper's data
+node tools/verify-practice.js    # verify the practice bank (runs Python)
 ```
 
 `validate-data.js` checks that question numbers run 1..n without gaps, that
