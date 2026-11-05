@@ -1,0 +1,6 @@
+# Source exam papers stay local; they are not redistributed with the app.
+New papers/
+*.pdf
+
+# Scratch space used while checking the transcribed questions.
+.audit/
