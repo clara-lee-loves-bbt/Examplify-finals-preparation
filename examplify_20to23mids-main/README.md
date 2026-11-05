@@ -46,6 +46,15 @@ and it does not touch the Examplify exam clone. Open it from the picker
   you have not tried and ones you got wrong. *Redo mistakes* and *Flagged* drill
   just those. Progress, accuracy and a day streak are kept in the browser's
   `localStorage`.
+- **Sync across devices.** *Copy sync code* (or *Share code…* on phones)
+  turns your progress into a short text code. *Paste sync code* on the other
+  device **merges** it in rather than overwriting. Attempt and solve counts
+  take the larger value, the most recent result wins, flags are kept and the
+  day history is combined. Pasting the same code twice changes nothing. Sync
+  both ways to bring two devices fully in step.
+- **Live copy:** <https://clara-lee-loves-bbt.github.io/Examplify-finals-preparation/examplify_20to23mids-main/practice.html>
+  (GitHub Pages from `main`. The repo root has a `.nojekyll` file so the `{{n}}`
+  blank markers are served exactly as written.)
 - Code is syntax-highlighted and long lines wrap with a hanging indent, so
   nothing needs horizontal scrolling. Light and dark themes are supported.
 

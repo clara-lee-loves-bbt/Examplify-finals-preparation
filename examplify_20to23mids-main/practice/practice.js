@@ -325,9 +325,19 @@
       '<div class="list-head"><h2>Problems</h2><span>' + list.length + ' shown</span></div>' +
       (list.length ? '<div class="plist">' + rows + '</div>' : '<div class="plist"><div class="empty">No questions match these filters.</div></div>') +
       (list.length > shown ? '<button class="btn more" data-act="more">Show more (' + (list.length - shown) + ' left)</button>' : '') +
+      '<section class="card sync">' +
+        '<h2>Sync across devices</h2>' +
+        '<p class="sync-note">Copy a code here, then paste it on your other device. Codes <b>merge</b>, so nothing on either device is lost. Do it both ways to bring phone and laptop fully in step.</p>' +
+        '<div class="sync-btns">' +
+          '<button class="btn" data-act="sync-copy">Copy sync code</button>' +
+          (navigator.share ? '<button class="btn" data-act="sync-share">Share code…</button>' : '') +
+          '<button class="btn primary" data-act="sync-paste">Paste sync code</button>' +
+        '</div>' +
+        (store.lastSync ? '<p class="sync-note">Last merged ' + esc(new Date(store.lastSync).toLocaleString()) + '.</p>' : '') +
+      '</section>' +
       '<div class="foot">' +
         '<a href="examplify.html">Full past papers in exam mode (laptop) →</a>' +
-        '<span>Progress is saved in this browser only.</span>' +
+        '<span>Progress is saved in this browser; use the sync code to move it.</span>' +
         '<button data-act="reset">Reset all progress</button>' +
       '</div>' +
       '</main>';
@@ -346,6 +356,128 @@
       (isFlagged(q.id) ? '<span class="flag">⚑</span>' : '') + '</span></span>' +
       '<span class="diff d' + q.d + '">' + DIFF[q.d] + '</span></a>';
   }
+
+  /* =====================================================================
+     SYNC CODE — progress as a pasteable text code that merges on import
+     ===================================================================== */
+  var SYNC_PREFIX = 'CS1010E-SYNC1:';
+  var LAST = { ok: 'o', bad: 'b', shown: 's' };
+  var LAST_BACK = { o: 'ok', b: 'bad', s: 'shown' };
+
+  function makeSyncCode() {
+    var p = {};
+    Object.keys(store.p).forEach(function (id) {
+      var e = store.p[id];
+      if (!e || (!e.n && !e.flag)) return;
+      p[id] = [e.n || 0, e.c || 0, LAST[e.last] || '', e.flag ? 1 : 0, Math.round((e.t || 0) / 1000)];
+    });
+    var json = JSON.stringify({ v: 1, p: p, d: store.days });
+    return SYNC_PREFIX + btoa(unescape(encodeURIComponent(json)));
+  }
+
+  function readSyncCode(text) {
+    var s = String(text || '').replace(/\s+/g, '');
+    var i = s.indexOf(SYNC_PREFIX);
+    if (i < 0) throw new Error('That doesn\'t look like a sync code. It should start with ' + SYNC_PREFIX);
+    var data;
+    try { data = JSON.parse(decodeURIComponent(escape(atob(s.slice(i + SYNC_PREFIX.length))))); }
+    catch (e) { throw new Error('The code is incomplete or damaged. Copy the whole code and try again.'); }
+    if (!data || data.v !== 1 || typeof data.p !== 'object') throw new Error('This sync code is from an unknown version.');
+    return data;
+  }
+
+  // Merge never loses work: attempt and correct counts take the larger value,
+  // the most recent result wins, flags are kept from either side.
+  function mergeSync(data) {
+    var changed = 0;
+    Object.keys(data.p).forEach(function (id) {
+      if (!BY_ID[id]) return;
+      var r = data.p[id];
+      var inc = { n: r[0] || 0, c: r[1] || 0, last: LAST_BACK[r[2]], flag: !!r[3], t: (r[4] || 0) * 1000 };
+      var cur = store.p[id];
+      if (!cur) {
+        var fresh = { n: inc.n, c: inc.c, t: inc.t };
+        if (inc.last) fresh.last = inc.last;
+        if (inc.flag) fresh.flag = true;
+        store.p[id] = fresh;
+        changed++;
+        return;
+      }
+      var before = JSON.stringify(cur);
+      cur.n = Math.max(cur.n || 0, inc.n);
+      cur.c = Math.max(cur.c || 0, inc.c);
+      if (inc.t > (cur.t || 0)) { if (inc.last) cur.last = inc.last; cur.t = inc.t; }
+      if (inc.flag) cur.flag = true;
+      if (JSON.stringify(cur) !== before) changed++;
+    });
+    Object.keys(data.d || {}).forEach(function (day) {
+      store.days[day] = Math.max(store.days[day] || 0, data.d[day] || 0);
+    });
+    store.lastSync = Date.now();
+    save();
+    return changed;
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+    return Promise.reject(new Error('no clipboard'));
+  }
+
+  function openModal(html) {
+    closeModal();
+    var m = document.createElement('div');
+    m.className = 'modal-back';
+    m.id = 'modal';
+    m.innerHTML = '<div class="modal" role="dialog" aria-modal="true">' + html + '</div>';
+    document.body.appendChild(m);
+    m.addEventListener('click', function (e) {
+      if (e.target === m || e.target.closest('[data-m="close"]')) closeModal();
+      if (e.target.closest('[data-m="merge"]')) doMerge();
+      if (e.target.closest('[data-m="copy"]')) {
+        var t = m.querySelector('textarea');
+        t.focus(); t.select();
+        copyText(t.value).then(function () { toast('Sync code copied'); closeModal(); },
+          function () { toast('Select the code and copy it'); });
+      }
+    });
+    var ta = m.querySelector('textarea');
+    if (ta) setTimeout(function () { ta.focus(); if (ta.readOnly) ta.select(); }, 50);
+  }
+  function closeModal() { var m = document.getElementById('modal'); if (m) m.remove(); }
+
+  function showCodeModal(code) {
+    openModal('<h3>Your sync code</h3>' +
+      '<p class="sync-note">Copy this whole code and paste it into <b>Paste sync code</b> on your other device.</p>' +
+      '<textarea class="sync-text" readonly>' + esc(code) + '</textarea>' +
+      '<div class="modal-btns"><button class="btn" data-m="close">Close</button><button class="btn primary" data-m="copy">Copy</button></div>');
+  }
+
+  function showPasteModal() {
+    openModal('<h3>Paste sync code</h3>' +
+      '<p class="sync-note">Paste the code copied on your other device. It is merged into the progress here.</p>' +
+      '<textarea class="sync-text" placeholder="' + SYNC_PREFIX + '…" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>' +
+      '<p class="sync-err" id="sync-err" hidden></p>' +
+      '<div class="modal-btns"><button class="btn" data-m="close">Cancel</button><button class="btn primary" data-m="merge">Merge progress</button></div>');
+  }
+
+  function doMerge() {
+    var m = document.getElementById('modal');
+    var err = document.getElementById('sync-err');
+    try {
+      var data = readSyncCode(m.querySelector('textarea').value);
+      var n = mergeSync(data);
+      closeModal();
+      if (!cur) renderHome();
+      toast(n ? 'Merged — ' + n + ' question' + (n === 1 ? '' : 's') + ' updated' : 'Already up to date');
+    } catch (e) {
+      err.textContent = e.message;
+      err.hidden = false;
+    }
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && document.getElementById('modal')) { e.stopImmediatePropagation(); closeModal(); }
+  }, true);
 
   /* =====================================================================
      QUESTION
@@ -615,6 +747,18 @@
         if (session.mode !== 'list') { session = { mode: 'list', done: 0, right: 0, recent: [] }; saveSession(); }
         if (cur) cur.stale = true;
         break; // the link's own navigation does the rest
+      case 'sync-copy': {
+        var code = makeSyncCode();
+        copyText(code).then(function () { toast('Sync code copied — paste it on your other device'); },
+          function () { showCodeModal(code); });
+        break;
+      }
+      case 'sync-share':
+        navigator.share({ title: 'CS1010E practice progress', text: makeSyncCode() }).catch(function () { /* cancelled */ });
+        break;
+      case 'sync-paste':
+        showPasteModal();
+        break;
       case 'reset':
         if (window.confirm('Clear all your practice progress on this device?')) {
           var keepTheme = store.theme;
