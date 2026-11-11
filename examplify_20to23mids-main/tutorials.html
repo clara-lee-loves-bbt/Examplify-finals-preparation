@@ -1,0 +1,2865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f7f8fa" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="CS1010E">
+<title>Tutorials &amp; Assignments — CS1010E</title>
+<style>
+/* ===========================================================
+   CS1010E on-the-go practice — mobile-first, LeetCode-style
+   =========================================================== */
+
+:root {
+  --bg: #f7f8fa;
+  --card: #ffffff;
+  --card-2: #f2f3f5;
+  --ink: #1a1a1a;
+  --ink-2: #3c4043;
+  --muted: #6b7280;
+  --line: #e4e6eb;
+  --accent: #ffa116;
+  --accent-ink: #1a1a1a;
+  --accent-text: #b45309;
+  --easy: #00897b;
+  --med: #b7791f;
+  --hard: #e11d48;
+  --ok: #15803d;
+  --ok-bg: #e8f6ee;
+  --ok-line: #9fd8b5;
+  --bad: #c62828;
+  --bad-bg: #fdecec;
+  --bad-line: #f2b1b1;
+  --warn: #92400e;
+  --warn-bg: #fff4e0;
+  --warn-line: #f6cf8f;
+  --code-bg: #f6f8fa;
+  --code-line: #e6e8eb;
+  --code-num: #a0a7b1;
+  --tk-kw: #cf222e;
+  --tk-bi: #8250df;
+  --tk-str: #0a3069;
+  --tk-num: #0550ae;
+  --tk-com: #6e7781;
+  --tk-fn: #8250df;
+  --shadow: 0 1px 2px rgba(0,0,0,.05), 0 1px 6px rgba(0,0,0,.04);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1a1a1a;
+    --card: #262626;
+    --card-2: #303030;
+    --ink: #eff1f6;
+    --ink-2: #d4d6dc;
+    --muted: #9ca3af;
+    --line: #3a3a3a;
+    --accent-text: #ffb84d;
+    --easy: #2ec4b0;
+    --med: #ffc01e;
+    --hard: #ff5c7a;
+    --ok: #4ade80;
+    --ok-bg: #16301f;
+    --ok-line: #2f6b43;
+    --bad: #ff7b7b;
+    --bad-bg: #3a1d1d;
+    --bad-line: #7a3434;
+    --warn: #ffcf7a;
+    --warn-bg: #3a2c12;
+    --warn-line: #7a5a20;
+    --code-bg: #1e1e1e;
+    --code-line: #333333;
+    --code-num: #6b7280;
+    --tk-kw: #ff7b72;
+    --tk-bi: #d2a8ff;
+    --tk-str: #a5d6ff;
+    --tk-num: #79c0ff;
+    --tk-com: #8b949e;
+    --tk-fn: #d2a8ff;
+    --shadow: none;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1a1a1a;
+  --card: #262626;
+  --card-2: #303030;
+  --ink: #eff1f6;
+  --ink-2: #d4d6dc;
+  --muted: #9ca3af;
+  --line: #3a3a3a;
+  --accent-text: #ffb84d;
+  --easy: #2ec4b0;
+  --med: #ffc01e;
+  --hard: #ff5c7a;
+  --ok: #4ade80;
+  --ok-bg: #16301f;
+  --ok-line: #2f6b43;
+  --bad: #ff7b7b;
+  --bad-bg: #3a1d1d;
+  --bad-line: #7a3434;
+  --warn: #ffcf7a;
+  --warn-bg: #3a2c12;
+  --warn-line: #7a5a20;
+  --code-bg: #1e1e1e;
+  --code-line: #333333;
+  --code-num: #6b7280;
+  --tk-kw: #ff7b72;
+  --tk-bi: #d2a8ff;
+  --tk-str: #a5d6ff;
+  --tk-num: #79c0ff;
+  --tk-com: #8b949e;
+  --tk-fn: #d2a8ff;
+  --shadow: none;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
+}
+button, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+a { color: var(--accent-text); }
+
+.mono, code, pre, .code, textarea.ans-out, input.ans-blank {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Roboto Mono", "Liberation Mono", monospace;
+}
+
+.wrap { max-width: 720px; margin: 0 auto; padding: 0 16px; }
+
+/* ---------------- top bar ---------------- */
+.topbar {
+  position: sticky; top: 0; z-index: 20;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  -webkit-backdrop-filter: saturate(1.4) blur(10px);
+  backdrop-filter: saturate(1.4) blur(10px);
+  border-bottom: 1px solid var(--line);
+  padding-top: env(safe-area-inset-top);
+}
+.topbar-in {
+  max-width: 720px; margin: 0 auto; padding: 0 8px 0 16px;
+  height: 52px; display: flex; align-items: center; gap: 8px;
+}
+.brand { font-weight: 700; font-size: 17px; display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+.brand-mark {
+  width: 26px; height: 26px; border-radius: 7px; background: var(--accent); color: var(--accent-ink);
+  display: inline-grid; place-items: center; font-size: 13px; font-weight: 800; flex: none;
+}
+.brand small { color: var(--muted); font-weight: 500; font-size: 13px; }
+.icon-btn {
+  width: 40px; height: 40px; border-radius: 10px; border: 0; background: transparent;
+  display: inline-grid; place-items: center; color: var(--ink-2); flex: none;
+}
+.icon-btn:active { background: var(--card-2); }
+.icon-btn svg { width: 22px; height: 22px; }
+.icon-btn.on { color: var(--accent-text); }
+.qbar-title { flex: 1; min-width: 0; font-size: 14px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.qbar-title b { color: var(--ink); font-weight: 600; }
+
+/* ---------------- home ---------------- */
+.home { padding-bottom: calc(32px + env(safe-area-inset-bottom)); }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 16px 0 12px; }
+.stat { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 8px; text-align: center; box-shadow: var(--shadow); }
+.stat b { display: block; font-size: 19px; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.stat b small { font-size: 12px; font-weight: 600; color: var(--muted); }
+.stat span { font-size: 11.5px; color: var(--muted); }
+.ring-bar { height: 6px; border-radius: 3px; background: var(--card-2); overflow: hidden; margin: 2px 0 14px; }
+.ring-bar i { display: block; height: 100%; background: var(--easy); border-radius: 3px; }
+
+.cta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px; }
+.btn {
+  border: 1px solid var(--line); background: var(--card); color: var(--ink);
+  border-radius: 12px; min-height: 48px; padding: 10px 14px; font-weight: 600; font-size: 15px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-align: center;
+}
+.btn:active { transform: scale(.98); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.big { grid-column: 1 / -1; min-height: 56px; font-size: 17px; }
+.btn small { font-weight: 500; opacity: .75; }
+.btn[disabled] { opacity: .45; pointer-events: none; }
+
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; box-shadow: var(--shadow); margin-bottom: 14px; }
+.card h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 10px; font-weight: 600; }
+.frow + .frow { margin-top: 14px; }
+.flabel { font-size: 13px; color: var(--muted); margin-bottom: 6px; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.flabel button { border: 0; background: none; color: var(--accent-text); font-size: 13px; font-weight: 600; padding: 2px 4px; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  border: 1px solid var(--line); background: var(--card-2); color: var(--ink-2);
+  border-radius: 999px; padding: 6px 11px; font-size: 13.5px; font-weight: 600; min-height: 34px;
+  display: inline-flex; align-items: center; gap: 6px; position: relative;
+}
+.chip small { font-weight: 500; color: var(--muted); font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.chip.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.chip.on small { color: inherit; opacity: .7; }
+.chip .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); position: absolute; top: -1px; right: -1px; border: 2px solid var(--card); }
+.seg { display: flex; background: var(--card-2); border-radius: 10px; padding: 3px; gap: 2px; }
+.seg button { flex: 1; border: 0; background: transparent; border-radius: 8px; padding: 7px 4px; font-size: 13.5px; font-weight: 600; color: var(--muted); min-height: 34px; }
+.seg button.on { background: var(--card); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+.legend { font-size: 12.5px; color: var(--muted); margin-top: 10px; display: flex; align-items: center; gap: 6px; }
+.legend .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); display: inline-block; }
+
+.search { width: 100%; border: 1px solid var(--line); background: var(--card); border-radius: 10px; padding: 10px 12px; font-size: 16px; margin-bottom: 8px; }
+.list-head { display: flex; justify-content: space-between; align-items: baseline; margin: 6px 2px 8px; }
+.list-head h2 { font-size: 17px; margin: 0; }
+.list-head span { color: var(--muted); font-size: 13px; }
+.plist { background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; box-shadow: var(--shadow); }
+.prow {
+  display: grid; grid-template-columns: 22px 1fr auto; gap: 10px; align-items: center;
+  padding: 11px 12px; border-top: 1px solid var(--line); text-decoration: none; color: inherit;
+}
+.prow:first-child { border-top: 0; }
+.prow:nth-child(even) { background: color-mix(in srgb, var(--card-2) 45%, var(--card)); }
+.prow:active { background: var(--card-2); }
+.prow-main { min-width: 0; }
+.prow-title { font-weight: 600; font-size: 14.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.prow-sub { font-size: 12px; color: var(--muted); margin-top: 1px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.prow-sub .new { color: var(--warn); font-weight: 600; }
+.st { width: 22px; height: 22px; display: grid; place-items: center; font-size: 14px; }
+.st.ok { color: var(--ok); }
+.st.bad { color: var(--bad); }
+.st.none { color: var(--line); }
+.diff { font-size: 12.5px; font-weight: 600; }
+.diff.d1 { color: var(--easy); }
+.diff.d2 { color: var(--med); }
+.diff.d3 { color: var(--hard); }
+.prow .flag { color: var(--accent-text); font-size: 12px; }
+.more { display: block; width: 100%; margin-top: 10px; }
+.empty { padding: 28px 16px; text-align: center; color: var(--muted); }
+.foot { text-align: center; color: var(--muted); font-size: 13px; margin: 22px 0 8px; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.foot button { border: 0; background: none; color: var(--muted); text-decoration: underline; font-size: 13px; }
+
+/* ---------------- question ---------------- */
+.qview { padding-bottom: calc(110px + env(safe-area-inset-bottom)); }
+.meta { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0 8px; }
+.pill {
+  font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 999px;
+  background: var(--card-2); color: var(--ink-2); border: 1px solid var(--line);
+}
+.pill.d1 { color: var(--easy); }
+.pill.d2 { color: var(--med); }
+.pill.d3 { color: var(--hard); }
+.pill.warn { background: var(--warn-bg); color: var(--warn); border-color: var(--warn-line); }
+.qtitle { font-size: 20px; line-height: 1.3; margin: 2px 0 10px; font-weight: 700; }
+.prose p { margin: 0 0 10px; }
+.prose code, .opt-text code, .fb code {
+  font-size: .9em; background: var(--card-2); border: 1px solid var(--line);
+  padding: 1px 5px; border-radius: 5px; word-break: break-word;
+}
+
+.code {
+  background: var(--code-bg); border: 1px solid var(--code-line); border-radius: 12px;
+  overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 0 12px;
+  font-size: 13.5px; line-height: 1.6;
+}
+.code-in { padding: 10px 0; }
+.cl { display: flex; align-items: flex-start; }
+.cn {
+  flex: none; width: 2.4em; padding-right: .8em; text-align: right;
+  color: var(--code-num); user-select: none; -webkit-user-select: none;
+}
+.cc { flex: 1; min-width: 0; padding-right: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.tk-kw { color: var(--tk-kw); }
+.tk-bi { color: var(--tk-bi); }
+.tk-str { color: var(--tk-str); }
+.tk-num { color: var(--tk-num); }
+.tk-com { color: var(--tk-com); font-style: italic; }
+.tk-fn { color: var(--tk-fn); font-weight: 600; }
+.code.small { font-size: 13px; margin: 0; border-radius: 8px; }
+.code.small .code-in { padding: 6px 0; }
+.code.small .cn { display: none; }
+.code.small .cc { padding-left: 10px; }
+
+.chip-blank {
+  display: inline-block; border: 1.5px dashed var(--accent); color: var(--accent-text);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-radius: 6px; padding: 0 6px; margin: 0 1px; min-width: 2.2em; text-align: center;
+  font: inherit; line-height: 1.35; cursor: pointer; white-space: pre;
+}
+.chip-blank.filled { border-style: solid; color: var(--ink); }
+.chip-blank.ok { border-color: var(--ok); background: var(--ok-bg); }
+.chip-blank.bad { border-color: var(--bad); background: var(--bad-bg); }
+
+/* options */
+.opts { display: flex; flex-direction: column; gap: 8px; margin: 6px 0 12px; }
+.opt {
+  display: grid; grid-template-columns: 30px 1fr 22px; gap: 10px; align-items: center; text-align: left;
+  border: 1.5px solid var(--line); background: var(--card); border-radius: 12px; padding: 11px 12px; min-height: 52px;
+  width: 100%; box-shadow: var(--shadow);
+}
+.opt:active { transform: scale(.99); }
+.opt-letter {
+  width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--card-2); font-weight: 700; font-size: 13.5px; color: var(--ink-2);
+}
+.opt-text { min-width: 0; overflow-wrap: anywhere; }
+.opt-text .code { margin: 0; }
+.opt-mark { font-weight: 700; text-align: center; }
+.opt.right { border-color: var(--ok); background: var(--ok-bg); }
+.opt.right .opt-letter { background: var(--ok); color: #fff; }
+.opt.right .opt-mark { color: var(--ok); }
+.opt.wrong { border-color: var(--bad); background: var(--bad-bg); }
+.opt.wrong .opt-letter { background: var(--bad); color: #fff; }
+.opt.wrong .opt-mark { color: var(--bad); }
+.opts.locked .opt { pointer-events: none; }
+.opts.locked .opt:not(.right):not(.wrong) { opacity: .6; }
+
+/* typed answers */
+.ans-block { margin: 6px 0 12px; }
+.ans-hint { font-size: 13px; color: var(--muted); margin: 0 0 8px; }
+.blank-row { display: grid; grid-template-columns: 30px 1fr; gap: 8px; align-items: center; margin-bottom: 8px; }
+.blank-no {
+  width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+  background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent-text); font-weight: 700; font-size: 14px;
+}
+input.ans-blank, textarea.ans-out {
+  width: 100%; border: 1.5px solid var(--line); background: var(--card); border-radius: 10px;
+  padding: 11px 12px; font-size: 16px; /* 16px stops iOS zooming on focus */
+  outline: none;
+}
+textarea.ans-out { min-height: 84px; resize: vertical; line-height: 1.45; }
+input.ans-blank:focus, textarea.ans-out:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
+input.ans-blank.ok, textarea.ans-out.ok { border-color: var(--ok); background: var(--ok-bg); }
+input.ans-blank.bad, textarea.ans-out.bad { border-color: var(--bad); background: var(--bad-bg); }
+.keys { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 2px; }
+.keys button {
+  min-width: 40px; height: 38px; padding: 0 9px; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--card-2); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 15px; font-weight: 600;
+}
+.keys button:active { background: var(--line); }
+
+/* feedback */
+.fb { border-radius: 12px; padding: 12px 14px; margin: 6px 0 12px; border: 1px solid; }
+.fb.ok { background: var(--ok-bg); border-color: var(--ok-line); }
+.fb.bad { background: var(--bad-bg); border-color: var(--bad-line); }
+.fb.shown { background: var(--warn-bg); border-color: var(--warn-line); }
+.fb-head { font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+.fb.ok .fb-head { color: var(--ok); }
+.fb.bad .fb-head { color: var(--bad); }
+.fb.shown .fb-head { color: var(--warn); }
+.fb-body { margin-top: 8px; font-size: 14px; }
+.fb-body .lbl { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 8px 0 4px; font-weight: 600; }
+.fb-body .lbl:first-child { margin-top: 0; }
+.fb .also { font-size: 13px; color: var(--muted); margin-top: 6px; }
+.fb .override { margin-top: 10px; border: 0; background: none; color: var(--accent-text); font-weight: 600; padding: 4px 0; text-decoration: underline; font-size: 14px; }
+.explain { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; }
+.explain h3 { margin: 0 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.explain p:last-child { margin-bottom: 0; }
+
+/* bottom action bar */
+.actionbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  -webkit-backdrop-filter: saturate(1.4) blur(10px);
+  backdrop-filter: saturate(1.4) blur(10px);
+  border-top: 1px solid var(--line);
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+}
+.actionbar-in { max-width: 720px; margin: 0 auto; display: flex; gap: 8px; }
+.actionbar .btn { flex: 1; }
+.actionbar .btn.grow { flex: 2; }
+
+/* sync */
+.sync-note { font-size: 13.5px; color: var(--muted); margin: 0 0 10px; }
+.sync-note b { color: var(--ink-2); }
+.sync-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
+.sync-btns .btn { flex: 1 1 40%; min-height: 44px; font-size: 14.5px; }
+.sync-btns .btn.primary { flex-basis: 100%; }
+.modal-back {
+  position: fixed; inset: 0; z-index: 60; background: rgba(0,0,0,.45);
+  display: flex; align-items: flex-end; justify-content: center;
+  padding: 16px 12px calc(12px + env(safe-area-inset-bottom));
+}
+.modal {
+  width: 100%; max-width: 560px; background: var(--card); color: var(--ink);
+  border-radius: 16px; padding: 16px; box-shadow: 0 10px 40px rgba(0,0,0,.3);
+}
+.modal h3 { margin: 0 0 6px; font-size: 18px; }
+.sync-text {
+  width: 100%; min-height: 120px; border: 1.5px solid var(--line); background: var(--card-2);
+  border-radius: 10px; padding: 10px; font: 13px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  word-break: break-all; resize: vertical;
+}
+textarea.sync-text:not([readonly]) { font-size: 16px; }
+.sync-err { color: var(--bad); font-size: 13.5px; margin: 8px 0 0; }
+.modal-btns { display: flex; gap: 8px; margin-top: 12px; }
+.modal-btns .btn { flex: 1; }
+@media (min-width: 600px) { .modal-back { align-items: center; } }
+
+.toast {
+  position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom)); transform: translateX(-50%);
+  background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 10px; font-size: 14px; z-index: 50;
+  max-width: calc(100% - 32px); box-shadow: 0 6px 20px rgba(0,0,0,.2);
+}
+
+@media (min-width: 560px) {
+  .qtitle { font-size: 22px; }
+  .code { font-size: 14px; }
+}
+@media (max-width: 360px) {
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .code { font-size: 12.5px; }
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/* ===== questions/registry.js ===== */
+/* Tutorial & assignment practice — question registry.
+
+   Each question file calls tutorial([...]) once. The shape is the same as the
+   lecture bank in practice/questions/: id, src, topic, d, type, t, q, code,
+   q2, exp, plus opts/ans for MCQ or blanks/test for fill-in. `src` names the
+   worksheet the question was converted from (T8 … T12, A4 … A6).
+
+   dedent() strips the common indentation from code and test strings so the
+   stored Python starts at column 0. */
+(function () {
+  function dedent(s) {
+    if (typeof s !== 'string') return s;
+    s = s.replace(/^\n/, '').replace(/\s+$/, '');
+    var lines = s.split('\n');
+    var min = Infinity;
+    lines.forEach(function (l) {
+      if (!l.trim()) return;
+      var m = l.match(/^ */)[0].length;
+      if (m < min) min = m;
+    });
+    if (!isFinite(min) || min === 0) return s;
+    return lines.map(function (l) { return l.slice(min); }).join('\n');
+  }
+  window.PRACTICE_QUESTIONS = window.PRACTICE_QUESTIONS || [];
+  window.tutorial = function (list) {
+    list.forEach(function (q) {
+      q.code = dedent(q.code);
+      if (q.verify) q.verify = dedent(q.verify);
+      if (q.test) q.test = dedent(q.test);
+      if (q.optCode && q.opts) q.opts = q.opts.map(dedent);
+      window.PRACTICE_QUESTIONS.push(q);
+    });
+  };
+})();
+</script>
+<script>
+/* ===== questions/t08.js ===== */
+/* Tutorial 8 — List processing
+   Converted from AY26/27S1 Week 8 Tutorial Worksheet, Q1 and Q2. */
+tutorial([
+  {
+    id: 'T8-01', src: 'T8', topic: 'list_filter', d: 1, type: 'fib',
+    t: 'list_filter with a loop',
+    q: 'Complete `list_filter(func, lst)` using a `for` loop and `.append()`. Do not use list slicing or concatenation.',
+    code: `
+      def list_filter(func, lst):
+          result = []
+          for elem in lst:
+              if {{1}}:
+                  {{2}}
+          return result`,
+    blanks: [['func(elem)'], ['result.append(elem)']],
+    test: `
+      assert list_filter(lambda x: x > 2, [2, 4, 3, 1, 2, 5]) == [4, 3, 5]
+      assert list_filter(lambda x: x < 0, [2, 4, 3, 1, 2, 5]) == []
+      assert list_filter(lambda x: True, []) == []`,
+    exp: 'Test the predicate on the **element**, not on the list. Only a True result is appended, and appending to `result` builds the new list without touching `lst`.'
+  },
+  {
+    id: 'T8-02', src: 'T8', topic: 'list_filter', d: 2, type: 'fib',
+    t: 'list_filter by recursion',
+    q: 'Complete the recursive `list_filter`. No loops and no list methods — use slicing and concatenation.',
+    code: `
+      def list_filter(func, lst):
+          if {{1}}:
+              return {{2}}
+          elif {{3}}:
+              return {{4}}
+          else:
+              return {{5}}`,
+    blanks: [['not lst'], ['[]'], ['func(lst[0])'], ['[lst[0]] + list_filter(func, lst[1:])'], ['list_filter(func, lst[1:])']],
+    test: `
+      assert list_filter(lambda x: x > 2, [2, 4, 3, 1, 2, 5]) == [4, 3, 5]
+      assert list_filter(lambda x: x < 0, [4]) == []
+      assert list_filter(lambda x: True, []) == []`,
+    exp: 'Base case: an empty list filters to `[]`. Otherwise look at the head: keep it (wrapping it in `[ ]` so it can be concatenated) and recurse on the tail, or drop it and recurse on the tail.'
+  },
+  {
+    id: 'T8-03', src: 'T8', topic: 'Tracing recursion', d: 2, type: 'mcq',
+    t: 'Trace list_filter',
+    q: 'Using the recursive `list_filter`, what does this call return?',
+    code: `
+      fun = lambda x: x > 2
+      print(list_filter(fun, [2, 4, 1, 5]))`,
+    opts: ['[4, 5]', '[2, 4, 5]', '[4]', '[]'],
+    ans: 0,
+    exp: '`2` fails the test, `4` passes, `1` fails and `5` passes. The kept elements come back in their original order, so the result is `[4, 5]`.'
+  },
+  {
+    id: 'T8-04', src: 'T8', topic: 'deep_filter', d: 3, type: 'fib',
+    t: 'deep_filter by recursion',
+    q: 'Complete the recursive `deep_filter(func, lst)`. It keeps the nesting of the input but keeps only numbers satisfying `func`. No loops and no list methods.',
+    code: `
+      def deep_filter(func, lst):
+          if {{1}}:
+              return {{2}}
+          elif {{3}}:
+              if {{4}}:
+                  return {{5}}
+              else:
+                  return {{6}}
+          else:
+              return {{7}}`,
+    blanks: [['not lst'], ['[]'], ['type(lst[0]) != list'], ['func(lst[0])'], ['[lst[0]] + deep_filter(func, lst[1:])'], ['deep_filter(func, lst[1:])'], ['[deep_filter(func, lst[0])] + deep_filter(func, lst[1:])']],
+    test: `
+      assert deep_filter(lambda x: x > 2, [2, [4, 3], [1, 2], 5]) == [[4, 3], [], 5]
+      assert deep_filter(lambda x: x < 0, [[2, [4, 3, [1, 2]], 5]]) == [[[[]]]]
+      assert deep_filter(lambda x: True, []) == []`,
+    exp: 'Three cases: empty list, a number (test it and either keep or drop it), and a sublist (filter it recursively but **wrap the result in a list** so the structure survives). An empty sublist therefore stays as `[]`.'
+  },
+  {
+    id: 'T8-05', src: 'T8', topic: 'Tracing recursion', d: 2, type: 'mcq',
+    t: 'Trace deep_filter',
+    q: 'What does this call return?',
+    code: `
+      fun = lambda x: x > 2
+      print(deep_filter(fun, [2, [4, 1], 5]))`,
+    opts: ['[[4], 5]', '[4, 5]', '[[4], [5]]', '[[4, 5]]'],
+    ans: 0,
+    exp: '`2` is dropped, the sublist becomes `[4]`, and `5` is kept at the top level. The result keeps the sublist as a list: `[[4], 5]`.'
+  },
+  {
+    id: 'T8-06', src: 'T8', topic: 'deep_filter', d: 2, type: 'fib',
+    t: 'deep_filter with a loop',
+    q: 'Complete the iterative `deep_filter` using `.append()` only — no slicing and no concatenation.',
+    code: `
+      def deep_filter(func, lst):
+          result = []
+          for elem in lst:
+              if {{1}}:
+                  if {{2}}:
+                      {{3}}
+              else:
+                  {{4}}
+          return result`,
+    blanks: [['type(elem) != list'], ['func(elem)'], ['result.append(elem)'], ['result.append(deep_filter(func, elem))']],
+    test: `
+      assert deep_filter(lambda x: x > 2, [2, [4, 3], [1, 2], 5]) == [[4, 3], [], 5]
+      assert deep_filter(lambda x: x < 0, [[2, [4, 3, [1, 2]], 5]]) == [[[[]]]]`,
+    exp: 'A number is appended only if it passes the test. A sublist is filtered by a recursive call and the **whole resulting list** is appended, which is what keeps the nesting.'
+  },
+  {
+    id: 'T8-07', src: 'T8', topic: 'Nested lists', d: 2, type: 'mcq',
+    t: 'Filtering a deeply nested list',
+    q: 'What is the result of this call from the worksheet?',
+    code: `
+      print(deep_filter(lambda x: x < 0, [[2, [4, 3, [1, 2]], 5]]))`,
+    opts: ['[[[[]]]]', '[[]]', '[[[]]]', '[]'],
+    ans: 0,
+    exp: 'No number passes, but every list layer still has to be rebuilt. The outer list holds one sublist, which holds one sublist, which holds the empty result: `[[[[]]]]`.'
+  },
+  {
+    id: 'T8-08', src: 'T8', topic: 'Base cases', d: 2, type: 'mcq',
+    t: 'A missing base case',
+    q: 'The base case is removed from the recursive `list_filter`. What happens when this runs?',
+    code: `
+      def list_filter(func, lst):
+          if func(lst[0]):
+              return [lst[0]] + list_filter(func, lst[1:])
+          else:
+              return list_filter(func, lst[1:])
+
+      print(list_filter(lambda x: x > 2, [4]))`,
+    opts: ['IndexError', 'RecursionError', 'It prints [4]', 'It prints []'],
+    ans: 0,
+    exp: '`[4]` passes, so the call recurses on `[]`. There the test `func(lst[0])` reads index 0 of an empty list, which raises `IndexError` before any recursion limit is reached.'
+  }
+]);
+</script>
+<script>
+/* ===== questions/t09.js ===== */
+/* Tutorial 9 — Dictionaries
+   Converted from AY26/27S1 Week 9 Tutorial Worksheet, Q1–Q3. */
+tutorial([
+  {
+    id: 'T9-01', src: 'T9', topic: 'Creating dicts', d: 1, type: 'mcq',
+    t: 'dict() from a sequence of pairs',
+    q: 'What is printed?',
+    code: `
+      a = (("A", 2), ("B", 3), (1, 4))
+      dict_a = dict(a)
+      print(dict_a)`,
+    opts: ["{'A': 2, 'B': 3, 1: 4}", "{'A': 2, 'B': 3, 1: '4'}", "{(('A', 2)): 1, (('B', 3)): 1}", 'TypeError'],
+    ans: 0,
+    exp: '`dict()` accepts a sequence of pairs: the first item of each pair becomes the key and the second becomes the value, kept in insertion order.'
+  },
+  {
+    id: 'T9-02', src: 'T9', topic: 'Lookup', d: 1, type: 'mcq',
+    t: 'Looking up a value as a key',
+    q: '`dict_a` is `{1: 2}` after the next three lines. What does the last line print?',
+    code: `
+      a = (("A", 2), ("B", 3), (1, 4))
+      dict_a = dict(a)
+      print(dict_a[2])`,
+    opts: ['KeyError', '4', "'B'", 'None'],
+    ans: 0,
+    exp: 'The keys are `\'A\'`, `\'B\'` and `1`. The value `2` is not a key, so square-bracket lookup raises `KeyError` rather than searching the values.'
+  },
+  {
+    id: 'T9-03', src: 'T9', topic: 'Copying', d: 2, type: 'mcq',
+    t: 'Shallow copy of a nested dict',
+    q: 'What does the final `print(dict_c)` output?',
+    code: `
+      dict_c = {1: {2: 3}, 4: 5}
+      dict_d = dict_c.copy()
+      dict_d[4] = 9
+      dict_d[1][2] = 9
+      print(dict_c)`,
+    opts: ['{1: {2: 9}, 4: 5}', '{1: {2: 9}, 4: 9}', '{1: {2: 3}, 4: 9}', '{1: {2: 3}, 4: 5}'],
+    ans: 0,
+    exp: '`copy()` is shallow: both dictionaries share the same inner dictionary. Changing `dict_d[1][2]` is visible through `dict_c`, but replacing the top-level value `dict_d[4]` is not.'
+  },
+  {
+    id: 'T9-04', src: 'T9', topic: 'Deleting', d: 1, type: 'mcq',
+    t: 'Deleting with the wrong key',
+    q: 'What is printed?',
+    code: `
+      b = [[1, "A"], [(2, 3), 4]]
+      dict_b = dict(b)
+      del dict_b[2]
+      print(dict_b)`,
+    opts: ['KeyError', "{1: 'A'}", "{1: 'A', (2, 3): 4}", "{(2, 3): 4}"],
+    ans: 0,
+    exp: 'The keys are `1` and the tuple `(2, 3)`. There is no key `2`, so `del` raises `KeyError` and the dictionary is left untouched.'
+  },
+  {
+    id: 'T9-05', src: 'T9', topic: 'Anagram', d: 2, type: 'fib',
+    t: 'is_anagram with dictionaries',
+    q: 'Complete `is_anagram(word1, word2)`. Ignore spaces and assume lowercase letters. Two words are anagrams exactly when their letter counts match.',
+    code: `
+      def is_anagram(word1, word2):
+          def char_counts(word):
+              dic = {}
+              for char in word:
+                  if char != " ":
+                      if char in dic:
+                          {{1}}
+                      else:
+                          {{2}}
+              return dic
+
+          return {{3}}`,
+    blanks: [['dic[char] += 1', 'dic[char] = dic[char] + 1'], ['dic[char] = 1'], ['char_counts(word1) == char_counts(word2)']],
+    test: `
+      assert is_anagram("nag a ram", "anagram") is True
+      assert is_anagram("nag ram", "anagram") is False
+      assert is_anagram("toyota", "atoyot") is True
+      assert is_anagram("toyota", "yototo") is False
+      assert is_anagram("", "") is True`,
+    exp: 'Build a frequency dictionary for each word, skipping spaces, then compare the dictionaries. Equal dictionaries mean every letter occurs the same number of times.'
+  },
+  {
+    id: 'T9-06', src: 'T9', topic: 'T9 keypad', d: 2, type: 'fib',
+    t: 'to_dict: keypad list to dictionary',
+    q: 'Complete `to_dict(keyL)`. `keyL` is a list where index `i` holds the characters on key `i`, e.g. `[" ", "", "abc", ..., "wxyz"]`.',
+    code: `
+      def to_dict(keyL):
+          keyD = {}
+          for i in range(len(keyL)):
+              for char in {{1}}:
+                  {{2}}
+          return keyD`,
+    blanks: [['keyL[i]'], ['keyD[char] = i']],
+    test: `
+      keyL = [" ", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"]
+      keyD = to_dict(keyL)
+      assert keyD[" "] == 0
+      assert keyD["a"] == 2 and keyD["c"] == 2
+      assert keyD["s"] == 7 and keyD["z"] == 9
+      assert len(keyD) == 27`,
+    exp: 'The list index is the digit. Walking each key string and storing `char → i` inverts the representation; the empty string on key 1 simply adds nothing.'
+  },
+  {
+    id: 'T9-07', src: 'T9', topic: 'T9 keypad', d: 3, type: 'fib',
+    t: 'to_list: keypad dictionary to list',
+    q: 'Complete `to_list(keyD)`. The result must be the list representation, built by appending each character to the entry for its digit.',
+    code: `
+      def to_list(keyD):
+          keyL = [""] * ({{1}})
+          for k, v in keyD.items():
+              {{2}}
+          return keyL`,
+    blanks: [['max(keyD.values()) + 1'], ['keyL[v] += k', 'keyL[v] = keyL[v] + k']],
+    test: `
+      keyD = {" ": 0, "a": 2, "b": 2, "c": 2, "d": 3, "e": 3, "f": 3,
+              "g": 4, "h": 4, "i": 4, "j": 5, "k": 5, "l": 5,
+              "m": 6, "n": 6, "o": 6, "p": 7, "q": 7, "r": 7, "s": 7,
+              "t": 8, "u": 8, "v": 8, "w": 9, "x": 9, "y": 9, "z": 9}
+      keyL = to_list(keyD)
+      assert keyL == [" ", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"]`,
+    exp: 'The largest digit tells you how many slots are needed, so make `max(values) + 1` empty strings. Each character is then appended to the slot named by its digit; the dictionary order in the example adds the letters alphabetically.'
+  },
+  {
+    id: 'T9-08', src: 'T9', topic: 'T9 keypad', d: 2, type: 'fib',
+    t: 'to_nums: typing a word',
+    q: 'Complete `to_nums(word)`, which turns a string into the integer formed by the digits of its letters. `keyD` is already defined.',
+    code: `
+      def to_nums(word):
+          num = 0
+          for char in word:
+              num = {{1}}
+          return num`,
+    blanks: [['num * 10 + keyD[char]']],
+    test: `
+      keyD = {" ": 0, "a": 2, "b": 2, "c": 2, "d": 3, "e": 3, "f": 3,
+              "g": 4, "h": 4, "i": 4, "j": 5, "k": 5, "l": 5,
+              "m": 6, "n": 6, "o": 6, "p": 7, "q": 7, "r": 7, "s": 7,
+              "t": 8, "u": 8, "v": 8, "w": 9, "x": 9, "y": 9, "z": 9}
+      assert to_nums("i luv u") == 4058808
+      assert to_nums("toyota beats anagram") == 86968202328702624726`,
+    exp: 'Shift the digits already collected one place left with `num * 10`, then add the digit of the current character. That is the same left-to-right build used to turn digits into an integer by hand.'
+  },
+  {
+    id: 'T9-09', src: 'T9', topic: 'Iteration', d: 2, type: 'mcq',
+    t: 'Items in insertion order',
+    q: 'What is printed?',
+    code: `
+      b = [[1, "A"], [(2, 3), 4]]
+      dict_b = dict(b)
+      for k, v in dict_b.items():
+          print(k, v)`,
+    opts: ['1 A then (2, 3) 4', '(2, 3) 4 then 1 A', 'A 1 then 4 (2, 3)', 'TypeError'],
+    ans: 0,
+    exp: '`items()` yields `(key, value)` pairs in insertion order. Unpacking each pair into `k, v` prints `1 A` first, then `(2, 3) 4`.'
+  },
+  {
+    id: 'T9-10', src: 'T9', topic: 'Keys', d: 1, type: 'mcq',
+    t: 'A list as a dictionary key',
+    q: 'What happens?',
+    code: `
+      d = {[1, 2]: 'a'}`,
+    opts: ['TypeError', "d becomes {[1, 2]: 'a'}", 'KeyError', "d becomes {(1, 2): 'a'}"],
+    ans: 0,
+    exp: 'Dictionary keys must be immutable (hashable). A list is mutable, so building the dictionary raises `TypeError: unhashable type: \'list\'`. A tuple key would be fine.'
+  },
+  {
+    id: 'T9-11', src: 'T9', topic: 'Nested data', d: 1, type: 'mcq',
+    t: 'Mutating a list stored in a dict',
+    q: 'What is printed?',
+    code: `
+      d = {1: [2, 3]}
+      d[1][0] = 9
+      print(d)`,
+    opts: ['{1: [9, 3]}', "{1: [2, 3]}", 'TypeError', "{9: [2, 3]}"],
+    ans: 0,
+    exp: 'The **key** must be immutable, but the value does not have to be. `d[1]` fetches the list and `[0] = 9` changes its first element.'
+  }
+]);
+</script>
+<script>
+/* ===== questions/t10.js ===== */
+/* Tutorial 10 — Multi-dimensional arrays
+   Converted from AY26/27S1 Week 10 Tutorial Worksheet, Q1–Q4. */
+tutorial([
+  {
+    id: 'T10-01', src: 'T10', topic: 'Transpose', d: 2, type: 'fib',
+    t: 'transpose with nested loops',
+    q: 'Complete `transpose(M)` using nested loops. Do not use a list comprehension inside the loop body.',
+    code: `
+      def transpose(M):
+          Mrows = len(M)
+          Mcols = len(M[0])
+          T = [[0] * Mrows for r in range(Mcols)]
+          for mrow in range(Mrows):
+              for mcol in range(Mcols):
+                  {{1}}
+          return T`,
+    blanks: [['T[mcol][mrow] = M[mrow][mcol]']],
+    test: `
+      assert transpose([[1, 2, 3], [4, 5, 6]]) == [[1, 4], [2, 5], [3, 6]]
+      assert transpose([[1]]) == [[1]]
+      assert transpose([[1, 2], [3, 4], [5, 6]]) == [[1, 3, 5], [2, 4, 6]]`,
+    exp: 'Row `mrow` of `M` becomes column `mrow` of `T`. The destination row is the old column and the destination column is the old row, hence `T[mcol][mrow] = M[mrow][mcol]`.'
+  },
+  {
+    id: 'T10-02', src: 'T10', topic: 'Transpose', d: 3, type: 'fib',
+    t: 'transpose as a comprehension',
+    q: 'Complete `transpose(M)` so that `T` is built in one nested list comprehension.',
+    code: `
+      def transpose(M):
+          Mrows = len(M)
+          Mcols = len(M[0])
+          T = {{1}}
+          return T`,
+    blanks: [['[[M[tcol][trow] for tcol in range(Mrows)] for trow in range(Mcols)]']],
+    test: `
+      assert transpose([[1, 2, 3], [4, 5, 6]]) == [[1, 4], [2, 5], [3, 6]]
+      assert transpose([[1]]) == [[1]]`,
+    exp: 'The outer loop runs over the **columns** of `M`, because each of them becomes a row of `T`. The inner loop walks down that column of `M`.'
+  },
+  {
+    id: 'T10-03', src: 'T10', topic: 'Matrix multiplication', d: 3, type: 'fib',
+    t: 'mat_mult with comprehensions',
+    q: 'Complete `M = A × B` using list comprehensions and `sum`. Assume the shapes are compatible.',
+    code: `
+      def mat_mult(A, B):
+          Arows = len(A)
+          Acols = len(A[0])
+          Bcols = len(B[0])
+          M = {{1}}
+          return M`,
+    blanks: [['[[sum([A[mrow][k] * B[k][mcol] for k in range(Acols)]) for mcol in range(Bcols)] for mrow in range(Arows)]']],
+    test: `
+      A = [[1, 2, 3], [4, 5, 6]]
+      B = [[1, 4], [2, 5], [3, 6]]
+      assert mat_mult(A, B) == [[14, 32], [32, 77]]`,
+    exp: 'Entry `(mrow, mcol)` is the dot product of row `mrow` of `A` with column `mcol` of `B`. The inner comprehension builds that sum, the middle one fills a row, and the outer one fills the matrix.'
+  },
+  {
+    id: 'T10-04', src: 'T10', topic: 'Slicing matrices', d: 2, type: 'fib',
+    t: 'minor_mat',
+    q: 'Complete `minor_mat(M, r, c)`, which removes row `r` and column `c`. Use list slicing, concatenation and `.append()`.',
+    code: `
+      def minor_mat(M, r, c):
+          S = []
+          for row in {{1}}:
+              S.append({{2}})
+          return S`,
+    blanks: [['M[:r] + M[r + 1:]'], ['row[:c] + row[c + 1:]']],
+    test: `
+      M = [[0, 1, 2, 3, 4, 5],
+           [6, 7, 8, 9, 10, 11],
+           [12, 13, 14, 15, 16, 17],
+           [18, 19, 20, 21, 22, 23]]
+      assert minor_mat(M, 2, 1) == [[0, 2, 3, 4, 5], [6, 8, 9, 10, 11], [18, 20, 21, 22, 23]]
+      assert minor_mat([[1, 2], [3, 4]], 0, 1) == [[3]]`,
+    exp: 'Skip row `r` by concatenating the rows above it with the rows below it. Inside every surviving row, skip column `c` the same way with slices.'
+  },
+  {
+    id: 'T10-05', src: 'T10', topic: 'Submatrices', d: 3, type: 'fib',
+    t: 'submat_sums',
+    q: 'Complete `submat_sums(M, srows, scols)`. Each result cell is the sum of one non-overlapping `srows × scols` block.',
+    code: `
+      def submat_sums(M, srows, scols):
+          Mrows = len(M)
+          Mcols = len(M[0])
+          Trows = Mrows // srows
+          Tcols = Mcols // scols
+          T = [[0] * Tcols for r in range(Trows)]
+          for mrow in range(Mrows):
+              for mcol in range(Mcols):
+                  {{1}}
+          return T`,
+    blanks: [['T[mrow // srows][mcol // scols] += M[mrow][mcol]']],
+    test: `
+      M = [[0, 1, 2, 3, 4, 5],
+           [6, 7, 8, 9, 10, 11],
+           [12, 13, 14, 15, 16, 17],
+           [18, 19, 20, 21, 22, 23]]
+      assert submat_sums(M, 2, 3) == [[24, 42], [96, 114]]`,
+    exp: 'Integer division maps a source cell to its block: rows `0–1` go to result row 0 and rows `2–3` to row 1, with columns behaving the same way. Every source cell is added to exactly one result cell.'
+  },
+  {
+    id: 'T10-06', src: 'T10', topic: 'Aliasing', d: 2, type: 'mcq',
+    t: 'Repeating a row with *',
+    q: 'What is printed?',
+    code: `
+      T = [[0] * 2] * 2
+      T[0][0] = 1
+      print(T)`,
+    opts: ['[[1, 0], [1, 0]]', '[[1, 0], [0, 0]]', '[[0, 0], [1, 0]]', 'TypeError'],
+    ans: 0,
+    exp: '`[[0] * 2] * 2` repeats the **same** inner list twice, so both rows are one object. Changing `T[0][0]` is visible through `T[1]` too. Build rows with a comprehension to get independent lists.'
+  },
+  {
+    id: 'T10-07', src: 'T10', topic: 'Dimensions', d: 1, type: 'mcq',
+    t: 'Rows and columns',
+    q: 'What is printed?',
+    code: `
+      M = [[1, 2], [3, 4], [5, 6]]
+      print(len(M), len(M[0]))`,
+    opts: ['3 2', '2 3', '3 3', '6 2'],
+    ans: 0,
+    exp: '`len(M)` counts the rows (3) and `len(M[0])` counts the columns in the first row (2). The matrix is 3 × 2.'
+  },
+  {
+    id: 'T10-08', src: 'T10', topic: 'Slicing matrices', d: 1, type: 'mcq',
+    t: 'A small minor matrix',
+    q: 'What is returned?',
+    code: `
+      print(minor_mat([[1, 2], [3, 4]], 0, 1))`,
+    opts: ['[[3]]', '[[4]]', '[[1]]', '[[2]]'],
+    ans: 0,
+    exp: 'Removing row 0 (the `[1, 2]` row) leaves `[3, 4]`, and removing column 1 from it leaves `[3]`. The result is a 1 × 1 matrix, `[[3]]`.'
+  },
+  {
+    id: 'T10-09', src: 'T10', topic: 'Transpose', d: 1, type: 'mcq',
+    t: 'Shape after transposing',
+    q: 'A matrix `M` has 2 rows and 3 columns. What shape is `transpose(M)`?',
+    opts: ['3 rows and 2 columns', '2 rows and 3 columns', '3 rows and 3 columns', '2 rows and 2 columns'],
+    ans: 0,
+    exp: 'Transposing swaps rows and columns, so an `R × C` matrix becomes `C × R`. Here 2 × 3 becomes 3 × 2.'
+  }
+]);
+</script>
+<script>
+/* ===== questions/t11.js ===== */
+/* Tutorial 11 — Searching and sorting
+   Converted from AY26/27S1 Week 11 Tutorial Worksheet, Q1–Q3. */
+tutorial([
+  {
+    id: 'T11-01', src: 'T11', topic: 'Bubble sort', d: 2, type: 'fib',
+    t: 'bubble: one pass',
+    q: 'Complete `bubble(L)`: one left-to-right pass that swaps adjacent out-of-order pairs. It must return a new list and leave `L` alone.',
+    code: `
+      def bubble(L):
+          n = len(L)
+          T = L.copy()
+          for i in range(1, n):
+              if {{1}}:
+                  {{2}}
+          return T`,
+    blanks: [['T[i - 1] > T[i]'], ['T[i - 1], T[i] = T[i], T[i - 1]']],
+    test: `
+      L0 = [9, 8, 7, 6, 5, 4, 3, 2, 1]
+      assert bubble(L0) == [8, 7, 6, 5, 4, 3, 2, 1, 9]
+      assert L0 == [9, 8, 7, 6, 5, 4, 3, 2, 1]
+      assert bubble([4, 5, 6, 7, 1, 2, 3, 9, 8]) == [4, 5, 6, 1, 2, 3, 7, 8, 9]`,
+    exp: 'Compare each pair and swap when the left one is larger. Working on the copy `T` leaves the input unchanged, and the largest element ends up at the back after one pass.'
+  },
+  {
+    id: 'T11-02', src: 'T11', topic: 'Bubble sort', d: 2, type: 'fib',
+    t: 'bubble_sort: repeat the pass',
+    q: 'Complete `bubble_sort(L)`, which calls `bubble` repeatedly. Assume `bubble` is already defined.',
+    code: `
+      def bubble_sort(L):
+          n = len(L)
+          S = L.copy()
+          for i in range(n):
+              {{1}}
+          return S`,
+    blanks: [['S = bubble(S)']],
+    test: `
+      def bubble(L):
+          n = len(L)
+          T = L.copy()
+          for i in range(1, n):
+              if T[i - 1] > T[i]:
+                  T[i - 1], T[i] = T[i], T[i - 1]
+          return T
+      L = [9, 8, 7, 6, 5, 4, 3, 2, 1]
+      assert bubble_sort(L) == [1, 2, 3, 4, 5, 6, 7, 8, 9]
+      assert L == [9, 8, 7, 6, 5, 4, 3, 2, 1]
+      assert bubble_sort([4, 5, 6, 7, 1, 2, 3, 9, 8]) == [1, 2, 3, 4, 5, 6, 7, 8, 9]`,
+    exp: 'One call to `bubble` fixes only the largest remaining element, so at most `n` passes are needed. The result of each pass becomes the input of the next.'
+  },
+  {
+    id: 'T11-03', src: 'T11', topic: 'Bubble sort', d: 2, type: 'mcq',
+    t: 'One pass over a mixed list',
+    q: 'What does `bubble` return for this list?',
+    code: `
+      print(bubble([4, 5, 6, 7, 1, 2, 3, 9, 8]))`,
+    opts: ['[4, 5, 6, 1, 2, 3, 7, 8, 9]', '[1, 2, 3, 4, 5, 6, 7, 8, 9]', '[4, 5, 1, 2, 3, 6, 7, 8, 9]', '[4, 5, 6, 7, 1, 2, 3, 8, 9]'],
+    ans: 0,
+    exp: 'Each pass only moves an element one place left, so 1, 2 and 3 shift one step towards the front and 9 bubbles to the end: `[4, 5, 6, 1, 2, 3, 7, 8, 9]`.'
+  },
+  {
+    id: 'T11-04', src: 'T11', topic: 'Sorting with a key', d: 3, type: 'fib',
+    t: 'second_largest arrangement',
+    q: 'Complete `second_largest(digits_str)`. Sort the digits descending, then swap the rightmost pair that can be swapped to make a smaller number. Return the digits as a string, or `"no answer"` if no smaller arrangement exists.',
+    code: `
+      def second_largest(digits_str):
+          L = list(digits_str)
+          L.sort(reverse=True)
+          i = len(L) - 1
+          found = False
+          while i > 0 and not found:
+              if {{1}}:
+                  {{2}}
+                  found = True
+              i = i - 1
+          if found:
+              return {{3}}
+          else:
+              return {{4}}`,
+    blanks: [['L[i - 1] > L[i]'], ['L[i - 1], L[i] = L[i], L[i - 1]'], ["''.join(L)"], ["'no answer'"]],
+    test: `
+      assert second_largest("123") == '312'
+      assert second_largest("111222333") == '333221211'
+      assert second_largest("254170017642136") == '776654432211010'
+      assert second_largest("50000") == '05000'
+      assert second_largest("5") == 'no answer'
+      assert second_largest("222222222222") == 'no answer'`,
+    exp: 'The descending sort gives the largest arrangement. To get the next one down, find the least significant digit that has a larger digit to its left and swap that adjacent pair. If every digit is already in order, no second arrangement exists.'
+  },
+  {
+    id: 'T11-05', src: 'T11', topic: 'Binary search', d: 3, type: 'fib',
+    t: 'count_even in O(log n)',
+    q: 'The list has all even numbers before all odd numbers. Complete the binary search in `count_even(L)`; there is at least one of each parity.',
+    code: `
+      def count_even(L):
+          low = 0
+          high = len(L) - 2
+          while low <= high:
+              mid = (low + high) // 2
+              if {{1}}:
+                  return {{2}}
+              elif {{3}}:
+                  high = mid - 1
+              else:
+                  low = mid + 1
+          return 0`,
+    blanks: [['L[mid] % 2 == 0 and L[mid + 1] % 2 == 1'], ['mid + 1'], ['L[mid] % 2 == 1']],
+    test: `
+      assert count_even([8, 6, 2, 8, 16, 4, 4, 3, 7, 7, 1, 13]) == 7
+      assert count_even([8, 3]) == 1
+      assert count_even([2, 4, 6, 1]) == 3
+      assert count_even([0, 1]) == 1`,
+    exp: 'Look for the boundary where an even element is immediately followed by an odd one. If `L[mid]` is odd the boundary is to the left; if it is even the boundary is to the right. The index of the first odd element is exactly the number of evens.'
+  },
+  {
+    id: 'T11-06', src: 'T11', topic: 'Built-in sorting', d: 1, type: 'mcq',
+    t: 'sort() versus sorted()',
+    q: 'Which statement is correct?',
+    opts: ['`sorted(L)` returns a new list and leaves `L` unchanged; `L.sort()` sorts `L` in place',
+           'Both leave `L` unchanged',
+           '`L.sort()` returns a new list; `sorted(L)` sorts in place',
+           'Both sort in place and return the same list'],
+    ans: 0,
+    exp: '`L.sort()` mutates the list and returns `None`. `sorted(L)` builds a new sorted list and leaves the original alone. Both accept `reverse=True`.'
+  },
+  {
+    id: 'T11-07', src: 'T11', topic: 'Sorting with a key', d: 2, type: 'mcq',
+    t: 'Second largest of "50000"',
+    q: 'What does `second_largest("50000")` return?',
+    opts: ["'05000'", "'00005'", "'50000'", "'no answer'"],
+    ans: 0,
+    exp: 'The largest arrangement is `50000`. The only smaller arrangement swaps the 5 with a 0, giving `05000`. Leading zeros are allowed, so this is the answer.'
+  },
+  {
+    id: 'T11-08', src: 'T11', topic: 'Complexity', d: 2, type: 'mcq',
+    t: 'Why count_even is fast',
+    q: '`count_even` halves the search range each time. For a list of n numbers, how many comparisons does it need in the worst case?',
+    opts: ['About log₂ n', 'About n', 'About n²', 'About n log n'],
+    ans: 0,
+    exp: 'Each step discards half of the remaining positions, so the number of steps grows like log₂ n. A linear scan would need up to n checks.'
+  }
+]);
+</script>
+<script>
+/* ===== questions/t12.js ===== */
+/* Tutorial 12 — Object-Oriented Programming
+   Converted from AY26/27S1 Week 12 Tutorial Worksheet (BankAccount tasks). */
+tutorial([
+  {
+    id: 'T12-01', src: 'T12', topic: 'Methods', d: 1, type: 'fib',
+    t: 'Adding deposit()',
+    q: 'Complete `deposit()` so that money is added to the account balance.',
+    code: `
+      class BankAccount:
+          def __init__(self, name, balance):
+              self.name = name
+              self.balance = balance
+
+          def withdraw(self, amount):
+              if self.balance < amount:
+                  print(f"Insufficient fund for withdrawal of \${amount}.")
+                  return 0
+              else:
+                  self.balance -= amount
+                  return amount
+
+          def deposit(self, amount):
+              {{1}}
+
+          def show_balance(self):
+              print(f"Account balance is \${self.balance}.")`,
+    blanks: [['self.balance += amount', 'self.balance = self.balance + amount']],
+    test: `
+      a = BankAccount("Alice", 100)
+      a.deposit(50)
+      a.deposit(200)
+      assert a.balance == 350
+      assert a.withdraw(350) == 350
+      assert a.balance == 0`,
+    exp: 'The method needs the object it was called on, so it must take `self` and update `self.balance`. Nothing is returned; the sample run only checks the balance through `show_balance()`.'
+  },
+  {
+    id: 'T12-02', src: 'T12', topic: 'Methods', d: 2, type: 'fib',
+    t: 'Withdrawal security check',
+    q: 'Complete the check and the successful branch of `withdraw(name, amount)`. A wrong name must print the message and return without changing the balance.',
+    code: `
+      class BankAccount:
+          def __init__(self, name, balance):
+              self.name = name
+              self.balance = balance
+
+          def withdraw(self, name, amount):
+              if {{1}}:
+                  print("You are not authorized for this account.")
+                  return
+              if self.balance < amount:
+                  print(f"Insufficient fund for withdrawal of \${amount}.")
+                  return 0
+              else:
+                  {{2}}
+                  return amount
+
+          def deposit(self, amount):
+              self.balance += amount`,
+    blanks: [['name != self.name'], ['self.balance -= amount', 'self.balance = self.balance - amount']],
+    test: `
+      a = BankAccount("Alice", 100)
+      assert a.withdraw("John", 30) is None
+      assert a.balance == 100
+      assert a.withdraw("Alice", 30) == 30
+      assert a.balance == 70
+      assert a.withdraw("Alice", 100) == 0
+      assert a.balance == 70`,
+    exp: 'The account holder is stored in `self.name`; compare the supplied name with it before touching the balance. The authorised branch subtracts the amount and returns it, while the insufficient-funds branch returns 0.'
+  },
+  {
+    id: 'T12-03', src: 'T12', topic: 'Attributes', d: 1, type: 'fib',
+    t: 'Year-end interest',
+    q: 'The constructor now stores the annual rate in `self.rate`. Complete `year_end_processing()` so the balance grows by that rate.',
+    code: `
+      class BankAccount:
+          def __init__(self, name, balance, rate):
+              self.name = name
+              self.balance = balance
+              self.rate = rate
+
+          def year_end_processing(self):
+              {{1}}`,
+    blanks: [['self.balance *= 1 + self.rate', 'self.balance = self.balance * (1 + self.rate)']],
+    test: `
+      a = BankAccount("Alice", 100, 0.05)
+      a.year_end_processing()
+      assert abs(a.balance - 105.0) < 1e-9
+      a.year_end_processing()
+      assert abs(a.balance - 110.25) < 1e-9`,
+    exp: 'A 5% increase multiplies the balance by 1.05. Using `self.rate` keeps the rate with the object, so each account can have its own interest rate.'
+  },
+  {
+    id: 'T12-04', src: 'T12', topic: 'Inheritance', d: 3, type: 'fib',
+    t: 'MinimumAccount',
+    q: 'Complete `MinimumAccount`: a 10% rate, and a $20 fee (never below $0) before interest whenever the balance is under $1000.',
+    code: `
+      class BankAccount:
+          def __init__(self, name, balance, rate):
+              self.name = name
+              self.balance = balance
+              self.rate = rate
+
+          def year_end_processing(self):
+              self.balance *= 1 + self.rate
+
+      class MinimumAccount(BankAccount):
+          def __init__(self, name, balance):
+              super().__init__({{1}})
+
+          def year_end_processing(self):
+              if self.balance < 1000:
+                  self.balance = {{2}}
+              {{3}}`,
+    blanks: [['name, balance, 0.10'], ['max(self.balance - 20, 0)'], ['super().year_end_processing()']],
+    test: `
+      bob = MinimumAccount("Bob", 120)
+      bob.year_end_processing()
+      assert abs(bob.balance - 110.0) < 1e-9
+      rich = MinimumAccount("Rich", 1000)
+      rich.year_end_processing()
+      assert abs(rich.balance - 1100.0) < 1e-9
+      broke = MinimumAccount("Broke", 10)
+      broke.year_end_processing()
+      assert abs(broke.balance - 0.0) < 1e-9
+      assert isinstance(bob, MinimumAccount) and isinstance(bob, BankAccount)`,
+    exp: 'Pass the fixed 10% rate up to `BankAccount` with `super().__init__`. The fee is applied first and is floored at zero with `max`; then the inherited interest step runs. Reusing the parent method is what makes the subclass a true `BankAccount`.'
+  },
+  {
+    id: 'T12-05', src: 'T12', topic: 'isinstance', d: 1, type: 'mcq',
+    t: 'Which isinstance checks are True?',
+    q: '`Bob_acc = MinimumAccount("Bob", 120)`, where `MinimumAccount` inherits from `BankAccount`. Which pair of results is printed?',
+    code: `
+      print(isinstance(Bob_acc, MinimumAccount), isinstance(Bob_acc, BankAccount))`,
+    opts: ['True True', 'True False', 'False True', 'False False'],
+    ans: 0,
+    exp: 'A `MinimumAccount` is an instance of its own class **and** of every class it inherits from. Both checks are True.'
+  },
+  {
+    id: 'T12-06', src: 'T12', topic: 'Attributes', d: 2, type: 'mcq',
+    t: 'An attribute that was never stored',
+    q: 'What happens when this runs?',
+    code: `
+      class BankAccount:
+          def __init__(self, name, balance, rate):
+              self.name = name
+              self.balance = balance
+
+          def year_end_processing(self):
+              self.balance *= 1 + self.rate
+
+      a = BankAccount("Alice", 100, 0.05)
+      a.year_end_processing()`,
+    opts: ['AttributeError', 'NameError', 'TypeError', 'It prints 100'],
+    ans: 0,
+    exp: 'The constructor receives `rate` but never assigns `self.rate = rate`, so the object has no `rate` attribute. Reading `self.rate` raises `AttributeError`.'
+  },
+  {
+    id: 'T12-07', src: 'T12', topic: 'Composition', d: 2, type: 'fib',
+    t: 'transfer_to()',
+    q: 'Complete `transfer_to(other, amount)`. The transfer must go through the account security check, and the money must actually arrive in the other account.',
+    code: `
+      class BankAccount:
+          def __init__(self, name, balance):
+              self.name = name
+              self.balance = balance
+
+          def withdraw(self, name, amount):
+              if name != self.name:
+                  print("You are not authorized for this account.")
+                  return
+              if self.balance < amount:
+                  print(f"Insufficient fund for withdrawal of \${amount}.")
+                  return 0
+              self.balance -= amount
+              return amount
+
+          def deposit(self, amount):
+              self.balance += amount
+
+          def transfer_to(self, other, amount):
+              paid = {{1}}
+              if paid:
+                  {{2}}`,
+    blanks: [['self.withdraw(self.name, amount)'], ['other.deposit(paid)']],
+    test: `
+      alice = BankAccount("Alice", 100)
+      bob = BankAccount("Bob", 120)
+      bob.transfer_to(alice, 50)
+      assert bob.balance == 70
+      assert alice.balance == 150
+      broke = BankAccount("Broke", 10)
+      broke.transfer_to(alice, 50)
+      assert broke.balance == 10 and alice.balance == 150`,
+    exp: 'Reusing `withdraw` keeps the authorisation and insufficient-funds rules in one place. Only transfer what was actually withdrawn, otherwise a failed withdrawal would still credit the other account.'
+  },
+  {
+    id: 'T12-08', src: 'T12', topic: 'Inheritance', d: 2, type: 'mcq',
+    t: 'Fee boundary at exactly $1000',
+    q: 'What is the balance after one year-end processing?',
+    code: `
+      class BankAccount:
+          def __init__(self, name, balance, rate):
+              self.name = name
+              self.balance = balance
+              self.rate = rate
+          def year_end_processing(self):
+              self.balance *= 1 + self.rate
+
+      class MinimumAccount(BankAccount):
+          def __init__(self, name, balance):
+              super().__init__(name, balance, 0.10)
+          def year_end_processing(self):
+              if self.balance < 1000:
+                  self.balance = max(self.balance - 20, 0)
+              super().year_end_processing()
+
+      bob = MinimumAccount("Bob", 1000)
+      bob.year_end_processing()
+      print(bob.balance)`,
+    opts: ['1100.0', '1080.0', '1000.0', '1078.0'],
+    ans: 0,
+    exp: 'The fee applies only when the balance is strictly less than 1000. At exactly 1000 there is no fee, so the balance simply grows by 10% to 1100.0.'
+  }
+]);
+</script>
+<script>
+/* ===== questions/a04.js ===== */
+/* Assignment 4 — List processing and dictionaries (FITB)
+   Converted from Assignment 4 Tasks 1–3. Every item is fill-in-the-blank. */
+tutorial([
+  {
+    id: 'A4-01', src: 'A4', topic: 'Higher-order functions', d: 3, type: 'fib',
+    t: 'set_smooth — digital convolution',
+    q: 'Complete `set_smooth(left, centre, right)`. Its returned smoother replaces every point with `left * previous + centre * current + right * next`, using 0 beyond the ends. It must change the wave in place, and if the three weights do not add to 1 it must return the wave untouched.',
+    code: `
+      def set_smooth(left, centre, right):
+          def smoother(wave):
+              if left + centre + right != 1:
+                  return wave
+              n = len(wave)
+              original = {{1}}
+              for i in range(n):
+                  left_val = {{2}}
+                  right_val = {{3}}
+                  wave[i] = {{4}}
+              return wave
+          return smoother`,
+    blanks: [['wave[:]'], ['original[i - 1] if i > 0 else 0'], ['original[i + 1] if i < n - 1 else 0'], ['int(left * left_val + centre * original[i] + right * right_val)']],
+    test: `
+      def ref(wave, left, centre, right):
+          n = len(wave)
+          o = wave[:]
+          return [int(left * (o[i - 1] if i > 0 else 0) + centre * o[i] + right * (o[i + 1] if i < n - 1 else 0)) for i in range(n)]
+
+      w = [0, 10, 20, 30, 40]
+      out = set_smooth(0.25, 0.5, 0.25)(w)
+      assert out is w
+      assert out == ref([0, 10, 20, 30, 40], 0.25, 0.5, 0.25)
+
+      flat = [5, 6, 7]
+      assert set_smooth(0.5, 0.5, 0.5)(flat) is flat
+      assert flat == [5, 6, 7]`,
+    exp: 'Keep a copy of the original wave, because each output value needs its **old** neighbours. The edges read 0 instead of an out-of-range index, and `int()` truncates the weighted sum. When the weights are invalid, returning the input object unchanged satisfies the no-change requirement.'
+  },
+  {
+    id: 'A4-02', src: 'A4', topic: 'Higher-order functions', d: 3, type: 'fib',
+    t: 'smooth_transformer — chained smoothing',
+    q: 'Complete `smooth_transformer(parameter_list, repetition_list)`. It returns a smoother that applies each triplet\'s smoother the matching number of times, in order.',
+    code: `
+      def smooth_transformer(parameter_list, repetition_list):
+          def smoother(wave):
+              for params, times in {{1}}:
+                  s = {{2}}
+                  for i in range({{3}}):
+                      {{4}}
+              return wave
+          return smoother`,
+    blanks: [['zip(parameter_list, repetition_list)'], ['set_smooth(params[0], params[1], params[2])'], ['times'], ['wave = s(wave)']],
+    test: `
+      def ref_smooth(left, centre, right):
+          def smoother(wave):
+              n = len(wave)
+              o = wave[:]
+              for i in range(n):
+                  wave[i] = int(left * (o[i - 1] if i > 0 else 0) + centre * o[i] + right * (o[i + 1] if i < n - 1 else 0))
+              return wave
+          return smoother
+
+      def set_smooth(left, centre, right):
+          return ref_smooth(left, centre, right)
+
+      base = [0, 10, 20, 30, 40]
+      w = base[:]
+      out = smooth_transformer([(0.25, 0.5, 0.25)], [2])(w)
+      step1 = ref_smooth(0.25, 0.5, 0.25)(base[:])
+      step2 = ref_smooth(0.25, 0.5, 0.25)(step1[:])
+      assert out is w and out == step2
+
+      chained = smooth_transformer([(0.0, 1.0, 0.0), (0.2, 0.6, 0.2)], [1, 1])(base[:])
+      assert chained == ref_smooth(0.2, 0.6, 0.2)(base[:])`,
+    exp: '`zip` pairs each triplet with its repetition count. Build one smoother per triplet, then call it `times` times on the wave. Each call mutates the wave and returns it, so reassigning `wave` lets the next stage start from the smoothed result.'
+  },
+  {
+    id: 'A4-03', src: 'A4', topic: 'Nested lists', d: 3, type: 'fib',
+    t: 'flatten_with_depth',
+    q: 'Complete `flatten_with_depth(lst)`, which returns `(depth, value)` pairs. A top-level number has depth 0 and each list layer adds one.',
+    code: `
+      def flatten_with_depth(lst):
+          def flatten(item, depth):
+              if {{1}}:
+                  return {{2}}
+              out = []
+              for x in item:
+                  out += {{3}}
+              return out
+
+          result = []
+          for x in lst:
+              result += {{4}}
+          return result`,
+    blanks: [['type(item) != list'], ['[(depth, item)]'], ['flatten(x, depth + 1)'], ['flatten(x, 0)']],
+    test: `
+      data1 = [[10, [20, 30]], [[5], [5, [5]]], [100, [200, [300]]]]
+      data2 = [9, [10, [[[20]], [30], 40], 50], [[60], [[[70]], 80], [90], [100]], 110]
+      assert flatten_with_depth(data1) == [(1, 10), (2, 20), (2, 30), (2, 5), (2, 5), (3, 5), (1, 100), (2, 200), (3, 300)]
+      assert flatten_with_depth(data2) == [(0, 9), (1, 10), (4, 20), (3, 30), (2, 40), (1, 50), (2, 60), (4, 70), (2, 80), (2, 90), (2, 100), (0, 110)]
+      assert flatten_with_depth([]) == []`,
+    exp: 'A number is a leaf, so it contributes one `(depth, value)` pair. A list contributes the concatenation of its elements flattened at `depth + 1`. Starting the top-level walk at depth 0 makes top-level numbers depth 0.'
+  },
+  {
+    id: 'A4-04', src: 'A4', topic: 'Nested lists', d: 3, type: 'fib',
+    t: 'nested_from_depth',
+    q: 'Complete `nested_from_depth(ddata)`. Rebuild any nested list whose depth-encoding matches the input. `stack` holds the list open at each depth, with `stack[d]` the list for depth `d`.',
+    code: `
+      def nested_from_depth(ddata):
+          result = []
+          stack = [result]
+          for depth, value in ddata:
+              while len(stack) > depth + 1:
+                  {{1}}
+              while len(stack) < depth + 1:
+                  new = []
+                  {{2}}
+                  {{3}}
+              {{4}}
+          return result`,
+    blanks: [['stack.pop()'], ['stack[-1].append(new)'], ['stack.append(new)'], ['stack[depth].append(value)']],
+    test: `
+      def flat(item, depth):
+          if type(item) != list:
+              return [(depth, item)]
+          out = []
+          for y in item:
+              out += flat(y, depth + 1)
+          return out
+
+      def flat_top(lst):
+          out = []
+          for y in lst:
+              out += flat(y, 0)
+          return out
+
+      fd1 = [(1, 10), (2, 20), (2, 30), (2, 5), (2, 5), (3, 5), (1, 100), (2, 200), (3, 300)]
+      fd2 = [(0, 9), (1, 10), (4, 20), (3, 30), (2, 40), (1, 50), (2, 60), (4, 70), (2, 80), (2, 90), (2, 100), (0, 110)]
+      assert flat_top(nested_from_depth(fd1)) == fd1
+      assert flat_top(nested_from_depth(fd2)) == fd2
+      assert flat_top(nested_from_depth([])) == []`,
+    exp: 'A deeper value needs new lists nested inside the current one; a shallower value closes the extra levels again. Closing means popping the stack, opening means appending a fresh list and pushing it. Appending the value to `stack[depth]` places it at exactly the requested depth.'
+  },
+  {
+    id: 'A4-05', src: 'A4', topic: 'Dictionaries', d: 2, type: 'fib',
+    t: 'is_ancestor',
+    q: 'Complete `is_ancestor(name1, name2, pdict)`. A person is an ancestor if they are the parent, or an ancestor of the parent. Missing names return False.',
+    code: `
+      def is_ancestor(name1, name2, pdict):
+          if name1 not in pdict and name1 not in pdict.values():
+              return False
+          if name2 not in pdict and name2 not in pdict.values():
+              return False
+          if name2 not in pdict:
+              return False
+          return {{1}} or {{2}}`,
+    blanks: [['pdict[name2] == name1'], ['is_ancestor(name1, pdict[name2], pdict)']],
+    test: `
+      parent = {'Amy': 'Ben', 'May': 'Tom', 'Tom': 'Ben', 'Ben': 'Howard',
+                'Howard': 'George', 'Frank': 'Amy', 'Joe': 'Bill', 'Bill': 'Mary',
+                'Mary': 'Philip', 'Simon': 'Bill', 'Zoe': 'Mary'}
+      assert is_ancestor('Howard', 'Amy', parent) is True
+      assert is_ancestor('Amy', 'Tom', parent) is False
+      assert is_ancestor('George', 'Frank', parent) is True
+      assert is_ancestor('Ben', 'Amy', parent) is True
+      assert is_ancestor('Luna', 'Amy', parent) is False
+      assert is_ancestor('Amy', 'Luna', parent) is False`,
+    exp: 'Two ways to succeed: the target person\'s parent is `name1`, or `name1` is an ancestor of that parent. Walking up the parent chain must stop when the chain leaves the dictionary.'
+  },
+  {
+    id: 'A4-06', src: 'A4', topic: 'Dictionaries', d: 3, type: 'fib',
+    t: 'is_related',
+    q: 'Complete `is_related(name1, name2, pdict)`. Two people are related when their ancestor chains (including themselves) share a name. Missing names return False.',
+    code: `
+      def is_related(name1, name2, pdict):
+          people = list(pdict.keys()) + list(pdict.values())
+          if name1 not in people or name2 not in people:
+              return False
+
+          def lineage(name):
+              chain = {{1}}
+              while {{2}}:
+                  name = {{3}}
+                  chain.append(name)
+              return chain
+
+          line1 = lineage(name1)
+          for person in lineage(name2):
+              if {{4}}:
+                  return True
+          return False`,
+    blanks: [['[name]'], ['name in pdict'], ['pdict[name]'], ['person in line1']],
+    test: `
+      parent = {'Amy': 'Ben', 'May': 'Tom', 'Tom': 'Ben', 'Ben': 'Howard',
+                'Howard': 'George', 'Frank': 'Amy', 'Joe': 'Bill', 'Bill': 'Mary',
+                'Mary': 'Philip', 'Simon': 'Bill', 'Zoe': 'Mary'}
+      assert is_related('Joe', 'Philip', parent) is True
+      assert is_related('Amy', 'Philip', parent) is False
+      parent['Ben'] = 'Philip'
+      assert is_related('Amy', 'Philip', parent) is True
+      assert is_related('Luna', 'Amy', parent) is False
+      assert is_related('Amy', 'Amy', parent) is True`,
+    exp: 'Build each person\'s chain by following the parent links up to the top. Sharing any name in the two chains means a common ancestor. Including the person themselves in the chain is what makes someone related to themselves.'
+  }
+]);
+</script>
+<script>
+/* ===== questions/a05.js ===== */
+/* Assignment 5 — 2D arrays: Game of Life (FITB)
+   Converted from Assignment 5 Tasks 1A–1G. Every item is fill-in-the-blank. */
+tutorial([
+  {
+    id: 'A5-01', src: 'A5', topic: '2D arrays', d: 1, type: 'fib',
+    t: 'build_society',
+    q: 'Complete `build_society(m, n)` so it returns `m` rows of `n` random cells, each either `"-"` or `"*"`.',
+    code: `
+      import random
+
+      def build_society(m, n):
+          society = []
+          for r in range(m):
+              row = []
+              for c in range(n):
+                  row.append({{1}})
+              {{2}}
+          return society`,
+    blanks: [["random.choice(['-', '*'])", "random.choice(['*', '-'])"], ['society.append(row)']],
+    test: `
+      random.seed(7)
+      s = build_society(3, 4)
+      assert len(s) == 3
+      assert all(len(row) == 4 for row in s)
+      assert all(ch in '-*' for row in s for ch in row)
+      assert build_society(1, 1) in [[['-']], [['*']]]`,
+    exp: 'Build one row at a time, choosing a random character for every cell. Append each finished row to the society, otherwise the inner loop\'s work is thrown away.'
+  },
+  {
+    id: 'A5-02', src: 'A5', topic: 'Strings to 2D arrays', d: 2, type: 'fib',
+    t: 'model_society',
+    q: 'Complete `model_society(txt)`, which turns a pasted multi-line drawing into a list of lists of `"-"` and `"*"`. Blank lines and spaces are ignored.',
+    code: `
+      def model_society(txt):
+          society = []
+          for line in txt.split('\\n'):
+              if {{1}}:
+                  row = []
+                  for ch in line:
+                      if {{2}}:
+                          row.append(ch)
+                  {{3}}
+          return society`,
+    blanks: [["line.strip() != ''"], ["ch in '-*'"], ['society.append(row)']],
+    test: `
+      txt = "\\n-***-\\n----*\\n****-\\n"
+      result = model_society(txt)
+      assert result == [['-', '*', '*', '*', '-'], ['-', '-', '-', '-', '*'], ['*', '*', '*', '*', '-']]
+      assert model_society("") == []`,
+    exp: 'Split the drawing into lines, skip blank ones, keep only the cell characters in each line, and append the finished row. That reproduces the society that was printed.'
+  },
+  {
+    id: 'A5-03', src: 'A5', topic: 'Rules as functions', d: 2, type: 'fib',
+    t: 'gol — Conway\'s rules',
+    q: 'Complete `gol(cell_value, live_neigh)`. A live cell survives with 2 or 3 live neighbours; a dead cell becomes alive with exactly 3.',
+    code: `
+      def gol(cell_value, live_neigh):
+          if cell_value:
+              return {{1}}
+          else:
+              return {{2}}`,
+    blanks: [['live_neigh == 2 or live_neigh == 3'], ['live_neigh == 3']],
+    test: `
+      live = [gol(True, n) for n in range(9)]
+      dead = [gol(False, n) for n in range(9)]
+      assert live == [False, False, True, True, False, False, False, False, False]
+      assert dead == [False, False, False, True, False, False, False, False, False]`,
+    exp: 'Two neighbours is the minimum for a live cell to survive, and more than three is overcrowding. A dead cell is born only with exactly three live neighbours.'
+  },
+  {
+    id: 'A5-04', src: 'A5', topic: 'Rules as functions', d: 2, type: 'fib',
+    t: 'tabulate — the rule table',
+    q: 'Complete `tabulate(rules)`. It returns `[("live", [...9 results...]), ("dead", [...9 results...])]` for neighbour counts 0–8.',
+    code: `
+      def tabulate(rules):
+          live = []
+          dead = []
+          for n in range(9):
+              live.append({{1}})
+              dead.append({{2}})
+          return [{{3}}, {{4}}]`,
+    blanks: [["'live' if rules(True, n) else 'dead'"], ["'live' if rules(False, n) else 'dead'"], ["('live', live)"], ["('dead', dead)"]],
+    test: `
+      def gol(cv, n):
+          return (n == 2 or n == 3) if cv else n == 3
+      assert tabulate(gol) == [
+          ('live', ['dead', 'dead', 'live', 'live', 'dead', 'dead', 'dead', 'dead', 'dead']),
+          ('dead', ['dead', 'dead', 'dead', 'live', 'dead', 'dead', 'dead', 'dead', 'dead'])
+      ]
+      inverse = tabulate(lambda cv, n: not gol(cv, n))
+      assert inverse[0][0] == 'live' and inverse[1][0] == 'dead'
+      assert inverse[0][1][0] == 'live' and inverse[0][1][2] == 'dead'`,
+    exp: 'Call the rule function once per neighbour count for a live current cell and once for a dead one. The list for each row keeps the nine results in neighbour-count order, and the pairs are returned live-cell row first.'
+  },
+  {
+    id: 'A5-05', src: 'A5', topic: 'Stable sorting', d: 2, type: 'fib',
+    t: 'migrate — sort rows by census',
+    q: 'Complete `migrate(society)`. Count the live cells in each row, sort the rows by that count descending, and keep equal-count rows in their original order. Do not change the input.',
+    code: `
+      def migrate(society):
+          census = []
+          for row in society:
+              census.append(({{1}}, row))
+          census.sort(key={{2}}, reverse=True)
+          result = []
+          for _, row in census:
+              {{3}}
+          return result`,
+    blanks: [["row.count('*')"], ['lambda pair: pair[0]'], ['result.append(row)']],
+    test: `
+      soc = [['-', '*', '-', '*', '-'],
+             ['*', '-', '-', '*', '*'],
+             ['-', '*', '*', '*', '*'],
+             ['*', '-', '-', '-', '-'],
+             ['-', '*', '*', '-', '-'],
+             ['-', '-', '*', '-', '*']]
+      res = migrate(soc)
+      assert [row.count('*') for row in res] == [4, 3, 2, 2, 2, 1]
+      assert res[0] == ['-', '*', '*', '*', '*']
+      assert res[2] == ['-', '*', '-', '*', '-']
+      assert res[3] == ['-', '*', '*', '-', '-']
+      assert res[4] == ['-', '-', '*', '-', '*']
+      assert soc[0] == ['-', '*', '-', '*', '-']`,
+    exp: 'Pair each row with its census, then sort by the census only. Python\'s sort is stable, so rows with equal counts stay in their original relative order. Building a new list leaves the input untouched.'
+  },
+  {
+    id: 'A5-06', src: 'A5', topic: 'Neighbourhoods', d: 3, type: 'fib',
+    t: 'destiny — one cell\'s next state',
+    q: 'Complete `destiny(society, coordinates, gol)`. Count the live cells in the eight neighbouring positions (ignoring the cell itself and anything off the grid), then apply `gol`.',
+    code: `
+      def destiny(society, coordinates, gol):
+          r, c = coordinates
+          live = 0
+          for dr in (-1, 0, 1):
+              for dc in (-1, 0, 1):
+                  if {{1}}:
+                      nr, nc = r + dr, c + dc
+                      if 0 <= nr < len(society) and 0 <= nc < len(society[0]):
+                          if {{2}}:
+                              live += 1
+          return {{3}}`,
+    blanks: [['not (dr == 0 and dc == 0)'], ["society[nr][nc] == '*'"], ["'*' if gol(society[r][c] == '*', live) else '-'"]],
+    test: `
+      def gol(cv, n):
+          return (n == 2 or n == 3) if cv else n == 3
+      soc = [['*', '*', '-'],
+             ['*', '-', '-'],
+             ['-', '-', '-']]
+      assert destiny(soc, (0, 0), gol) == '*'
+      assert destiny(soc, (2, 2), gol) == '-'
+      assert destiny(soc, (1, 1), gol) == '*'`,
+    exp: 'The offsets `dr, dc` in {-1, 0, 1} visit all nine positions; skip the (0, 0) offset so the cell does not count itself. Bounds checks ignore neighbours outside the society. Convert the cell to a Boolean for `gol` and back to a character for the result.'
+  },
+  {
+    id: 'A5-07', src: 'A5', topic: 'Evolution', d: 3, type: 'fib',
+    t: 'evolve — stop at stability',
+    q: 'Complete `evolve(society, n, gol)`. It returns the resulting society and the number of evolutions needed to reach it, stopping early when a generation is identical to the one before.',
+    code: `
+      def evolve(society, n, gol):
+          count = 0
+          for i in range(n):
+              new = []
+              for r in range(len(society)):
+                  row = []
+                  for c in range(len(society[0])):
+                      row.append(destiny(society, (r, c), gol))
+                  new.append(row)
+              if {{1}}:
+                  return society, count
+              society = new
+              count += 1
+          return society, count`,
+    blanks: [['new == society']],
+    test: `
+      def gol(cv, n):
+          return (n == 2 or n == 3) if cv else n == 3
+
+      def destiny(society, coordinates, gol):
+          r, c = coordinates
+          live = 0
+          for dr in (-1, 0, 1):
+              for dc in (-1, 0, 1):
+                  if not (dr == 0 and dc == 0):
+                      nr, nc = r + dr, c + dc
+                      if 0 <= nr < len(society) and 0 <= nc < len(society[0]):
+                          if society[nr][nc] == '*':
+                              live += 1
+          return '*' if gol(society[r][c] == '*', live) else '-'
+
+      assert evolve([['-']], 1000, gol) == ([['-']], 0)
+      soc = [['-', '-', '*'], ['*', '*', '-']]
+      result, count = evolve(soc, 5, gol)
+      assert result == [['-', '-', '-'], ['-', '-', '-']]
+      assert count == 2
+      assert soc == [['-', '-', '*'], ['*', '*', '-']]`,
+    exp: 'Build the whole next generation from the current one before comparing, so every cell sees the same old society. If the new generation equals the current one, stability has been reached and no further evolutions count. Returning `society` here is the stable generation itself.'
+  }
+]);
+</script>
+<script>
+/* ===== questions/a06.js ===== */
+/* Assignment 6 — OOP: RPG characters (FITB)
+   Converted from Assignment 6 Tasks 1A–1C. Every item is fill-in-the-blank.
+   Minimal base classes are included so each item runs on its own. */
+tutorial([
+  {
+    id: 'A6-01', src: 'A6', topic: 'Inheritance', d: 2, type: 'fib',
+    t: 'Berserker',
+    q: 'Complete `Berserker`. It is a `Fighter` costing 200 gold. While its hp is at most half its maximum, its strength becomes 200 (not double again), and it still attacks through `Fighter.act`.',
+    code: `
+      class Fighter:
+          def __init__(self):
+              self.name = 'Fighter'
+              self.maxhp = 1200
+              self.hp = 1200
+              self.str = 100
+              self.cost = 100
+          def act(self, myTeam, enemy):
+              pass
+
+      class Berserker(Fighter):
+          def __init__(self):
+              super().__init__()
+              self.cost = {{1}}
+          def act(self, myTeam, enemy):
+              if self.hp <= {{2}}:
+                  self.str = {{3}}
+              super().act(myTeam, enemy)`,
+    blanks: [['200'], ['self.maxhp / 2'], ['200']],
+    test: `
+      b = Berserker()
+      assert b.cost == 200
+      assert b.str == 100
+      b.hp = 600
+      b.act([], [])
+      assert b.str == 200
+      b.act([], [])
+      assert b.str == 200
+      fresh = Berserker()
+      fresh.hp = 700
+      fresh.act([], [])
+      assert fresh.str == 100`,
+    exp: 'Reuse `Fighter.__init__` and override only the cost. The berserk check compares current hp with half of `maxhp`; assigning 200 (rather than doubling) stops the strength growing 100 → 200 → 400. Calling `super().act` keeps the inherited attack.'
+  },
+  {
+    id: 'A6-02', src: 'A6', topic: 'Inheritance', d: 3, type: 'fib',
+    t: 'ArchMage',
+    q: 'Complete `ArchMage`. It is a `Mage` costing 600 gold. When it is the only living member of its own team it hits every living enemy for double its intelligence; otherwise it casts normally.',
+    code: `
+      class Mage:
+          def __init__(self):
+              self.name = 'Mage'
+              self.maxhp = 800
+              self.hp = 800
+              self.int = 400
+              self.cost = 200
+              self.mana = 50
+          def gotHurt(self, damage):
+              self.hp -= damage
+          def cast(self, myTeam, enemy):
+              pass
+
+      class ArchMage(Mage):
+          def __init__(self):
+              super().__init__()
+              self.cost = 600
+          def cast(self, myTeam, enemy):
+              alive = []
+              for c in myTeam:
+                  if c.hp > 0:
+                      alive.append(c)
+              if {{1}}:
+                  for e in enemy:
+                      if e.hp > 0:
+                          e.gotHurt({{2}})
+              else:
+                  super().cast(myTeam, enemy)`,
+    blanks: [['len(alive) == 1'], ['self.int * 2']],
+    test: `
+      a = ArchMage()
+      assert a.cost == 600
+      e1, e2 = Mage(), Mage()
+      a.cast([a], [e1, e2])
+      assert e1.hp == 0 and e2.hp == 0
+      e3 = Mage()
+      ally = Mage()
+      a.cast([a, ally], [e3])
+      assert e3.hp == 800
+      ally.hp = 0
+      e4 = Mage()
+      a.cast([a, ally], [e4])
+      assert e4.hp == 0`,
+    exp: 'Count only team members whose hp is above zero. Alone means exactly one survivor, which is the archmage itself. KABOOM deals `self.int * 2` to each living enemy, while every other case falls back to `Mage.cast` through `super()`.'
+  },
+  {
+    id: 'A6-03', src: 'A6', topic: 'Inheritance', d: 3, type: 'fib',
+    t: 'Necromancer',
+    q: 'Complete `Necromancer`. It is a `Mage` costing 400 gold. With a dead teammate and enough mana it revives one at random with half its maximum hp (rounded down) instead of attacking.',
+    code: `
+      from random import randint
+
+      manaCost = 20
+
+      class Mage:
+          def __init__(self):
+              self.name = 'Mage'
+              self.maxhp = 800
+              self.hp = 800
+              self.int = 400
+              self.cost = 200
+              self.mana = 50
+          def cast(self, myTeam, enemy):
+              pass
+
+      class Necromancer(Mage):
+          def __init__(self):
+              super().__init__()
+              self.cost = {{1}}
+          def cast(self, myTeam, enemy):
+              dead = []
+              for c in myTeam:
+                  if c.hp <= 0:
+                      dead.append(c)
+              if dead and self.mana >= manaCost:
+                  target = dead[randint(0, len(dead) - 1)]
+                  target.hp = {{2}}
+                  self.mana -= manaCost
+              else:
+                  super().cast(myTeam, enemy)`,
+    blanks: [['400'], ['target.maxhp // 2']],
+    test: `
+      n = Necromancer()
+      assert n.cost == 400
+      ally = Mage()
+      ally.hp = 0
+      n.cast([n, ally], [Mage()])
+      assert ally.hp == 400
+      assert n.mana == 30
+      n.mana = 10
+      ally.hp = 0
+      n.cast([n, ally], [Mage()])
+      assert ally.hp == 0 and n.mana == 10`,
+    exp: 'Gather the dead first; the spell is possible only when that list is non-empty and mana is at least `manaCost`. Reviving uses half of the target\'s maximum hp, with `//` for the rounded-down integer. Without a target or enough mana, normal mage behaviour takes over.'
+  },
+  {
+    id: 'A6-04', src: 'A6', topic: 'Inheritance', d: 1, type: 'fib',
+    t: 'Inheriting from the right base',
+    q: 'Complete the class header so an `ArchMage` is a kind of `Mage` and inherits its hp, mana and intelligence.',
+    code: `
+      class Mage:
+          def __init__(self):
+              self.name = 'Mage'
+              self.maxhp = 800
+              self.hp = 800
+              self.int = 400
+              self.cost = 200
+              self.mana = 50
+
+      class ArchMage({{1}}):
+          def __init__(self):
+              super().__init__()
+              self.cost = 600`,
+    blanks: [['Mage']],
+    test: `
+      a = ArchMage()
+      assert isinstance(a, Mage)
+      assert a.cost == 600
+      assert a.maxhp == 800 and a.int == 400 and a.mana == 50`,
+    exp: 'Put the parent class in the parentheses. Inheriting from `Mage` means `super().__init__()` sets the mage attributes, and only the cost needs to change.'
+  }
+]);
+</script>
+<script>
+window.PRACTICE_CONFIG = {
+  storageKey: 'cs1010e-tutorials-v1',
+  sessionKey: 'cs1010e-tutorials-session',
+  title: 'Tutorial & Assignment Practice',
+  mark: 'TA',
+  groupKey: 'src',
+  groups: [
+    { id: 'T8', name: 'Tutorial 8', hint: 'List processing' },
+    { id: 'T9', name: 'Tutorial 9', hint: 'Dictionaries' },
+    { id: 'T10', name: 'Tutorial 10', hint: 'Multi-dimensional arrays' },
+    { id: 'T11', name: 'Tutorial 11', hint: 'Searching and sorting' },
+    { id: 'T12', name: 'Tutorial 12', hint: 'Object-oriented programming' },
+    { id: 'A4', name: 'Assignment 4', hint: 'List processing and dictionaries' },
+    { id: 'A5', name: 'Assignment 5', hint: '2D arrays — Game of Life' },
+    { id: 'A6', name: 'Assignment 6', hint: 'OOP — RPG characters' }
+  ],
+  presets: [
+    { label: 'All', ids: ['T8', 'T9', 'T10', 'T11', 'T12', 'A4', 'A5', 'A6'] },
+    { label: 'Tutorials', ids: ['T8', 'T9', 'T10', 'T11', 'T12'] },
+    { label: 'Assignments', ids: ['A4', 'A5', 'A6'] }
+  ],
+  types: ['mcq', 'fib'],
+  typeLabels: { mcq: 'Multiple choice', fib: 'Fill in the blank' },
+  typeShort: { mcq: 'MCQ', fib: 'Fill-in' },
+  intro: 'Every question here is converted from the AY26/27 tutorial worksheets 8–12 and assignments 4–6. Tutorials are the priority set; Assignment 4 onwards follows. Answer an MCQ or type each blank for a fill-in, and the key and explanation appear straight away.',
+  backHref: 'practice.html',
+  backLabel: 'Lecture-by-lecture practice →',
+  examHref: 'examplify.html',
+  examLabel: 'Full past papers in exam mode (laptop) →'
+};
+</script>
+<script>
+/* ===== ../practice/practice.js ===== */
+/* CS1010E on-the-go practice.
+   A phone-first question runner, separate from the Examplify exam clone.
+   Routes:  #/            problem list + filters
+            #/q/<id>      one question
+   Progress lives in localStorage (this browser only).                     */
+(function () {
+  'use strict';
+
+  /* A page can override any of this with window.PRACTICE_CONFIG before this
+     script runs. Without it the page behaves exactly as the lecture bank. */
+  var CFG = window.PRACTICE_CONFIG || {};
+  var GROUPS = CFG.groups || null;          // [{id, name, hint}] — tutorial/assignment mode
+  var GROUP_KEY = CFG.groupKey || 'lec';
+  var TYPES = CFG.types || ['mcq', 'fib', 'out'];
+  var TYPE = CFG.typeLabels || { mcq: 'Multiple choice', fib: 'Fill in the blank', out: 'Predict the output' };
+  var TYPE_SHORT = CFG.typeShort || { mcq: 'MCQ', fib: 'Fill-in', out: 'Output' };
+
+  var QS = (window.PRACTICE_QUESTIONS || []).slice();
+  var BY_ID = {};
+  QS.forEach(function (q) { BY_ID[q.id] = q; });
+  QS.sort(function (a, b) {
+    if (GROUPS) {
+      var ga = groupIndex(a[GROUP_KEY]), gb = groupIndex(b[GROUP_KEY]);
+      if (ga !== gb) return ga - gb;
+      return (+a.id.split('-')[1]) - (+b.id.split('-')[1]);
+    }
+    return a.lec - b.lec || (+a.id.split('-')[1]) - (+b.id.split('-')[1]);
+  });
+  function groupIndex(id) {
+    for (var i = 0; i < GROUPS.length; i++) if (GROUPS[i].id === id) return i;
+    return GROUPS.length;
+  }
+  function groupName(q) {
+    if (!GROUPS) return 'L' + q.lec;
+    for (var i = 0; i < GROUPS.length; i++) if (GROUPS[i].id === q[GROUP_KEY]) return GROUPS[i].name;
+    return String(q[GROUP_KEY]);
+  }
+
+  var LECS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+  var NOT_REVISED_FROM = 9;
+  var LEC_NAMES = {
+    1: 'Problem solving', 2: 'Expressions & functions', 3: 'Sequences & iterables',
+    4: 'Statements & loops', 5: 'Recursion', 6: 'Objects & lists', 7: 'List processing',
+    8: 'Dictionaries', 9: '2D arrays', 10: 'Searching & sorting', 11: 'OOP'
+  };
+  var DIFF = { 1: 'Easy', 2: 'Medium', 3: 'Hard' };
+  var CIRCLED = ['⓪', '①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨'];
+  var PAGE = 60;
+
+  /* ---------------- storage ---------------- */
+  var KEY = CFG.storageKey || 'cs1010e-practice-v1';
+  var SKEY = CFG.sessionKey || 'cs1010e-practice-session';
+  function defaults() {
+    var ids = GROUPS ? GROUPS.map(function (g) { return g.id; }) : LECS.slice();
+    return { p: {}, f: { lecs: ids, type: 'all', diff: 0, status: 'all' }, days: {}, theme: null };
+  }
+  function load() {
+    try {
+      var s = JSON.parse(localStorage.getItem(KEY));
+      if (s && s.p && s.f) { s.days = s.days || {}; return s; }
+    } catch (e) { /* storage unavailable */ }
+    return defaults();
+  }
+  var store = load();
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) { /* ignore */ } }
+
+  function loadSession() {
+    try {
+      var s = JSON.parse(sessionStorage.getItem(SKEY));
+      if (s && s.mode) return s;
+    } catch (e) { /* ignore */ }
+    return { mode: 'list', done: 0, right: 0, recent: [] };
+  }
+  var session = loadSession();
+  function saveSession() { try { sessionStorage.setItem(SKEY, JSON.stringify(session)); } catch (e) { /* ignore */ } }
+
+  /* ---------------- theme ---------------- */
+  function applyTheme() {
+    if (store.theme) document.documentElement.setAttribute('data-theme', store.theme);
+    else document.documentElement.removeAttribute('data-theme');
+  }
+  function isDark() {
+    if (store.theme) return store.theme === 'dark';
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  applyTheme();
+
+  /* ---------------- helpers ---------------- */
+  var app = document.getElementById('app');
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function inline(s) {
+    return esc(s).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+  }
+  function md(s) {
+    if (!s) return '';
+    return s.split(/\n\n+/).map(function (p) { return '<p>' + inline(p).replace(/\n/g, '<br>') + '</p>'; }).join('');
+  }
+  function today() {
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function prog(id) { return store.p[id]; }
+  function isSolved(id) { var p = prog(id); return !!(p && p.c); }
+  function isWrong(id) { var p = prog(id); return !!(p && (p.last === 'bad' || p.last === 'shown')); }
+  function isFlagged(id) { var p = prog(id); return !!(p && p.flag); }
+  function toast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.hidden = false;
+    clearTimeout(toast.timer);
+    toast.timer = setTimeout(function () { t.hidden = true; }, 2200);
+  }
+
+  var ICON = {
+    back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
+    flag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/></svg>',
+    flagOn: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4" fill="none"/><path d="M5 4h11l-2 4 2 4H5z"/></svg>',
+    moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>',
+    sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>'
+  };
+
+  /* ---------------- Python syntax highlighting ---------------- */
+  var KW = {};
+  ('False None True and as assert break class continue def del elif else except finally for from global ' +
+   'if import in is lambda nonlocal not or pass raise return try while with yield').split(' ')
+    .forEach(function (w) { KW[w] = 1; });
+  var BI = {};
+  ('print len range tuple list dict map filter sum max min abs int str float type isinstance issubclass ' +
+   'super ord chr input round sorted reversed enumerate zip id set bool reduce all any self')
+    .split(' ').forEach(function (w) { BI[w] = 1; });
+  var TOK = /(#[^\n]*)|([rRbBfF]{0,2}'(?:\\.|[^'\\\n])*'|[rRbBfF]{0,2}"(?:\\.|[^"\\\n])*")|(\{\{\d+\}\})|(\d[\d_]*(?:\.\d+)?(?:[eE][-+]?\d+)?)|([A-Za-z_]\w*)|(\n)|([^\S\n]+)|([\s\S])/g;
+
+  // Returns an array of HTML strings, one per line. blankFn(n) renders a {{n}} marker.
+  function highlight(code, blankFn) {
+    var lines = [''];
+    var prevWord = '';
+    var m;
+    TOK.lastIndex = 0;
+    while ((m = TOK.exec(code))) {
+      var html;
+      if (m[1]) html = '<span class="tk-com">' + esc(m[1]) + '</span>';
+      else if (m[2]) html = '<span class="tk-str">' + esc(m[2]) + '</span>';
+      else if (m[3]) html = blankFn ? blankFn(+m[3].slice(2, -2)) : esc(m[3]);
+      else if (m[4]) html = '<span class="tk-num">' + esc(m[4]) + '</span>';
+      else if (m[5]) {
+        var w = m[5];
+        if (prevWord === 'def' || prevWord === 'class') html = '<span class="tk-fn">' + w + '</span>';
+        else if (KW[w]) html = '<span class="tk-kw">' + w + '</span>';
+        else if (BI[w]) html = '<span class="tk-bi">' + w + '</span>';
+        else html = w;
+        prevWord = w;
+      } else if (m[6]) { lines.push(''); continue; }
+      else if (m[7]) html = m[7];
+      else { html = esc(m[8]); prevWord = ''; }
+      if (!m[7] && !m[5]) prevWord = m[5] || (m[8] ? '' : prevWord);
+      lines[lines.length - 1] += html;
+    }
+    return lines;
+  }
+  // Long lines soft-wrap; continuation lines hang 4 columns past the line's own indentation.
+  function codeBlock(code, blankFn, small) {
+    var lines = highlight(code, blankFn);
+    var raw = String(code).split('\n');
+    return '<div class="code' + (small ? ' small' : '') + '"><div class="code-in">' +
+      lines.map(function (l, i) {
+        var hang = (raw[i] || '').match(/^ */)[0].length + 4;
+        return '<div class="cl"><span class="cn">' + (i + 1) + '</span><span class="cc" style="padding-left:' + hang +
+          'ch;text-indent:-' + hang + 'ch">' + (l || ' ') + '</span></div>';
+      }).join('') + '</div></div>';
+  }
+
+  /* ---------------- answer checking ---------------- */
+  function unifyQuotes(s) {
+    return String(s).replace(/[‘’‛′]/g, "'").replace(/[“”″]/g, '"').replace(/"/g, "'");
+  }
+  // Code: drop whitespace except a single space between two word characters.
+  function normCode(s) {
+    s = unifyQuotes(s).replace(/ /g, ' ').trim().replace(/\s+/g, ' ');
+    var out = '';
+    for (var i = 0; i < s.length; i++) {
+      var c = s[i];
+      if (c === ' ') {
+        if (/\w/.test(out.slice(-1)) && /\w/.test(s[i + 1] || '')) out += ' ';
+      } else out += c;
+    }
+    return out.replace(/;$/, '');
+  }
+  // Output: whitespace (including newlines) collapses; spacing next to brackets and commas is ignored.
+  function normOut(s) {
+    return unifyQuotes(s).replace(/ /g, ' ').trim().replace(/\s+/g, ' ')
+      .replace(/\s*([,()[\]{}:])\s*/g, '$1');
+  }
+  function checkOut(q, given) {
+    var want = [q.ans].concat(q.alts || []);
+    var g = normOut(given);
+    return want.some(function (w) {
+      var n = normOut(w);
+      if (/^[A-Z]\w*Error$/.test(w.trim())) return n.toLowerCase() === g.toLowerCase();
+      return n === g;
+    });
+  }
+  function checkBlank(alts, given) {
+    var g = normCode(given);
+    if (!g) return false;
+    return alts.some(function (a) { return normCode(a) === g; });
+  }
+
+  /* ---------------- filtering & picking ---------------- */
+  function matches(q, f, ignoreStatus) {
+    if (f.lecs.indexOf(q[GROUP_KEY]) < 0) return false;
+    if (f.type !== 'all' && q.type !== f.type) return false;
+    if (f.diff && q.d !== f.diff) return false;
+    if (!ignoreStatus) {
+      var p = prog(q.id);
+      if (f.status === 'new' && p && p.n) return false;
+      if (f.status === 'wrong' && !isWrong(q.id)) return false;
+      if (f.status === 'solved' && !isSolved(q.id)) return false;
+      if (f.status === 'flagged' && !isFlagged(q.id)) return false;
+    }
+    if (f.search) {
+      var s = f.search.toLowerCase();
+      var hay = (q.t + ' ' + q.topic + ' ' + q.id + ' ' + (GROUPS ? groupName(q) : LEC_NAMES[q.lec])).toLowerCase();
+      if (hay.indexOf(s) < 0) return false;
+    }
+    return true;
+  }
+  function filtered() { return QS.filter(function (q) { return matches(q, store.f); }); }
+  function poolFor(mode) {
+    var f = store.f;
+    if (mode === 'mistakes') return QS.filter(function (q) { return f.lecs.indexOf(q[GROUP_KEY]) >= 0 && isWrong(q.id); });
+    if (mode === 'flagged') return QS.filter(function (q) { return isFlagged(q.id); });
+    return filtered();
+  }
+  function weight(q) {
+    var p = prog(q.id);
+    if (!p || !p.n) return 3;
+    if (p.last === 'bad' || p.last === 'shown') return 4;
+    return p.flag ? 2 : 1;
+  }
+  function pickNext(mode, currentId) {
+    var pool = poolFor(mode);
+    if (!pool.length) return null;
+    if (mode === 'list') {
+      var i = pool.findIndex(function (q) { return q.id === currentId; });
+      return pool[(i + 1) % pool.length];
+    }
+    var avoid = Math.min(15, pool.length - 1);
+    var recent = session.recent.slice(-avoid);
+    var cands = pool.filter(function (q) { return recent.indexOf(q.id) < 0 && q.id !== currentId; });
+    if (!cands.length) cands = pool;
+    var total = cands.reduce(function (s, q) { return s + weight(q); }, 0);
+    var r = Math.random() * total;
+    for (var k = 0; k < cands.length; k++) {
+      r -= weight(cands[k]);
+      if (r <= 0) return cands[k];
+    }
+    return cands[cands.length - 1];
+  }
+
+  /* ---------------- stats ---------------- */
+  function stats() {
+    var solved = 0, tried = 0, attempts = 0, correct = 0;
+    QS.forEach(function (q) {
+      var p = prog(q.id);
+      if (!p) return;
+      if (p.n) tried++;
+      if (p.c) solved++;
+      attempts += p.n || 0;
+      correct += p.c || 0;
+    });
+    var streak = 0;
+    var d = new Date();
+    if (!store.days[today()]) d.setDate(d.getDate() - 1);
+    for (;;) {
+      var k = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      if (!store.days[k]) break;
+      streak++;
+      d.setDate(d.getDate() - 1);
+    }
+    return {
+      solved: solved, tried: tried,
+      acc: attempts ? Math.round(100 * correct / attempts) : null,
+      today: store.days[today()] || 0, streak: streak
+    };
+  }
+
+  /* =====================================================================
+     HOME
+     ===================================================================== */
+  var shown = PAGE;
+  function topbarHome() {
+    return '<header class="topbar"><div class="topbar-in">' +
+      '<div class="brand"><span class="brand-mark">' + (CFG.mark || 'PY') + '</span>' + (CFG.title || 'CS1010E Practice') + '</div>' +
+      '<button class="icon-btn" data-act="theme" aria-label="Toggle dark mode">' + (isDark() ? ICON.sun : ICON.moon) + '</button>' +
+      '</div></header>';
+  }
+  function renderHome() {
+    var s = stats();
+    var f = store.f;
+    var list = filtered();
+    var mistakes = poolFor('mistakes').length;
+    var flagged = poolFor('flagged').length;
+    var pct = Math.round(100 * s.solved / QS.length);
+
+    var lecChips = GROUPS ? GROUPS.map(function (g) {
+      var total = 0, done = 0;
+      QS.forEach(function (q) { if (q[GROUP_KEY] === g.id) { total++; if (isSolved(q.id)) done++; } });
+      return '<button class="chip' + (f.lecs.indexOf(g.id) >= 0 ? ' on' : '') + '" data-act="group" data-v="' + g.id + '" title="' + esc(g.hint || '') + '" aria-pressed="' + (f.lecs.indexOf(g.id) >= 0) + '">' +
+        esc(g.name) + ' <small>' + done + '/' + total + '</small></button>';
+    }).join('') : LECS.map(function (l) {
+      var total = 0, done = 0;
+      QS.forEach(function (q) { if (q.lec === l) { total++; if (isSolved(q.id)) done++; } });
+      return '<button class="chip' + (f.lecs.indexOf(l) >= 0 ? ' on' : '') + '" data-act="lec" data-v="' + l + '" aria-pressed="' + (f.lecs.indexOf(l) >= 0) + '">' +
+        'L' + l + ' <small>' + done + '/' + total + '</small>' +
+        (l >= NOT_REVISED_FROM ? '<span class="dot" title="Not revised yet"></span>' : '') + '</button>';
+    }).join('');
+
+    function seg(key, opts) {
+      return '<div class="seg" role="group">' + opts.map(function (o) {
+        return '<button data-act="seg" data-k="' + key + '" data-v="' + o[0] + '" class="' + (String(f[key]) === String(o[0]) ? 'on' : '') + '">' + o[1] + '</button>';
+      }).join('') + '</div>';
+    }
+
+    var rows = list.slice(0, shown).map(rowHtml).join('');
+
+    app.innerHTML = topbarHome() +
+      '<main class="wrap home">' +
+      (CFG.intro ? '<section class="card intro"><p class="sync-note">' + CFG.intro + '</p></section>' : '') +
+      '<div class="stats">' +
+        '<div class="stat"><b>' + s.solved + '<small>/' + QS.length + '</small></b><span>solved</span></div>' +
+        '<div class="stat"><b>' + (s.acc === null ? '–' : s.acc + '%') + '</b><span>accuracy</span></div>' +
+        '<div class="stat"><b>' + s.today + '</b><span>today</span></div>' +
+        '<div class="stat"><b>' + s.streak + '</b><span>day streak</span></div>' +
+      '</div>' +
+      '<div class="ring-bar" aria-hidden="true"><i style="width:' + pct + '%"></i></div>' +
+      '<div class="cta">' +
+        '<button class="btn primary big" data-act="start" data-mode="shuffle"' + (list.length ? '' : ' disabled') + '>▶ Shuffle practice <small>(' + list.length + ')</small></button>' +
+        '<button class="btn" data-act="start" data-mode="mistakes"' + (mistakes ? '' : ' disabled') + '>↻ Redo mistakes <small>' + mistakes + '</small></button>' +
+        '<button class="btn" data-act="start" data-mode="flagged"' + (flagged ? '' : ' disabled') + '>⚑ Flagged <small>' + flagged + '</small></button>' +
+      '</div>' +
+      '<section class="card">' +
+        '<h2>Filter</h2>' +
+        '<div class="frow"><div class="flabel">' + (GROUPS ? 'Source' : 'Lectures') +
+          '<span>' + (CFG.presets
+            ? CFG.presets.map(function (p, i) { return '<button data-act="preset" data-i="' + i + '">' + p.label + '</button>'; }).join('')
+            : '<button data-act="lecs" data-v="all">All</button><button data-act="lecs" data-v="revised">L1–8</button><button data-act="lecs" data-v="new">L9–11</button>') +
+          '</span></div>' +
+          '<div class="chips">' + lecChips + '</div>' +
+          (GROUPS ? '' : '<div class="legend"><span class="dot"></span> Lecture 9 onwards — not revised yet</div>') + '</div>' +
+        '<div class="frow"><div class="flabel">Type</div>' + seg('type', [['all', 'All']].concat(TYPES.map(function (t) { return [t, TYPE_SHORT[t] || TYPE[t]]; }))) + '</div>' +
+        '<div class="frow"><div class="flabel">Difficulty</div>' + seg('diff', [[0, 'All'], [1, 'Easy'], [2, 'Medium'], [3, 'Hard']]) + '</div>' +
+        '<div class="frow"><div class="flabel">Status</div>' + seg('status', [['all', 'All'], ['new', 'New'], ['wrong', 'Wrong'], ['solved', 'Solved'], ['flagged', '⚑']]) + '</div>' +
+      '</section>' +
+      '<input class="search" type="search" placeholder="Search titles and topics" value="' + esc(f.search || '') + '" data-act="search" autocomplete="off" autocapitalize="off" spellcheck="false">' +
+      '<div class="list-head"><h2>Problems</h2><span>' + list.length + ' shown</span></div>' +
+      (list.length ? '<div class="plist">' + rows + '</div>' : '<div class="plist"><div class="empty">No questions match these filters.</div></div>') +
+      (list.length > shown ? '<button class="btn more" data-act="more">Show more (' + (list.length - shown) + ' left)</button>' : '') +
+      '<section class="card sync">' +
+        '<h2>Sync across devices</h2>' +
+        '<p class="sync-note">Copy a code here, then paste it on your other device. Codes <b>merge</b>, so nothing on either device is lost. Do it both ways to bring phone and laptop fully in step.</p>' +
+        '<div class="sync-btns">' +
+          '<button class="btn" data-act="sync-copy">Copy sync code</button>' +
+          (navigator.share ? '<button class="btn" data-act="sync-share">Share code…</button>' : '') +
+          '<button class="btn primary" data-act="sync-paste">Paste sync code</button>' +
+        '</div>' +
+        (store.lastSync ? '<p class="sync-note">Last merged ' + esc(new Date(store.lastSync).toLocaleString()) + '.</p>' : '') +
+      '</section>' +
+      '<div class="foot">' +
+        (CFG.backHref ? '<a href="' + CFG.backHref + '">' + (CFG.backLabel || 'Back') + '</a>' : '<a href="examplify.html">Full past papers in exam mode (laptop) →</a>') +
+        (CFG.examHref ? '<a href="' + CFG.examHref + '">' + (CFG.examLabel || 'Full past papers →') + '</a>' : '') +
+        '<span>Progress is saved in this browser; use the sync code to move it.</span>' +
+        '<button data-act="reset">Reset all progress</button>' +
+      '</div>' +
+      '</main>';
+  }
+  function rowHtml(q) {
+    var p = prog(q.id);
+    var st = !p || !p.n ? '<span class="st none">○</span>'
+      : p.c && p.last === 'ok' ? '<span class="st ok" title="Solved">✓</span>'
+      : p.c ? '<span class="st ok" title="Solved before">✓</span>'
+      : '<span class="st bad" title="Not solved yet">✗</span>';
+    if (p && p.c && p.last !== 'ok') st = '<span class="st bad" title="Wrong last time">↻</span>';
+    return '<a class="prow" href="#/q/' + encodeURIComponent(q.id) + '" data-act="open" data-id="' + q.id + '">' + st +
+      '<span class="prow-main"><span class="prow-title">' + esc(q.t) + '</span>' +
+      '<span class="prow-sub"><span>' + esc(groupName(q)) + ' · ' + esc(q.topic) + '</span><span>· ' + (TYPE_SHORT[q.type] || TYPE[q.type]) + '</span>' +
+      (!GROUPS && q.lec >= NOT_REVISED_FROM ? '<span class="new">· not revised</span>' : '') +
+      (isFlagged(q.id) ? '<span class="flag">⚑</span>' : '') + '</span></span>' +
+      '<span class="diff d' + q.d + '">' + DIFF[q.d] + '</span></a>';
+  }
+
+  /* =====================================================================
+     SYNC CODE — progress as a pasteable text code that merges on import
+     ===================================================================== */
+  var SYNC_PREFIX = 'CS1010E-SYNC1:';
+  var LAST = { ok: 'o', bad: 'b', shown: 's' };
+  var LAST_BACK = { o: 'ok', b: 'bad', s: 'shown' };
+
+  function makeSyncCode() {
+    var p = {};
+    Object.keys(store.p).forEach(function (id) {
+      var e = store.p[id];
+      if (!e || (!e.n && !e.flag)) return;
+      p[id] = [e.n || 0, e.c || 0, LAST[e.last] || '', e.flag ? 1 : 0, Math.round((e.t || 0) / 1000)];
+    });
+    var json = JSON.stringify({ v: 1, p: p, d: store.days });
+    return SYNC_PREFIX + btoa(unescape(encodeURIComponent(json)));
+  }
+
+  function readSyncCode(text) {
+    var s = String(text || '').replace(/\s+/g, '');
+    var i = s.indexOf(SYNC_PREFIX);
+    if (i < 0) throw new Error('That doesn\'t look like a sync code. It should start with ' + SYNC_PREFIX);
+    var data;
+    try { data = JSON.parse(decodeURIComponent(escape(atob(s.slice(i + SYNC_PREFIX.length))))); }
+    catch (e) { throw new Error('The code is incomplete or damaged. Copy the whole code and try again.'); }
+    if (!data || data.v !== 1 || typeof data.p !== 'object') throw new Error('This sync code is from an unknown version.');
+    return data;
+  }
+
+  // Merge never loses work: attempt and correct counts take the larger value,
+  // the most recent result wins, flags are kept from either side.
+  function mergeSync(data) {
+    var changed = 0;
+    Object.keys(data.p).forEach(function (id) {
+      if (!BY_ID[id]) return;
+      var r = data.p[id];
+      var inc = { n: r[0] || 0, c: r[1] || 0, last: LAST_BACK[r[2]], flag: !!r[3], t: (r[4] || 0) * 1000 };
+      var cur = store.p[id];
+      if (!cur) {
+        var fresh = { n: inc.n, c: inc.c, t: inc.t };
+        if (inc.last) fresh.last = inc.last;
+        if (inc.flag) fresh.flag = true;
+        store.p[id] = fresh;
+        changed++;
+        return;
+      }
+      var before = JSON.stringify(cur);
+      cur.n = Math.max(cur.n || 0, inc.n);
+      cur.c = Math.max(cur.c || 0, inc.c);
+      if (inc.t > (cur.t || 0)) { if (inc.last) cur.last = inc.last; cur.t = inc.t; }
+      if (inc.flag) cur.flag = true;
+      if (JSON.stringify(cur) !== before) changed++;
+    });
+    Object.keys(data.d || {}).forEach(function (day) {
+      store.days[day] = Math.max(store.days[day] || 0, data.d[day] || 0);
+    });
+    store.lastSync = Date.now();
+    save();
+    return changed;
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+    return Promise.reject(new Error('no clipboard'));
+  }
+
+  function openModal(html) {
+    closeModal();
+    var m = document.createElement('div');
+    m.className = 'modal-back';
+    m.id = 'modal';
+    m.innerHTML = '<div class="modal" role="dialog" aria-modal="true">' + html + '</div>';
+    document.body.appendChild(m);
+    m.addEventListener('click', function (e) {
+      if (e.target === m || e.target.closest('[data-m="close"]')) closeModal();
+      if (e.target.closest('[data-m="merge"]')) doMerge();
+      if (e.target.closest('[data-m="copy"]')) {
+        var t = m.querySelector('textarea');
+        t.focus(); t.select();
+        copyText(t.value).then(function () { toast('Sync code copied'); closeModal(); },
+          function () { toast('Select the code and copy it'); });
+      }
+    });
+    var ta = m.querySelector('textarea');
+    if (ta) setTimeout(function () { ta.focus(); if (ta.readOnly) ta.select(); }, 50);
+  }
+  function closeModal() { var m = document.getElementById('modal'); if (m) m.remove(); }
+
+  function showCodeModal(code) {
+    openModal('<h3>Your sync code</h3>' +
+      '<p class="sync-note">Copy this whole code and paste it into <b>Paste sync code</b> on your other device.</p>' +
+      '<textarea class="sync-text" readonly>' + esc(code) + '</textarea>' +
+      '<div class="modal-btns"><button class="btn" data-m="close">Close</button><button class="btn primary" data-m="copy">Copy</button></div>');
+  }
+
+  function showPasteModal() {
+    openModal('<h3>Paste sync code</h3>' +
+      '<p class="sync-note">Paste the code copied on your other device. It is merged into the progress here.</p>' +
+      '<textarea class="sync-text" placeholder="' + SYNC_PREFIX + '…" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>' +
+      '<p class="sync-err" id="sync-err" hidden></p>' +
+      '<div class="modal-btns"><button class="btn" data-m="close">Cancel</button><button class="btn primary" data-m="merge">Merge progress</button></div>');
+  }
+
+  function doMerge() {
+    var m = document.getElementById('modal');
+    var err = document.getElementById('sync-err');
+    try {
+      var data = readSyncCode(m.querySelector('textarea').value);
+      var n = mergeSync(data);
+      closeModal();
+      if (!cur) renderHome();
+      toast(n ? 'Merged — ' + n + ' question' + (n === 1 ? '' : 's') + ' updated' : 'Already up to date');
+    } catch (e) {
+      err.textContent = e.message;
+      err.hidden = false;
+    }
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && document.getElementById('modal')) { e.stopImmediatePropagation(); closeModal(); }
+  }, true);
+
+  /* =====================================================================
+     QUESTION
+     ===================================================================== */
+  var cur = null; // { q, order, done, result, values }
+
+  function modeLabel() {
+    return { shuffle: 'Shuffle', list: 'Problem list', mistakes: 'Mistakes', flagged: 'Flagged' }[session.mode] || 'Practice';
+  }
+  function shuffle(a) {
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+  function openQuestion(q) {
+    cur = {
+      q: q,
+      order: q.type === 'mcq' ? shuffle(q.opts.map(function (_, i) { return i; })) : null,
+      done: false, result: null,
+      values: q.type === 'fib' ? q.blanks.map(function () { return ''; }) : ['']
+    };
+    renderQuestion();
+  }
+  function renderQuestion() {
+    var q = cur.q;
+    var flagged = isFlagged(q.id);
+    var score = session.done ? ' · <b>' + session.right + '/' + session.done + '</b>' : '';
+    var html = '<header class="topbar"><div class="topbar-in">' +
+      '<button class="icon-btn" data-act="home" aria-label="Back to problem list">' + ICON.back + '</button>' +
+      '<div class="qbar-title">' + modeLabel() + score + '</div>' +
+      '<button class="icon-btn' + (flagged ? ' on' : '') + '" data-act="flag" aria-label="' + (flagged ? 'Unflag' : 'Flag') + ' question" aria-pressed="' + flagged + '">' + (flagged ? ICON.flagOn : ICON.flag) + '</button>' +
+      '<button class="icon-btn" data-act="theme" aria-label="Toggle dark mode">' + (isDark() ? ICON.sun : ICON.moon) + '</button>' +
+      '</div></header>';
+
+    html += '<main class="wrap qview">';
+    html += '<div class="meta">' +
+      '<span class="pill">' + esc(groupName(q)) + ' · ' + esc(q.topic) + '</span>' +
+      '<span class="pill d' + q.d + '">' + DIFF[q.d] + '</span>' +
+      '<span class="pill">' + TYPE[q.type] + '</span>' +
+      (!GROUPS && q.lec >= NOT_REVISED_FROM ? '<span class="pill warn">Lecture ' + q.lec + ' — not revised yet</span>' : '') +
+      '</div>';
+    html += '<h1 class="qtitle">' + esc(q.t) + '</h1>';
+
+    var prompt = q.q || (q.type === 'out' ? 'What is printed?' : '');
+    html += '<div class="prose">' + md(prompt) + '</div>';
+
+    if (q.code) {
+      html += codeBlock(q.code, q.type === 'fib' ? function (n) {
+        var v = cur.values[n - 1];
+        var cls = 'chip-blank' + (v ? ' filled' : '') + (cur.done ? (cur.blankOk && cur.blankOk[n - 1] ? ' ok' : ' bad') : '');
+        return '<span class="' + cls + '" data-act="focus-blank" data-b="' + n + '" role="button" tabindex="-1">' + (v ? esc(v) : CIRCLED[n] || n) + '</span>';
+      } : null);
+    }
+    if (q.q2) html += '<div class="prose">' + md(q.q2) + '</div>';
+
+    if (q.type === 'mcq') html += renderOptions();
+    else html += renderTyped();
+
+    if (cur.done) html += renderFeedback();
+    html += '</main>';
+
+    html += '<div class="actionbar"><div class="actionbar-in">' + actionButtons() + '</div></div>';
+    app.innerHTML = html;
+  }
+
+  function renderOptions() {
+    var q = cur.q;
+    var letters = 'ABCDEFGH';
+    return '<div class="opts' + (cur.done ? ' locked' : '') + '" role="list">' + cur.order.map(function (oi, pos) {
+      var cls = 'opt';
+      var mark = '';
+      if (cur.done) {
+        if (oi === q.ans) { cls += ' right'; mark = '✓'; }
+        else if (oi === cur.picked) { cls += ' wrong'; mark = '✗'; }
+      }
+      var text = q.optCode ? codeBlock(q.opts[oi], null, true) : inline(q.opts[oi]);
+      return '<button class="' + cls + '" data-act="pick" data-i="' + oi + '"><span class="opt-letter">' + letters[pos] + '</span>' +
+        '<span class="opt-text">' + text + '</span><span class="opt-mark">' + mark + '</span></button>';
+    }).join('') + '</div>';
+  }
+
+  var KEYS = ['(', ')', '[', ']', ':', ',', "'", '_', '=', '+', '-', '*', '/', '%', '<', '>', '.'];
+  function renderTyped() {
+    var q = cur.q;
+    var dis = cur.done ? ' readonly' : '';
+    var attrs = ' autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="done"';
+    var html = '<div class="ans-block">';
+    if (q.type === 'fib') {
+      html += '<p class="ans-hint">Type the code for each blank. Spacing doesn\'t matter.</p>';
+      q.blanks.forEach(function (_, i) {
+        var cls = cur.done ? (cur.blankOk[i] ? ' ok' : ' bad') : '';
+        html += '<label class="blank-row"><span class="blank-no">' + (CIRCLED[i + 1] || i + 1) + '</span>' +
+          '<input class="ans-blank' + cls + '" data-b="' + (i + 1) + '" value="' + esc(cur.values[i]) + '" placeholder="blank ' + (i + 1) + '"' + attrs + dis + '></label>';
+      });
+    } else {
+      html += '<p class="ans-hint">Type exactly what is printed (one line per printed line). If it raises an error, type the error name, e.g. <code>TypeError</code>.</p>';
+      html += '<textarea class="ans-out' + (cur.done ? (cur.result === 'ok' ? ' ok' : ' bad') : '') + '" rows="3" placeholder="output…"' + attrs + dis + '>' + esc(cur.values[0]) + '</textarea>';
+    }
+    if (!cur.done) {
+      html += '<div class="keys" aria-label="Symbols">' + KEYS.map(function (k) {
+        return '<button type="button" data-act="key" data-k="' + esc(k) + '" aria-label="Insert ' + esc(k) + '">' + esc(k) + '</button>';
+      }).join('') + '</div>';
+    }
+    return html + '</div>';
+  }
+
+  function renderFeedback() {
+    var q = cur.q;
+    var r = cur.result;
+    var head = r === 'ok' ? '✓ Correct' : r === 'shown' ? 'Answer revealed' : '✗ Not quite';
+    var body = '';
+    if (q.type === 'fib') {
+      body += q.blanks.map(function (alts, i) {
+        var mine = cur.values[i];
+        return '<div class="lbl">Blank ' + (CIRCLED[i + 1] || i + 1) + (r !== 'shown' ? (cur.blankOk[i] ? ' ✓' : ' ✗') : '') + '</div>' +
+          codeBlock(alts[0], null, true) +
+          (r === 'bad' && !cur.blankOk[i] && mine ? '<div class="also">You wrote: <code>' + esc(mine) + '</code></div>' : '') +
+          (alts.length > 1 ? '<div class="also">Also accepted: ' + alts.slice(1).map(function (a) { return '<code>' + esc(a) + '</code>'; }).join(', ') + '</div>' : '');
+      }).join('');
+    } else if (q.type === 'out') {
+      body += '<div class="lbl">Expected output</div>' + codeBlock(q.ans, null, true);
+      if (r === 'bad' && cur.values[0].trim()) body += '<div class="lbl">Your answer</div>' + codeBlock(cur.values[0], null, true);
+    } else if (r === 'bad') {
+      body += '<div class="lbl">Answer</div><div>' + (q.optCode ? codeBlock(q.opts[q.ans], null, true) : inline(q.opts[q.ans])) + '</div>';
+    }
+    var override = (r === 'bad' && q.type !== 'mcq')
+      ? '<button class="override" data-act="override">My answer is equivalent — count it as correct</button>' : '';
+    return '<div class="fb ' + r + '" role="status"><div class="fb-head">' + head + '</div>' +
+      (body ? '<div class="fb-body">' + body + '</div>' : '') + override + '</div>' +
+      '<div class="explain"><h3>Explanation</h3><div class="prose">' + md(q.exp) + '</div></div>';
+  }
+
+  function actionButtons() {
+    if (!cur.done) {
+      if (cur.q.type === 'mcq') {
+        return '<button class="btn" data-act="reveal">Show answer</button><button class="btn" data-act="skip">Skip →</button>';
+      }
+      return '<button class="btn" data-act="reveal">Show answer</button><button class="btn primary grow" data-act="check">Check</button>';
+    }
+    return '<button class="btn" data-act="retry">Try again</button><button class="btn primary grow" data-act="next">Next →</button>';
+  }
+
+  function record(ok, how) {
+    var q = cur.q;
+    var p = store.p[q.id] || (store.p[q.id] = { n: 0, c: 0 });
+    p.n++;
+    if (ok) p.c++;
+    p.last = ok ? 'ok' : (how || 'bad');
+    p.t = Date.now();
+    var d = today();
+    store.days[d] = (store.days[d] || 0) + 1;
+    save();
+    session.done++;
+    if (ok) session.right++;
+    session.recent.push(q.id);
+    if (session.recent.length > 40) session.recent.shift();
+    saveSession();
+  }
+
+  function finish(result) {
+    cur.done = true;
+    cur.result = result;
+    record(result === 'ok', result);
+    renderQuestion();
+    var fb = document.querySelector('.fb');
+    if (fb && fb.getBoundingClientRect().top > window.innerHeight * 0.55) {
+      fb.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function check() {
+    var q = cur.q;
+    readInputs();
+    if (q.type === 'fib') {
+      if (cur.values.every(function (v) { return !v.trim(); })) { toast('Fill in the blanks first'); return; }
+      cur.blankOk = q.blanks.map(function (alts, i) { return checkBlank(alts, cur.values[i]); });
+      finish(cur.blankOk.every(Boolean) ? 'ok' : 'bad');
+    } else {
+      if (!cur.values[0].trim()) { toast('Type the output first'); return; }
+      finish(checkOut(q, cur.values[0]) ? 'ok' : 'bad');
+    }
+  }
+  function readInputs() {
+    var q = cur.q;
+    if (q.type === 'fib') {
+      document.querySelectorAll('input.ans-blank').forEach(function (el) { cur.values[+el.dataset.b - 1] = el.value; });
+    } else if (q.type === 'out') {
+      var t = document.querySelector('textarea.ans-out');
+      if (t) cur.values[0] = t.value;
+    }
+  }
+  function goNext() {
+    var next = pickNext(session.mode, cur && cur.q.id);
+    if (!next) {
+      toast(session.mode === 'mistakes' ? 'No mistakes left — nice!' : 'Nothing left in this set');
+      go('#/');
+      return;
+    }
+    history.replaceState(null, '', '#/q/' + encodeURIComponent(next.id));
+    route();
+  }
+
+  /* =====================================================================
+     ROUTING & EVENTS
+     ===================================================================== */
+  function go(hash) {
+    if (location.hash === hash) route();
+    else location.hash = hash;
+  }
+  function route() {
+    var m = location.hash.match(/^#\/q\/(.+)$/);
+    var q = m && BY_ID[decodeURIComponent(m[1])];
+    if (q) {
+      if (!cur || cur.q !== q || cur.stale) openQuestion(q);
+      else renderQuestion();
+    } else {
+      cur = null;
+      renderHome();
+    }
+    window.scrollTo(0, 0);
+  }
+  window.addEventListener('hashchange', function () { if (cur) cur.stale = true; route(); });
+
+  app.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-act]');
+    if (!el) return;
+    var act = el.dataset.act;
+    switch (act) {
+      case 'theme':
+        store.theme = isDark() ? 'light' : 'dark';
+        save(); applyTheme();
+        if (cur) { readInputs(); renderQuestion(); } else renderHome();
+        break;
+      case 'lec': {
+        var l = +el.dataset.v;
+        var i = store.f.lecs.indexOf(l);
+        if (i >= 0) store.f.lecs.splice(i, 1); else store.f.lecs.push(l);
+        store.f.lecs.sort(function (a, b) { return a - b; });
+        shown = PAGE; save(); renderHome();
+        break;
+      }
+      case 'group': {
+        var gid = el.dataset.v;
+        var gi = store.f.lecs.indexOf(gid);
+        if (gi >= 0) store.f.lecs.splice(gi, 1); else store.f.lecs.push(gid);
+        shown = PAGE; save(); renderHome();
+        break;
+      }
+      case 'preset': {
+        store.f.lecs = CFG.presets[+el.dataset.i].ids.slice();
+        shown = PAGE; save(); renderHome();
+        break;
+      }
+      case 'lecs':
+        store.f.lecs = el.dataset.v === 'all' ? LECS.slice()
+          : el.dataset.v === 'revised' ? LECS.filter(function (l) { return l < NOT_REVISED_FROM; })
+          : LECS.filter(function (l) { return l >= NOT_REVISED_FROM; });
+        shown = PAGE; save(); renderHome();
+        break;
+      case 'seg': {
+        var k = el.dataset.k, v = el.dataset.v;
+        store.f[k] = k === 'diff' ? +v : v;
+        shown = PAGE; save(); renderHome();
+        break;
+      }
+      case 'more':
+        shown += PAGE; renderHome();
+        break;
+      case 'start': {
+        session = { mode: el.dataset.mode, done: 0, right: 0, recent: [] };
+        saveSession();
+        var first = pickNext(session.mode, null);
+        if (first) go('#/q/' + encodeURIComponent(first.id));
+        break;
+      }
+      case 'open':
+        if (session.mode !== 'list') { session = { mode: 'list', done: 0, right: 0, recent: [] }; saveSession(); }
+        if (cur) cur.stale = true;
+        break; // the link's own navigation does the rest
+      case 'sync-copy': {
+        var code = makeSyncCode();
+        copyText(code).then(function () { toast('Sync code copied — paste it on your other device'); },
+          function () { showCodeModal(code); });
+        break;
+      }
+      case 'sync-share':
+        navigator.share({ title: 'CS1010E practice progress', text: makeSyncCode() }).catch(function () { /* cancelled */ });
+        break;
+      case 'sync-paste':
+        showPasteModal();
+        break;
+      case 'reset':
+        if (window.confirm('Clear all your practice progress on this device?')) {
+          var keepTheme = store.theme;
+          store = defaults(); store.theme = keepTheme; save();
+          session = { mode: 'list', done: 0, right: 0, recent: [] }; saveSession();
+          renderHome(); toast('Progress cleared');
+        }
+        break;
+      case 'home':
+        if (history.length > 1 && document.referrer === '' && location.hash.indexOf('#/q/') === 0) go('#/');
+        else go('#/');
+        break;
+      case 'flag': {
+        readInputs();
+        var p = store.p[cur.q.id] || (store.p[cur.q.id] = { n: 0, c: 0 });
+        p.flag = !p.flag; save();
+        renderQuestion();
+        toast(p.flag ? 'Flagged for later' : 'Flag removed');
+        break;
+      }
+      case 'pick':
+        if (cur.done) return;
+        cur.picked = +el.dataset.i;
+        finish(cur.picked === cur.q.ans ? 'ok' : 'bad');
+        break;
+      case 'check':
+        check();
+        break;
+      case 'reveal':
+        readInputs();
+        if (cur.q.type === 'fib') cur.blankOk = cur.q.blanks.map(function (alts, i) { return checkBlank(alts, cur.values[i]); });
+        finish('shown');
+        break;
+      case 'skip':
+        goNext();
+        break;
+      case 'retry':
+        openQuestion(cur.q);
+        window.scrollTo(0, 0);
+        break;
+      case 'next':
+        goNext();
+        break;
+      case 'override': {
+        var pp = store.p[cur.q.id];
+        if (pp) { pp.c++; pp.last = 'ok'; save(); }
+        session.right++; saveSession();
+        cur.result = 'ok';
+        if (cur.blankOk) cur.blankOk = cur.blankOk.map(function () { return true; });
+        renderQuestion();
+        toast('Counted as correct');
+        break;
+      }
+      case 'focus-blank': {
+        var inp = document.querySelector('input.ans-blank[data-b="' + el.dataset.b + '"]');
+        if (inp && !cur.done) { inp.focus(); inp.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+        break;
+      }
+      case 'key': {
+        var target = lastField && document.body.contains(lastField) ? lastField
+          : document.querySelector('input.ans-blank, textarea.ans-out');
+        if (!target) return;
+        insertAt(target, el.dataset.k);
+        break;
+      }
+    }
+  });
+
+  // Keep focus in the text field when a symbol key is tapped.
+  app.addEventListener('pointerdown', function (e) {
+    if (e.target.closest('[data-act="key"]')) e.preventDefault();
+  });
+  var lastField = null;
+  app.addEventListener('focusin', function (e) {
+    if (e.target.matches('input.ans-blank, textarea.ans-out')) lastField = e.target;
+  });
+  function insertAt(el, text) {
+    var s = el.selectionStart == null ? el.value.length : el.selectionStart;
+    var t = el.selectionEnd == null ? el.value.length : el.selectionEnd;
+    el.value = el.value.slice(0, s) + text + el.value.slice(t);
+    el.selectionStart = el.selectionEnd = s + text.length;
+    el.focus();
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  app.addEventListener('input', function (e) {
+    var el = e.target;
+    if (el.matches('input.ans-blank')) {
+      var n = +el.dataset.b;
+      cur.values[n - 1] = el.value;
+      var chip = document.querySelector('.chip-blank[data-b="' + n + '"]');
+      if (chip) {
+        chip.textContent = el.value || CIRCLED[n] || n;
+        chip.classList.toggle('filled', !!el.value);
+      }
+    } else if (el.matches('textarea.ans-out')) {
+      cur.values[0] = el.value;
+    } else if (el.matches('input.search')) {
+      store.f.search = el.value;
+      save();
+      clearTimeout(renderHome.t);
+      renderHome.t = setTimeout(function () {
+        var pos = el.selectionStart;
+        renderHome();
+        var s = document.querySelector('input.search');
+        if (s) { s.focus(); s.setSelectionRange(pos, pos); }
+      }, 180);
+    }
+  });
+
+  app.addEventListener('keydown', function (e) {
+    if (!cur || cur.done) return;
+    if (e.key === 'Enter' && e.target.matches('input.ans-blank')) {
+      e.preventDefault();
+      var next = document.querySelector('input.ans-blank[data-b="' + (+e.target.dataset.b + 1) + '"]');
+      if (next && !next.value) next.focus(); else check();
+    }
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && e.target.matches('textarea.ans-out')) {
+      e.preventDefault();
+      check();
+    }
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (!cur || e.target.matches('input, textarea')) return;
+    if (!cur.done && cur.q.type === 'mcq' && /^[a-hA-H1-8]$/.test(e.key)) {
+      var pos = /\d/.test(e.key) ? +e.key - 1 : e.key.toUpperCase().charCodeAt(0) - 65;
+      if (pos < cur.order.length) {
+        cur.picked = cur.order[pos];
+        finish(cur.picked === cur.q.ans ? 'ok' : 'bad');
+      }
+    } else if (cur.done && (e.key === 'Enter' || e.key === 'ArrowRight' || e.key === 'n')) {
+      goNext();
+    } else if (e.key === 'Escape') {
+      go('#/');
+    }
+  });
+
+  if (window.matchMedia) {
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    var onScheme = function () { if (!store.theme) { if (cur) { readInputs(); renderQuestion(); } else renderHome(); } };
+    if (mq.addEventListener) mq.addEventListener('change', onScheme);
+  }
+
+  // Expose the graders for the self-test in tools/ (harmless in the page).
+  window.__practice = { normCode: normCode, normOut: normOut, checkOut: checkOut, checkBlank: checkBlank, highlight: highlight };
+
+  route();
+})();
+</script>
+</body>
+</html>

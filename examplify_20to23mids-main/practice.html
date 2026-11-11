@@ -3876,12 +3876,35 @@ practice([
 (function () {
   'use strict';
 
+  /* A page can override any of this with window.PRACTICE_CONFIG before this
+     script runs. Without it the page behaves exactly as the lecture bank. */
+  var CFG = window.PRACTICE_CONFIG || {};
+  var GROUPS = CFG.groups || null;          // [{id, name, hint}] — tutorial/assignment mode
+  var GROUP_KEY = CFG.groupKey || 'lec';
+  var TYPES = CFG.types || ['mcq', 'fib', 'out'];
+  var TYPE = CFG.typeLabels || { mcq: 'Multiple choice', fib: 'Fill in the blank', out: 'Predict the output' };
+  var TYPE_SHORT = CFG.typeShort || { mcq: 'MCQ', fib: 'Fill-in', out: 'Output' };
+
   var QS = (window.PRACTICE_QUESTIONS || []).slice();
   var BY_ID = {};
   QS.forEach(function (q) { BY_ID[q.id] = q; });
   QS.sort(function (a, b) {
+    if (GROUPS) {
+      var ga = groupIndex(a[GROUP_KEY]), gb = groupIndex(b[GROUP_KEY]);
+      if (ga !== gb) return ga - gb;
+      return (+a.id.split('-')[1]) - (+b.id.split('-')[1]);
+    }
     return a.lec - b.lec || (+a.id.split('-')[1]) - (+b.id.split('-')[1]);
   });
+  function groupIndex(id) {
+    for (var i = 0; i < GROUPS.length; i++) if (GROUPS[i].id === id) return i;
+    return GROUPS.length;
+  }
+  function groupName(q) {
+    if (!GROUPS) return 'L' + q.lec;
+    for (var i = 0; i < GROUPS.length; i++) if (GROUPS[i].id === q[GROUP_KEY]) return GROUPS[i].name;
+    return String(q[GROUP_KEY]);
+  }
 
   var LECS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
   var NOT_REVISED_FROM = 9;
@@ -3891,15 +3914,15 @@ practice([
     8: 'Dictionaries', 9: '2D arrays', 10: 'Searching & sorting', 11: 'OOP'
   };
   var DIFF = { 1: 'Easy', 2: 'Medium', 3: 'Hard' };
-  var TYPE = { mcq: 'Multiple choice', fib: 'Fill in the blank', out: 'Predict the output' };
   var CIRCLED = ['⓪', '①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨'];
   var PAGE = 60;
 
   /* ---------------- storage ---------------- */
-  var KEY = 'cs1010e-practice-v1';
-  var SKEY = 'cs1010e-practice-session';
+  var KEY = CFG.storageKey || 'cs1010e-practice-v1';
+  var SKEY = CFG.sessionKey || 'cs1010e-practice-session';
   function defaults() {
-    return { p: {}, f: { lecs: LECS.slice(), type: 'all', diff: 0, status: 'all' }, days: {}, theme: null };
+    var ids = GROUPS ? GROUPS.map(function (g) { return g.id; }) : LECS.slice();
+    return { p: {}, f: { lecs: ids, type: 'all', diff: 0, status: 'all' }, days: {}, theme: null };
   }
   function load() {
     try {
@@ -4056,7 +4079,7 @@ practice([
 
   /* ---------------- filtering & picking ---------------- */
   function matches(q, f, ignoreStatus) {
-    if (f.lecs.indexOf(q.lec) < 0) return false;
+    if (f.lecs.indexOf(q[GROUP_KEY]) < 0) return false;
     if (f.type !== 'all' && q.type !== f.type) return false;
     if (f.diff && q.d !== f.diff) return false;
     if (!ignoreStatus) {
@@ -4068,7 +4091,7 @@ practice([
     }
     if (f.search) {
       var s = f.search.toLowerCase();
-      var hay = (q.t + ' ' + q.topic + ' ' + q.id + ' ' + LEC_NAMES[q.lec]).toLowerCase();
+      var hay = (q.t + ' ' + q.topic + ' ' + q.id + ' ' + (GROUPS ? groupName(q) : LEC_NAMES[q.lec])).toLowerCase();
       if (hay.indexOf(s) < 0) return false;
     }
     return true;
@@ -4076,7 +4099,7 @@ practice([
   function filtered() { return QS.filter(function (q) { return matches(q, store.f); }); }
   function poolFor(mode) {
     var f = store.f;
-    if (mode === 'mistakes') return QS.filter(function (q) { return f.lecs.indexOf(q.lec) >= 0 && isWrong(q.id); });
+    if (mode === 'mistakes') return QS.filter(function (q) { return f.lecs.indexOf(q[GROUP_KEY]) >= 0 && isWrong(q.id); });
     if (mode === 'flagged') return QS.filter(function (q) { return isFlagged(q.id); });
     return filtered();
   }
@@ -4139,7 +4162,7 @@ practice([
   var shown = PAGE;
   function topbarHome() {
     return '<header class="topbar"><div class="topbar-in">' +
-      '<div class="brand"><span class="brand-mark">PY</span>CS1010E Practice</div>' +
+      '<div class="brand"><span class="brand-mark">' + (CFG.mark || 'PY') + '</span>' + (CFG.title || 'CS1010E Practice') + '</div>' +
       '<button class="icon-btn" data-act="theme" aria-label="Toggle dark mode">' + (isDark() ? ICON.sun : ICON.moon) + '</button>' +
       '</div></header>';
   }
@@ -4151,7 +4174,12 @@ practice([
     var flagged = poolFor('flagged').length;
     var pct = Math.round(100 * s.solved / QS.length);
 
-    var lecChips = LECS.map(function (l) {
+    var lecChips = GROUPS ? GROUPS.map(function (g) {
+      var total = 0, done = 0;
+      QS.forEach(function (q) { if (q[GROUP_KEY] === g.id) { total++; if (isSolved(q.id)) done++; } });
+      return '<button class="chip' + (f.lecs.indexOf(g.id) >= 0 ? ' on' : '') + '" data-act="group" data-v="' + g.id + '" title="' + esc(g.hint || '') + '" aria-pressed="' + (f.lecs.indexOf(g.id) >= 0) + '">' +
+        esc(g.name) + ' <small>' + done + '/' + total + '</small></button>';
+    }).join('') : LECS.map(function (l) {
       var total = 0, done = 0;
       QS.forEach(function (q) { if (q.lec === l) { total++; if (isSolved(q.id)) done++; } });
       return '<button class="chip' + (f.lecs.indexOf(l) >= 0 ? ' on' : '') + '" data-act="lec" data-v="' + l + '" aria-pressed="' + (f.lecs.indexOf(l) >= 0) + '">' +
@@ -4169,6 +4197,7 @@ practice([
 
     app.innerHTML = topbarHome() +
       '<main class="wrap home">' +
+      (CFG.intro ? '<section class="card intro"><p class="sync-note">' + CFG.intro + '</p></section>' : '') +
       '<div class="stats">' +
         '<div class="stat"><b>' + s.solved + '<small>/' + QS.length + '</small></b><span>solved</span></div>' +
         '<div class="stat"><b>' + (s.acc === null ? '–' : s.acc + '%') + '</b><span>accuracy</span></div>' +
@@ -4183,11 +4212,14 @@ practice([
       '</div>' +
       '<section class="card">' +
         '<h2>Filter</h2>' +
-        '<div class="frow"><div class="flabel">Lectures' +
-          '<span><button data-act="lecs" data-v="all">All</button><button data-act="lecs" data-v="revised">L1–8</button><button data-act="lecs" data-v="new">L9–11</button></span></div>' +
+        '<div class="frow"><div class="flabel">' + (GROUPS ? 'Source' : 'Lectures') +
+          '<span>' + (CFG.presets
+            ? CFG.presets.map(function (p, i) { return '<button data-act="preset" data-i="' + i + '">' + p.label + '</button>'; }).join('')
+            : '<button data-act="lecs" data-v="all">All</button><button data-act="lecs" data-v="revised">L1–8</button><button data-act="lecs" data-v="new">L9–11</button>') +
+          '</span></div>' +
           '<div class="chips">' + lecChips + '</div>' +
-          '<div class="legend"><span class="dot"></span> Lecture 9 onwards — not revised yet</div></div>' +
-        '<div class="frow"><div class="flabel">Type</div>' + seg('type', [['all', 'All'], ['mcq', 'MCQ'], ['fib', 'Fill-in'], ['out', 'Output']]) + '</div>' +
+          (GROUPS ? '' : '<div class="legend"><span class="dot"></span> Lecture 9 onwards — not revised yet</div>') + '</div>' +
+        '<div class="frow"><div class="flabel">Type</div>' + seg('type', [['all', 'All']].concat(TYPES.map(function (t) { return [t, TYPE_SHORT[t] || TYPE[t]]; }))) + '</div>' +
         '<div class="frow"><div class="flabel">Difficulty</div>' + seg('diff', [[0, 'All'], [1, 'Easy'], [2, 'Medium'], [3, 'Hard']]) + '</div>' +
         '<div class="frow"><div class="flabel">Status</div>' + seg('status', [['all', 'All'], ['new', 'New'], ['wrong', 'Wrong'], ['solved', 'Solved'], ['flagged', '⚑']]) + '</div>' +
       '</section>' +
@@ -4206,7 +4238,8 @@ practice([
         (store.lastSync ? '<p class="sync-note">Last merged ' + esc(new Date(store.lastSync).toLocaleString()) + '.</p>' : '') +
       '</section>' +
       '<div class="foot">' +
-        '<a href="examplify.html">Full past papers in exam mode (laptop) →</a>' +
+        (CFG.backHref ? '<a href="' + CFG.backHref + '">' + (CFG.backLabel || 'Back') + '</a>' : '<a href="examplify.html">Full past papers in exam mode (laptop) →</a>') +
+        (CFG.examHref ? '<a href="' + CFG.examHref + '">' + (CFG.examLabel || 'Full past papers →') + '</a>' : '') +
         '<span>Progress is saved in this browser; use the sync code to move it.</span>' +
         '<button data-act="reset">Reset all progress</button>' +
       '</div>' +
@@ -4221,8 +4254,8 @@ practice([
     if (p && p.c && p.last !== 'ok') st = '<span class="st bad" title="Wrong last time">↻</span>';
     return '<a class="prow" href="#/q/' + encodeURIComponent(q.id) + '" data-act="open" data-id="' + q.id + '">' + st +
       '<span class="prow-main"><span class="prow-title">' + esc(q.t) + '</span>' +
-      '<span class="prow-sub"><span>L' + q.lec + ' · ' + esc(q.topic) + '</span><span>· ' + TYPE[q.type].split(' ')[0] + (q.type === 'fib' ? '-in' : q.type === 'out' ? ' output' : '') + '</span>' +
-      (q.lec >= NOT_REVISED_FROM ? '<span class="new">· not revised</span>' : '') +
+      '<span class="prow-sub"><span>' + esc(groupName(q)) + ' · ' + esc(q.topic) + '</span><span>· ' + (TYPE_SHORT[q.type] || TYPE[q.type]) + '</span>' +
+      (!GROUPS && q.lec >= NOT_REVISED_FROM ? '<span class="new">· not revised</span>' : '') +
       (isFlagged(q.id) ? '<span class="flag">⚑</span>' : '') + '</span></span>' +
       '<span class="diff d' + q.d + '">' + DIFF[q.d] + '</span></a>';
   }
@@ -4386,10 +4419,10 @@ practice([
 
     html += '<main class="wrap qview">';
     html += '<div class="meta">' +
-      '<span class="pill">L' + q.lec + ' · ' + esc(q.topic) + '</span>' +
+      '<span class="pill">' + esc(groupName(q)) + ' · ' + esc(q.topic) + '</span>' +
       '<span class="pill d' + q.d + '">' + DIFF[q.d] + '</span>' +
       '<span class="pill">' + TYPE[q.type] + '</span>' +
-      (q.lec >= NOT_REVISED_FROM ? '<span class="pill warn">Lecture ' + q.lec + ' — not revised yet</span>' : '') +
+      (!GROUPS && q.lec >= NOT_REVISED_FROM ? '<span class="pill warn">Lecture ' + q.lec + ' — not revised yet</span>' : '') +
       '</div>';
     html += '<h1 class="qtitle">' + esc(q.t) + '</h1>';
 
@@ -4588,6 +4621,18 @@ practice([
         var i = store.f.lecs.indexOf(l);
         if (i >= 0) store.f.lecs.splice(i, 1); else store.f.lecs.push(l);
         store.f.lecs.sort(function (a, b) { return a - b; });
+        shown = PAGE; save(); renderHome();
+        break;
+      }
+      case 'group': {
+        var gid = el.dataset.v;
+        var gi = store.f.lecs.indexOf(gid);
+        if (gi >= 0) store.f.lecs.splice(gi, 1); else store.f.lecs.push(gid);
+        shown = PAGE; save(); renderHome();
+        break;
+      }
+      case 'preset': {
+        store.f.lecs = CFG.presets[+el.dataset.i].ids.slice();
         shown = PAGE; save(); renderHome();
         break;
       }

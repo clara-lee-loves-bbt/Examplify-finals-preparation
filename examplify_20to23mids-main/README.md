@@ -65,6 +65,32 @@ each answer through Python. It checks every output answer, every runnable MCQ
 key, every accepted fill-in answer (against its tests) and the extra asserts
 some questions carry.
 
+## Tutorials & assignments practice (new page)
+
+**`tutorials.html`** is a second phone-first practice page, built the same way as
+`practice.html` but drawing from the tutorial worksheets instead of the lecture
+bank. Open it from the picker (*Tutorials & assignments practice*) or directly.
+
+- **61 converted questions** from the AY26/27 tutorial worksheets **8–12** and
+  **assignments 4–6**. Tutorials 8 onwards are the priority set (44 questions);
+  assignments 4 onwards follow (17).
+- Tutorial questions are rewritten as either multiple choice or
+  fill-in-the-blank over the worksheet's own code. Every assignment task is a
+  fill-in-the-blank.
+- Source filters narrow the list to all questions, tutorials only, assignments
+  only, or a single worksheet, alongside the type, difficulty, status and search
+  filters. Progress is stored separately from the lecture bank
+  (`cs1010e-tutorials-v1`).
+- Answer checking matches `practice.html`: spacing and quote style are ignored,
+  every blank must be right, and each answer comes with an explanation. *Show
+  answer* reveals the key, and *My answer is equivalent* overrides a
+  different-but-correct fill-in.
+
+Sources live in `tutorials/` (`index.html`, `questions/*.js`); the page reuses
+`practice/practice.css` and `practice/practice.js`. `node build.js` bundles it
+into `tutorials.html`, and `node tools/verify-tutorials.js` runs every accepted
+fill-in answer through Python.
+
 ## Papers
 
 Every source PDF has been split into its own exam. Nothing is combined, and
@@ -191,7 +217,9 @@ examplify.html          built single-file app — open this
 index.html              same app, multi-file version
 styles.css
 app.js
-build.js                inlines index.html + css + js -> examplify.html
+build.js                inlines each page + css + js -> examplify/practice/tutorials.html
+practice/               lecture bank (index.html, practice.css, practice.js, questions/)
+tutorials/              tutorial & assignment bank (index.html, questions/)
 data/registry.js        registerExam() helper
 data/exam-final-1920.js final papers (category: 'final') — top of the picker
 data/exam-final-2021.js
@@ -214,9 +242,10 @@ tools/validate-data.js  sanity-check the question data
 After editing `index.html`, `styles.css`, `app.js` or anything in `data/`:
 
 ```bash
-node build.js                    # rebuild examplify.html and practice.html
+node build.js                    # rebuild examplify.html, practice.html and tutorials.html
 node tools/validate-data.js      # verify every paper's data
-node tools/verify-practice.js    # verify the practice bank (runs Python)
+node tools/verify-practice.js    # verify the lecture practice bank (runs Python)
+node tools/verify-tutorials.js   # verify the tutorial/assignment bank (runs Python)
 ```
 
 `validate-data.js` checks that question numbers run 1..n without gaps, that

@@ -5,6 +5,8 @@
      index.html          + styles.css + data/*.js + app.js  -> examplify.html
      practice/index.html + practice.css + questions/*.js + practice.js
                                                            -> practice.html
+     tutorials/index.html + practice.css + questions/*.js + practice.js
+                                                           -> tutorials.html
 
    Usage:  node build.js                                                     */
 
@@ -45,3 +47,4 @@ function bundle(srcHtml, outName) {
 
 bundle('index.html', 'examplify.html');
 bundle('practice/index.html', 'practice.html');
+bundle('tutorials/index.html', 'tutorials.html');

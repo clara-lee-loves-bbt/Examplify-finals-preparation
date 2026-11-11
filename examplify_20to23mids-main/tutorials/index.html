@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f7f8fa" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="CS1010E">
+<title>Tutorials &amp; Assignments — CS1010E</title>
+<link rel="stylesheet" href="../practice/practice.css">
+</head>
+<body>
+<div id="app"></div>
+<div class="toast" id="toast" hidden></div>
+
+<script src="questions/registry.js"></script>
+<script src="questions/t08.js"></script>
+<script src="questions/t09.js"></script>
+<script src="questions/t10.js"></script>
+<script src="questions/t11.js"></script>
+<script src="questions/t12.js"></script>
+<script src="questions/a04.js"></script>
+<script src="questions/a05.js"></script>
+<script src="questions/a06.js"></script>
+<script>
+window.PRACTICE_CONFIG = {
+  storageKey: 'cs1010e-tutorials-v1',
+  sessionKey: 'cs1010e-tutorials-session',
+  title: 'Tutorial & Assignment Practice',
+  mark: 'TA',
+  groupKey: 'src',
+  groups: [
+    { id: 'T8', name: 'Tutorial 8', hint: 'List processing' },
+    { id: 'T9', name: 'Tutorial 9', hint: 'Dictionaries' },
+    { id: 'T10', name: 'Tutorial 10', hint: 'Multi-dimensional arrays' },
+    { id: 'T11', name: 'Tutorial 11', hint: 'Searching and sorting' },
+    { id: 'T12', name: 'Tutorial 12', hint: 'Object-oriented programming' },
+    { id: 'A4', name: 'Assignment 4', hint: 'List processing and dictionaries' },
+    { id: 'A5', name: 'Assignment 5', hint: '2D arrays — Game of Life' },
+    { id: 'A6', name: 'Assignment 6', hint: 'OOP — RPG characters' }
+  ],
+  presets: [
+    { label: 'All', ids: ['T8', 'T9', 'T10', 'T11', 'T12', 'A4', 'A5', 'A6'] },
+    { label: 'Tutorials', ids: ['T8', 'T9', 'T10', 'T11', 'T12'] },
+    { label: 'Assignments', ids: ['A4', 'A5', 'A6'] }
+  ],
+  types: ['mcq', 'fib'],
+  typeLabels: { mcq: 'Multiple choice', fib: 'Fill in the blank' },
+  typeShort: { mcq: 'MCQ', fib: 'Fill-in' },
+  intro: 'Every question here is converted from the AY26/27 tutorial worksheets 8–12 and assignments 4–6. Tutorials are the priority set; Assignment 4 onwards follows. Answer an MCQ or type each blank for a fill-in, and the key and explanation appear straight away.',
+  backHref: 'practice.html',
+  backLabel: 'Lecture-by-lecture practice →',
+  examHref: 'examplify.html',
+  examLabel: 'Full past papers in exam mode (laptop) →'
+};
+</script>
+<script src="../practice/practice.js"></script>
+</body>
+</html>
