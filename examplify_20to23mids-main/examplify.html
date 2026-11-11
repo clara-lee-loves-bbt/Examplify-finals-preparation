@@ -1616,6 +1616,7 @@ registerExam({
     },
     {
       n: 19, marks: 3, type: 'mcq',
+      scope: { level: 'crucial', reason: 'R(P, Q) uses multiple inheritance, which is not covered — L11 covers single inheritance only; you must know an R is also a Q' },
       stem: [
         { p: 'Given the following code fragment, which expression is evaluated to `True`?' },
         { code: 'class P():\n    def __init__(self):\n        self.x = 0\nclass Q():\n    def __init__(self):\n        self.y = 0\nclass R(P,Q):\n    def get_x(self):\n        return self.x\nr = R()' }
