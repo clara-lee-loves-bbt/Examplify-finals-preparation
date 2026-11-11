@@ -411,5 +411,172 @@ practice([
       L = [1, 3, 3, 5, 8]
       print(lower(L, 3, 0, 4), lower(L, 6, 0, 4), lower(L, 9, 0, 4))`,
     ans: '1 4 5',
-    exp: 'This returns the first index whose value is ≥ v, i.e. where v would be inserted to keep L sorted. That is index 1 for 3 (the first 3), index 4 for 6 (before the 8), and index 5 for 9 (past the end).' }
+    exp: 'This returns the first index whose value is ≥ v, i.e. where v would be inserted to keep L sorted. That is index 1 for 3 (the first 3), index 4 for 6 (before the 8), and index 5 for 9 (past the end).' },
+
+  { id: 'L10-30', lec: 10, topic: 'Binary search', d: 3, type: 'fib',
+    t: 'First occurrence by binary search',
+    q: '`first_index(L, v)` returns the index of the **first** occurrence of `v` in the ascending list `L`, or −1, in O(log N). Complete what happens on a match.',
+    code: `
+      def first_index(L, v):
+          lo, hi, ans = 0, len(L) - 1, -1
+          while lo <= hi:
+              mid = (lo + hi) // 2
+              if L[mid] == v:
+                  ans = mid
+                  {{1}}
+              elif L[mid] < v:
+                  lo = mid + 1
+              else:
+                  hi = mid - 1
+          return ans`,
+    blanks: [['hi = mid - 1', 'hi = mid-1']],
+    test: 'assert first_index([1, 2, 2, 2, 3], 2) == 1\nassert first_index([1, 3], 2) == -1\nassert first_index([5, 5, 5, 5], 5) == 0\nassert first_index([], 1) == -1',
+    exp: 'Record the match, but keep searching **left**, since an earlier copy may exist. Returning straight away would give whichever copy `mid` happened to land on.' },
+
+  { id: 'L10-31', lec: 10, topic: 'Bubble sort', d: 2, type: 'fib',
+    t: 'Bubble sort that stops early',
+    q: 'Complete this bubble sort so it stops as soon as a whole pass makes no swaps.',
+    code: `
+      def bubble(L):
+          swapped = True
+          while swapped:
+              swapped = False
+              for i in range(len(L) - 1):
+                  if L[i] > L[i + 1]:
+                      L[i], L[i + 1] = L[i + 1], L[i]
+                      {{1}}`,
+    blanks: [['swapped = True']],
+    test: 'for L in ([5, 1, 4, 2, 8], [], [1], [2, 1], [1, 2, 3]):\n    want = sorted(L)\n    bubble(L)\n    assert L == want',
+    exp: 'A pass with no swaps proves the list is sorted. On already-sorted input this makes bubble sort O(N), unlike selection sort, which is always O(N²).' },
+
+  { id: 'L10-32', lec: 10, topic: 'Two pointers', d: 2, type: 'fib',
+    t: 'Pair with a given sum in a sorted list',
+    q: '`has_pair(L, x)` checks whether two different elements of the ascending list `L` add up to `x`, in O(N). Complete the pointer moves.',
+    code: `
+      def has_pair(L, x):
+          i, j = 0, len(L) - 1
+          while i < j:
+              s = L[i] + L[j]
+              if s == x:
+                  return True
+              elif s < x:
+                  {{1}}
+              else:
+                  {{2}}
+          return False`,
+    blanks: [['i += 1', 'i = i + 1'], ['j -= 1', 'j = j - 1']],
+    test: 'assert has_pair([1, 2, 4, 7, 11], 9)\nassert not has_pair([1, 2, 4, 7, 11], 10)\nassert not has_pair([5], 10)\nassert has_pair([3, 3], 6)',
+    exp: 'If the sum is too small, the only way to increase it is to move the left pointer to a bigger value. If it is too big, move the right pointer down. Each step discards one element for good.' },
+
+  { id: 'L10-33', lec: 10, topic: 'Selection sort', d: 2, type: 'fib',
+    t: 'Recursive selection sort',
+    q: 'Complete this recursive version of the lecture\'s (not in-place) selection sort.',
+    code: `
+      def ssort(L):
+          if not L:
+              return []
+          m = min(L)
+          rest = L.copy()
+          rest.remove(m)
+          return {{1}}`,
+    blanks: [['[m] + ssort(rest)']],
+    test: 'L = [4, 5, 1, 3, 1]\nassert ssort(L) == [1, 1, 3, 4, 5]\nassert L == [4, 5, 1, 3, 1]\nassert ssort([]) == []',
+    exp: 'The smallest element comes first, followed by the sorted rest. Working on a copy keeps the caller\'s list unchanged.' },
+
+  { id: 'L10-34', lec: 10, topic: 'Merge', d: 3, type: 'fib',
+    t: 'Union of sorted lists without duplicates',
+    q: '`union(A, B)` merges two ascending lists into one ascending list with **no repeated values**. Complete the test before appending.',
+    code: `
+      def union(A, B):
+          i, j, out = 0, 0, []
+          while i < len(A) or j < len(B):
+              if j == len(B) or (i < len(A) and A[i] < B[j]):
+                  x = A[i]
+                  i += 1
+              else:
+                  x = B[j]
+                  j += 1
+              if {{1}}:
+                  out.append(x)
+          return out`,
+    blanks: [['not out or out[-1] != x', 'out == [] or out[-1] != x', 'len(out) == 0 or out[-1] != x', 'x not in out']],
+    test: 'assert union([1, 3, 3, 5], [2, 3, 6]) == [1, 2, 3, 5, 6]\nassert union([], [1, 1]) == [1]\nassert union([], []) == []',
+    exp: 'The values arrive in sorted order, so a duplicate can only be equal to the **last** value appended. Checking `out[-1]` is O(1), while `x not in out` also works but scans the whole list each time. The `not out` part guards against indexing an empty list.' },
+
+  { id: 'L10-35', lec: 10, topic: 'Selection sort', d: 2, type: 'fib',
+    t: 'Sort records by mark, highest first',
+    q: 'Complete this selection sort, which orders `(name, mark)` pairs by mark, **highest first**.',
+    code: `
+      def sort_by_mark(data):
+          data = list(data)
+          for i in range(len(data) - 1):
+              m = i
+              for j in range(i + 1, len(data)):
+                  if {{1}}:
+                      m = j
+              data[i], data[m] = data[m], data[i]
+          return data`,
+    blanks: [['data[j][1] > data[m][1]', 'data[m][1] < data[j][1]']],
+    test: "assert sort_by_mark((('A', 70), ('B', 90), ('C', 80))) == [('B', 90), ('C', 80), ('A', 70)]\nassert sort_by_mark(()) == []",
+    exp: 'Compare the marks (index 1 of each pair), and select the **largest** remaining one each round to get descending order.' },
+
+  { id: 'L10-36', lec: 10, topic: 'Binary search', d: 2, type: 'out',
+    t: 'Binary search over strings',
+    code: `
+      L = ['ant', 'bee', 'cat', 'dog', 'eel', 'fox']
+      lo, hi, steps, found = 0, len(L) - 1, 0, False
+      while lo <= hi and not found:
+          mid = (lo + hi) // 2
+          steps += 1
+          if L[mid] == 'eel':
+              found = True
+          elif L[mid] < 'eel':
+              lo = mid + 1
+          else:
+              hi = mid - 1
+      print(mid, steps)`,
+    ans: '4 2',
+    exp: 'Strings compare alphabetically, so binary search works on a sorted list of words too. mid = 2 (`cat` < `eel`), so go right: lo = 3, mid = 4 is `eel`, found in 2 steps.' },
+
+  { id: 'L10-37', lec: 10, topic: 'Selection sort', d: 2, type: 'out',
+    t: 'Counting real swaps',
+    code: `
+      L = [3, 1, 2]
+      swaps = 0
+      for i in range(len(L) - 1):
+          m = i
+          for j in range(i + 1, len(L)):
+              if L[j] < L[m]:
+                  m = j
+          if m != i:
+              L[i], L[m] = L[m], L[i]
+              swaps += 1
+      print(L, swaps)`,
+    ans: '[1, 2, 3] 2',
+    exp: 'i = 0: the smallest is 1, so swap to get `[1, 3, 2]`. i = 1: the smallest of the rest is 2, so swap to get `[1, 2, 3]`. Two swaps, each with `m != i`.' },
+
+  { id: 'L10-38', lec: 10, topic: 'Complexity', d: 2, type: 'mcq',
+    t: 'Cost of in inside a comprehension',
+    q: 'What is the worst-case running time of `common`, with A and B as lists?',
+    code: `
+      def common(A, B):
+          return [x for x in A if x in B]`,
+    opts: ['O(len(A) × len(B))', 'O(len(A) + len(B))', 'O(len(A) × log len(B))', 'O(len(A))'],
+    ans: 0,
+    exp: '`x in B` on a list is a linear search, O(len(B)), and it runs once for every element of A. Turning B into a dictionary (or set) makes each lookup about constant time.' },
+
+  { id: 'L10-39', lec: 10, topic: 'Merge sort', d: 3, type: 'out',
+    t: 'Order of merges in merge sort',
+    code: `
+      def ms(L):
+          if len(L) < 2:
+              return L
+          mid = len(L) // 2
+          a, b = ms(L[:mid]), ms(L[mid:])
+          print(len(a) + len(b), end=' ')
+          return sorted(a + b)
+
+      ms([5, 1, 4, 2, 3])`,
+    ans: '2 2 3 5',
+    exp: '[5, 1] merges first (size 2). Then the right half [4, 2, 3] splits into [4] and [2, 3]; [2, 3] merges (2), then [4] joins it (3). Finally the two halves merge (5).' }
 ]);

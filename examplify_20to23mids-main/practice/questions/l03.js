@@ -420,5 +420,128 @@ practice([
           return lambda x: {{1}}`,
     blanks: [['f(repeat(f, n - 1)(x))', 'repeat(f, n - 1)(f(x))']],
     test: 'assert repeat(lambda x: x * 2, 3)(1) == 8\nassert repeat(lambda x: x + 1, 0)(5) == 5\nassert repeat(lambda s: s + "a", 2)("") == "aa"',
-    exp: 'Applying `f` n times is applying it once to the result of applying it n − 1 times. With n = 0 you get the identity function.' }
+    exp: 'Applying `f` n times is applying it once to the result of applying it n − 1 times. With n = 0 you get the identity function.' },
+
+  { id: 'L3-47', lec: 3, topic: 'map / filter', d: 2, type: 'fib',
+    t: 'Squares of the odd numbers',
+    q: 'Complete the one-liner so that `odd_squares((1, 2, 3, 4, 5))` is `(1, 9, 25)`. Use only `map`, `filter` and lambdas.',
+    code: `
+      def odd_squares(t):
+          return tuple(map({{1}}, filter({{2}}, t)))`,
+    blanks: [['lambda x: x * x', 'lambda x: x ** 2', 'lambda x: x**2'],
+             ['lambda x: x % 2 == 1', 'lambda x: x % 2', 'lambda x: x % 2 != 0']],
+    test: 'assert odd_squares((1, 2, 3, 4, 5)) == (1, 9, 25)\nassert odd_squares((2, 4)) == ()',
+    exp: '`filter` runs first (it is the inner call) and keeps the odd numbers. Then `map` squares them. `x % 2` alone works as a filter because 1 is truthy and 0 is falsy.' },
+
+  { id: 'L3-48', lec: 3, topic: 'reduce', d: 1, type: 'fib',
+    t: 'Product with reduce',
+    q: 'Complete `product(t)` so that `product((2, 3, 4))` is `24` and `product(())` is `1`.',
+    code: `
+      from functools import reduce
+
+      def product(t):
+          return reduce({{1}}, t, {{2}})`,
+    blanks: [['lambda a, b: a * b', 'lambda x, y: x * y', 'lambda acc, x: acc * x'], ['1']],
+    test: 'assert product((2, 3, 4)) == 24\nassert product(()) == 1\nassert product((5,)) == 5',
+    exp: 'The initializer must be the identity for multiplication, which is 1, not 0. It also makes the empty tuple safe instead of raising `TypeError`.' },
+
+  { id: 'L3-49', lec: 3, topic: 'Slicing', d: 2, type: 'fib',
+    t: 'Rotate a tuple left',
+    q: 'Complete `rotate(t, k)` for a non-empty tuple, e.g. `rotate((1, 2, 3, 4, 5), 2)` is `(3, 4, 5, 1, 2)`. `k` may be larger than `len(t)`.',
+    code: `
+      def rotate(t, k):
+          k = k % len(t)
+          return {{1}}`,
+    blanks: [['t[k:] + t[:k]']],
+    test: 'assert rotate((1, 2, 3, 4, 5), 2) == (3, 4, 5, 1, 2)\nassert rotate((1, 2, 3), 4) == (2, 3, 1)\nassert rotate((7,), 9) == (7,)',
+    exp: 'Everything from position `k` onwards moves to the front, followed by the first `k` elements. `k % len(t)` handles rotating by more than the length.' },
+
+  { id: 'L3-50', lec: 3, topic: 'Lambda', d: 1, type: 'fib',
+    t: 'Palindrome as a lambda',
+    q: 'Complete the lambda so that `is_pal(\'level\')` is `True` and `is_pal(\'lever\')` is `False`.',
+    code: `
+      is_pal = lambda s: {{1}}`,
+    blanks: [['s == s[::-1]', 's[::-1] == s']],
+    test: "assert is_pal('level') and is_pal('') and is_pal('a')\nassert not is_pal('lever')",
+    exp: 'A palindrome equals its own reverse, and `[::-1]` reverses any sequence.' },
+
+  { id: 'L3-51', lec: 3, topic: 'Higher-order functions', d: 3, type: 'fib',
+    t: 'A pipeline of functions',
+    q: '`pipeline(fs)` returns a function that applies the functions in `fs` **in order**, e.g. `pipeline((lambda x: x + 1, lambda x: x * 2))(3)` is `8`. Complete it.',
+    code: `
+      from functools import reduce
+
+      def pipeline(fs):
+          return lambda x: reduce(lambda acc, f: {{1}}, fs, x)`,
+    blanks: [['f(acc)']],
+    test: 'assert pipeline((lambda x: x + 1, lambda x: x * 2))(3) == 8\nassert pipeline((lambda x: x * 2, lambda x: x + 1))(3) == 7\nassert pipeline(())(5) == 5',
+    exp: 'Here `reduce` walks over **functions**, and the accumulator is the value so far. Each step feeds that value into the next function, so `acc(f)` would be backwards. The empty pipeline returns `x` unchanged.' },
+
+  { id: 'L3-52', lec: 3, topic: 'Characters', d: 2, type: 'fib',
+    t: 'Letters to alphabet positions',
+    q: 'Complete `positions` so that `positions(\'cab\')` is `(3, 1, 2)`. All letters are lowercase.',
+    code: `
+      positions = lambda s: tuple(map(lambda c: {{1}}, s))`,
+    blanks: [["ord(c) - ord('a') + 1", "ord(c) - 96", "1 + ord(c) - ord('a')"]],
+    test: "assert positions('cab') == (3, 1, 2)\nassert positions('z') == (26,)",
+    exp: '`ord(c) - ord(\'a\')` counts from 0 for `a`, so add 1 to number the letters from 1.' },
+
+  { id: 'L3-53', lec: 3, topic: 'Generator expressions', d: 3, type: 'fib',
+    t: 'Interleave two tuples',
+    q: 'Complete `interleave(a, b)` for equal-length tuples, e.g. `interleave((1, 2), (3, 4))` is `(1, 3, 2, 4)`.',
+    code: `
+      def interleave(a, b):
+          return tuple(x for i in range(len(a))
+                         for x in {{1}})`,
+    blanks: [['(a[i], b[i])', '[a[i], b[i]]', 'a[i:i + 1] + b[i:i + 1]']],
+    test: 'assert interleave((1, 2), (3, 4)) == (1, 3, 2, 4)\nassert interleave((), ()) == ()',
+    exp: 'For each index, the inner `for` walks a little pair holding `a[i]` then `b[i]`, so they come out alternately.' },
+
+  { id: 'L3-54', lec: 3, topic: 'Slicing', d: 2, type: 'out',
+    t: 'Forward and backward steps',
+    code: `
+      s = 'python'
+      print(s[1::2], s[::-2])`,
+    ans: 'yhn nhy',
+    exp: '`s[1::2]` takes indices 1, 3, 5: y, h, n. `s[::-2]` starts from the end and takes indices 5, 3, 1: n, h, y.' },
+
+  { id: 'L3-55', lec: 3, topic: 'Higher-order functions', d: 2, type: 'out',
+    t: 'Functions made by map',
+    code: `
+      def make(n):
+          return lambda x: x * n
+
+      fs = tuple(map(make, range(1, 4)))
+      print(tuple(f(10) for f in fs))`,
+    ans: '(10, 20, 30)',
+    exp: 'Each call to `make` has its own parameter `n`, so every lambda keeps a different value (1, 2, 3). This contrasts with lambdas built in a loop, which all share one loop variable.' },
+
+  { id: 'L3-56', lec: 3, topic: 'Slicing', d: 2, type: 'mcq', run: true,
+    t: 'Out-of-range slices',
+    q: 'What is printed?',
+    code: `
+      t = (1, 2, 3)
+      print(t[5:], t[-10:2])`,
+    opts: ['() (1, 2)', 'IndexError', '() (1, 2, 3)', '(3,) (1, 2)'],
+    ans: 0,
+    exp: 'Slices clip their bounds to the sequence and never raise errors. A start past the end gives an empty tuple, and `-10` is treated as the beginning. Only **indexing** past the end, as in `t[5]`, raises `IndexError`.' },
+
+  { id: 'L3-57', lec: 3, topic: 'reduce', d: 3, type: 'out',
+    t: 'reduce with a pair accumulator',
+    code: `
+      from functools import reduce
+      s, n = reduce(lambda acc, x: (acc[0] + x, acc[1] + 1),
+                    (4, 8, 6), (0, 0))
+      print(s / n)`,
+    ans: '6.0',
+    exp: 'The accumulator is a (sum, count) pair: (4, 1) → (12, 2) → (18, 3). Then 18 / 3 = 6.0, a float because `/` was used.' },
+
+  { id: 'L3-58', lec: 3, topic: 'Strings', d: 2, type: 'mcq', run: true,
+    t: 'Chained string comparisons',
+    q: 'What is printed?',
+    code: `
+      print('abc' < 'abd' < 'ab', 'Z' < 'a' < 'z')`,
+    opts: ['False True', 'True True', 'True False', 'False False'],
+    ans: 0,
+    exp: 'A chain means **both** comparisons must hold. `\'abd\' < \'ab\'` is false because a prefix is smaller than the longer string. In ASCII every uppercase letter comes before every lowercase one, so `\'Z\' < \'a\'`.' }
 ]);

@@ -417,5 +417,213 @@ practice([
           steps += 1
       print(steps)`,
     ans: '8',
-    exp: '37 → 36 → 18 → 9 → 8 → 4 → 2 → 1 → 0 is 8 steps. Odd numbers lose 1 and even numbers are halved.' }
+    exp: '37 → 36 → 18 → 9 → 8 → 4 → 2 → 1 → 0 is 8 steps. Odd numbers lose 1 and even numbers are halved.' },
+
+  { id: 'L4-35', lec: 4, topic: 'Nested loops', d: 1, type: 'fib',
+    t: 'Right-aligned staircase',
+    q: '`staircase(n)` prints a right-aligned staircase of `#`. For example, `staircase(3)` prints:',
+    code: `
+      def staircase(n):
+          for i in range(1, n + 1):
+              print({{1}})`,
+    q2: 'Output of `staircase(3)` (dots stand for spaces): `..#`, `.##`, `###`.',
+    blanks: [["' ' * (n - i) + '#' * i", "' ' * (n - i) + i * '#'", "(n - i) * ' ' + '#' * i"]],
+    test: "staircase(3)\nassert OUT() == '  #\\n ##\\n###\\n', repr(OUT())",
+    exp: 'Row `i` has `i` hashes, padded on the left by `n - i` spaces so that every row is `n` characters wide.' },
+
+  { id: 'L4-36', lec: 4, topic: 'Selection', d: 1, type: 'fib',
+    t: 'FizzBuzz order of tests',
+    q: 'Complete `fizz(n)`: return `\'FizzBuzz\'` for multiples of both 3 and 5, `\'Fizz\'` for multiples of 3, `\'Buzz\'` for multiples of 5, and otherwise the number as a string.',
+    code: `
+      def fizz(n):
+          if {{1}}:
+              return 'FizzBuzz'
+          elif n % 3 == 0:
+              return 'Fizz'
+          elif n % 5 == 0:
+              return 'Buzz'
+          return str(n)`,
+    blanks: [['n % 15 == 0', 'n % 3 == 0 and n % 5 == 0', 'n % 5 == 0 and n % 3 == 0', 'not n % 15']],
+    test: "assert [fizz(i) for i in (1, 3, 5, 15, 30, 7)] == ['1', 'Fizz', 'Buzz', 'FizzBuzz', 'FizzBuzz', '7']",
+    exp: 'The combined case must be tested **first**. Otherwise 15 would stop at the `n % 3 == 0` branch and return `Fizz`.' },
+
+  { id: 'L4-37', lec: 4, topic: 'for loops', d: 3, type: 'fib',
+    t: 'Second largest distinct value',
+    q: '`second_largest(t)` returns the second largest **distinct** value in `t`, or `None` if there is none, without sorting. E.g. `(3, 7, 7, 5)` gives `5`. Complete the update when a new maximum is found.',
+    code: `
+      def second_largest(t):
+          first = second = None
+          for x in t:
+              if first is None or x > first:
+                  {{1}}
+              elif x != first and (second is None or x > second):
+                  second = x
+          return second`,
+    blanks: [['first, second = x, first', 'second, first = first, x', 'second = first; first = x']],
+    test: 'assert second_largest((3, 7, 7, 5)) == 5\nassert second_largest((4, 4)) is None\nassert second_largest((1, 2, 3)) == 2\nassert second_largest((5, 1)) == 1',
+    exp: 'When a new maximum arrives, the old maximum is pushed down to second place. Tuple assignment does both at once. Doing `first = x` first would overwrite the value that `second` needs.' },
+
+  { id: 'L4-38', lec: 4, topic: 'for loops', d: 3, type: 'fib',
+    t: 'Maximum subarray sum (Kadane)',
+    q: '`max_sub(t)` returns the largest sum of any non-empty run of **consecutive** elements, e.g. `(-2, 1, -3, 4, -1, 2, 1, -5, 4)` gives `6` (from `4, -1, 2, 1`). Complete the single pass.',
+    code: `
+      def max_sub(t):
+          best = cur = t[0]
+          for x in t[1:]:
+              cur = {{1}}
+              best = {{2}}
+          return best`,
+    blanks: [['max(x, cur + x)', 'max(cur + x, x)', 'x if x > cur + x else cur + x'], ['max(best, cur)', 'max(cur, best)']],
+    test: 'assert max_sub((-2, 1, -3, 4, -1, 2, 1, -5, 4)) == 6\nassert max_sub((-3, -1, -2)) == -1\nassert max_sub((5,)) == 5',
+    exp: '`cur` is the best sum of a run that **ends at x**: either extend the previous run or start fresh at `x`. `best` remembers the largest `cur` seen so far. This takes one pass instead of trying every pair of start and end.' },
+
+  { id: 'L4-39', lec: 4, topic: 'for loops', d: 2, type: 'fib',
+    t: 'Longest run of equal characters',
+    q: 'Complete `longest_run(s)` for a non-empty string, e.g. `longest_run(\'aabbbc\')` is `3`.',
+    code: `
+      def longest_run(s):
+          best = cur = 1
+          for i in range(1, len(s)):
+              if s[i] == s[i - 1]:
+                  cur += 1
+              else:
+                  {{1}}
+              best = max(best, cur)
+          return best`,
+    blanks: [['cur = 1']],
+    test: "assert longest_run('aabbbc') == 3\nassert longest_run('a') == 1\nassert longest_run('abc') == 1\nassert longest_run('xxxxy') == 4",
+    exp: 'A character that differs from its neighbour starts a new run of length 1.' },
+
+  { id: 'L4-40', lec: 4, topic: 'while loops', d: 2, type: 'fib',
+    t: 'Lowest common multiple',
+    q: 'Complete `lcm(a, b)` for positive integers. It tries multiples of the larger number until one is divisible by both.',
+    code: `
+      def lcm(a, b):
+          m = max(a, b)
+          while {{1}}:
+              m += max(a, b)
+          return m`,
+    blanks: [['m % a != 0 or m % b != 0', 'm % b != 0 or m % a != 0', 'not (m % a == 0 and m % b == 0)', 'm % a or m % b']],
+    test: 'assert lcm(4, 6) == 12\nassert lcm(5, 5) == 5\nassert lcm(7, 3) == 21\nassert lcm(1, 9) == 9',
+    exp: 'Keep going **while** `m` fails at least one of the two divisibility tests, i.e. `or`. Writing `and` would stop as soon as **either** one divides `m`.' },
+
+  { id: 'L4-41', lec: 4, topic: 'while loops', d: 1, type: 'fib',
+    t: 'Palindrome number without strings',
+    q: 'Complete `is_pal_num(n)` for `n ≥ 0`, e.g. `12321` gives `True`, without converting to a string.',
+    code: `
+      def is_pal_num(n):
+          orig, rev = n, 0
+          while n > 0:
+              rev = rev * 10 + n % 10
+              n //= 10
+          return {{1}}`,
+    blanks: [['rev == orig', 'orig == rev']],
+    test: 'assert is_pal_num(12321) and is_pal_num(7) and is_pal_num(0)\nassert not is_pal_num(123) and not is_pal_num(10)',
+    exp: 'The loop builds the reversed number. Compare it with a **saved copy** of the input, because `n` itself has been reduced to 0 by then.' },
+
+  { id: 'L4-42', lec: 4, topic: 'for loops', d: 2, type: 'fib',
+    t: 'Balanced parentheses',
+    q: 'Complete `balanced(s)`, which checks that the `(` and `)` in `s` are properly matched, e.g. `\'(()())\'` is `True` and `\')(\'` is `False`.',
+    code: `
+      def balanced(s):
+          depth = 0
+          for c in s:
+              if c == '(':
+                  depth += 1
+              elif c == ')':
+                  depth -= 1
+                  if {{1}}:
+                      return False
+          return {{2}}`,
+    blanks: [['depth < 0', 'depth == -1'], ['depth == 0', 'not depth']],
+    test: "assert balanced('(()())') and balanced('') and balanced('a(b)c')\nassert not balanced(')(') and not balanced('(()') and not balanced('())(')",
+    exp: 'A `)` with nothing open drops the depth below 0, which is an immediate failure. At the end, every `(` must have been closed, so the depth must be back to 0.' },
+
+  { id: 'L4-43', lec: 4, topic: 'Nested loops', d: 1, type: 'fib',
+    t: 'Number triangle',
+    q: '`tri(3)` should print `1`, `12` and `123` on three lines. Complete it.',
+    code: `
+      def tri(n):
+          for i in range(1, n + 1):
+              row = ''
+              for j in range(1, i + 1):
+                  row += {{1}}
+              print(row)`,
+    blanks: [['str(j)', 'f"{j}"']],
+    test: "tri(3)\nassert OUT() == '1\\n12\\n123\\n', repr(OUT())",
+    exp: '`row` is a string, so the number `j` has to be converted with `str` before concatenating. `row += j` would raise `TypeError`.' },
+
+  { id: 'L4-44', lec: 4, topic: 'Nested loops', d: 2, type: 'fib',
+    t: 'Counting inversions',
+    q: 'An inversion is a pair of positions i < j with `t[i] > t[j]`. Complete `inversions(t)`, e.g. `(4, 1, 3, 2)` has 4.',
+    code: `
+      def inversions(t):
+          c = 0
+          for i in range(len(t)):
+              for j in range({{1}}, len(t)):
+                  if {{2}}:
+                      c += 1
+          return c`,
+    blanks: [['i + 1', '1 + i'], ['t[i] > t[j]', 't[j] < t[i]']],
+    test: 'assert inversions((4, 1, 3, 2)) == 4\nassert inversions((1, 2, 3)) == 0\nassert inversions((3, 2, 1)) == 3',
+    exp: 'Each pair is checked once with `j` after `i`. The count of inversions is exactly how many swaps bubble sort makes (Lecture 10).' },
+
+  { id: 'L4-45', lec: 4, topic: 'while loops', d: 3, type: 'out',
+    t: 'A while loop that skips ahead',
+    code: `
+      i, s = 0, ''
+      while i < 10:
+          if i % 3 == 0:
+              s += 'a'
+          elif i % 3 == 1:
+              i += 1
+          else:
+              s += 'b'
+          i += 1
+      print(s)`,
+    ans: 'aaaa',
+    exp: 'Whenever `i % 3 == 1`, `i` goes up by 2 in that pass and skips the value with remainder 2. The loop visits 0, 1, 3, 4, 6, 7, 9 and never reaches the `b` branch.' },
+
+  { id: 'L4-46', lec: 4, topic: 'Return in loops', d: 2, type: 'out',
+    t: 'Returning from inside a nested loop',
+    code: `
+      def f(n):
+          total = 0
+          for i in range(n):
+              for j in range(i, n):
+                  if (i + j) % 4 == 3:
+                      return total
+                  total += j
+          return total
+
+      print(f(5))`,
+    ans: '3',
+    exp: 'With i = 0, j goes 0, 1, 2 (total becomes 0 + 1 + 2 = 3). At j = 3, `(0 + 3) % 4 == 3`, so the function returns at once and the outer loop never continues.' },
+
+  { id: 'L4-47', lec: 4, topic: 'Selection', d: 2, type: 'out',
+    t: 'Short-circuit inside if/elif',
+    code: `
+      x, y = 7, 0
+      if x % 2 and x > 5:
+          y += 1
+      if x > 6 or x / 0:
+          y += 10
+      elif x > 2:
+          y += 100
+      else:
+          y += 1000
+      print(y)`,
+    ans: '11',
+    exp: '`x % 2` is 1 (truthy) and `7 > 5`, so `y` becomes 1. In the second `if`, `x > 6` is already true, so `or` never evaluates `x / 0` and there is no error. Only the `+10` branch runs.' },
+
+  { id: 'L4-48', lec: 4, topic: 'for loops', d: 2, type: 'out',
+    t: 'Swapping pairs into the front',
+    code: `
+      s = 'abcdef'
+      r = ''
+      for i in range(0, len(s), 2):
+          r = s[i + 1] + s[i] + r
+      print(r)`,
+    ans: 'fedcba',
+    exp: 'Each pair goes in swapped (`ba`, `dc`, `fe`) and is put **in front** of what was built before. Together that reverses the whole string.' }
 ]);

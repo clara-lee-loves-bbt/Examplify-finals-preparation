@@ -1092,7 +1092,130 @@ practice([
           return lambda x: {{1}}`,
     blanks: [['f(repeat(f, n - 1)(x))', 'repeat(f, n - 1)(f(x))']],
     test: 'assert repeat(lambda x: x * 2, 3)(1) == 8\nassert repeat(lambda x: x + 1, 0)(5) == 5\nassert repeat(lambda s: s + "a", 2)("") == "aa"',
-    exp: 'Applying `f` n times is applying it once to the result of applying it n − 1 times. With n = 0 you get the identity function.' }
+    exp: 'Applying `f` n times is applying it once to the result of applying it n − 1 times. With n = 0 you get the identity function.' },
+
+  { id: 'L3-47', lec: 3, topic: 'map / filter', d: 2, type: 'fib',
+    t: 'Squares of the odd numbers',
+    q: 'Complete the one-liner so that `odd_squares((1, 2, 3, 4, 5))` is `(1, 9, 25)`. Use only `map`, `filter` and lambdas.',
+    code: `
+      def odd_squares(t):
+          return tuple(map({{1}}, filter({{2}}, t)))`,
+    blanks: [['lambda x: x * x', 'lambda x: x ** 2', 'lambda x: x**2'],
+             ['lambda x: x % 2 == 1', 'lambda x: x % 2', 'lambda x: x % 2 != 0']],
+    test: 'assert odd_squares((1, 2, 3, 4, 5)) == (1, 9, 25)\nassert odd_squares((2, 4)) == ()',
+    exp: '`filter` runs first (it is the inner call) and keeps the odd numbers. Then `map` squares them. `x % 2` alone works as a filter because 1 is truthy and 0 is falsy.' },
+
+  { id: 'L3-48', lec: 3, topic: 'reduce', d: 1, type: 'fib',
+    t: 'Product with reduce',
+    q: 'Complete `product(t)` so that `product((2, 3, 4))` is `24` and `product(())` is `1`.',
+    code: `
+      from functools import reduce
+
+      def product(t):
+          return reduce({{1}}, t, {{2}})`,
+    blanks: [['lambda a, b: a * b', 'lambda x, y: x * y', 'lambda acc, x: acc * x'], ['1']],
+    test: 'assert product((2, 3, 4)) == 24\nassert product(()) == 1\nassert product((5,)) == 5',
+    exp: 'The initializer must be the identity for multiplication, which is 1, not 0. It also makes the empty tuple safe instead of raising `TypeError`.' },
+
+  { id: 'L3-49', lec: 3, topic: 'Slicing', d: 2, type: 'fib',
+    t: 'Rotate a tuple left',
+    q: 'Complete `rotate(t, k)` for a non-empty tuple, e.g. `rotate((1, 2, 3, 4, 5), 2)` is `(3, 4, 5, 1, 2)`. `k` may be larger than `len(t)`.',
+    code: `
+      def rotate(t, k):
+          k = k % len(t)
+          return {{1}}`,
+    blanks: [['t[k:] + t[:k]']],
+    test: 'assert rotate((1, 2, 3, 4, 5), 2) == (3, 4, 5, 1, 2)\nassert rotate((1, 2, 3), 4) == (2, 3, 1)\nassert rotate((7,), 9) == (7,)',
+    exp: 'Everything from position `k` onwards moves to the front, followed by the first `k` elements. `k % len(t)` handles rotating by more than the length.' },
+
+  { id: 'L3-50', lec: 3, topic: 'Lambda', d: 1, type: 'fib',
+    t: 'Palindrome as a lambda',
+    q: 'Complete the lambda so that `is_pal(\'level\')` is `True` and `is_pal(\'lever\')` is `False`.',
+    code: `
+      is_pal = lambda s: {{1}}`,
+    blanks: [['s == s[::-1]', 's[::-1] == s']],
+    test: "assert is_pal('level') and is_pal('') and is_pal('a')\nassert not is_pal('lever')",
+    exp: 'A palindrome equals its own reverse, and `[::-1]` reverses any sequence.' },
+
+  { id: 'L3-51', lec: 3, topic: 'Higher-order functions', d: 3, type: 'fib',
+    t: 'A pipeline of functions',
+    q: '`pipeline(fs)` returns a function that applies the functions in `fs` **in order**, e.g. `pipeline((lambda x: x + 1, lambda x: x * 2))(3)` is `8`. Complete it.',
+    code: `
+      from functools import reduce
+
+      def pipeline(fs):
+          return lambda x: reduce(lambda acc, f: {{1}}, fs, x)`,
+    blanks: [['f(acc)']],
+    test: 'assert pipeline((lambda x: x + 1, lambda x: x * 2))(3) == 8\nassert pipeline((lambda x: x * 2, lambda x: x + 1))(3) == 7\nassert pipeline(())(5) == 5',
+    exp: 'Here `reduce` walks over **functions**, and the accumulator is the value so far. Each step feeds that value into the next function, so `acc(f)` would be backwards. The empty pipeline returns `x` unchanged.' },
+
+  { id: 'L3-52', lec: 3, topic: 'Characters', d: 2, type: 'fib',
+    t: 'Letters to alphabet positions',
+    q: 'Complete `positions` so that `positions(\'cab\')` is `(3, 1, 2)`. All letters are lowercase.',
+    code: `
+      positions = lambda s: tuple(map(lambda c: {{1}}, s))`,
+    blanks: [["ord(c) - ord('a') + 1", "ord(c) - 96", "1 + ord(c) - ord('a')"]],
+    test: "assert positions('cab') == (3, 1, 2)\nassert positions('z') == (26,)",
+    exp: '`ord(c) - ord(\'a\')` counts from 0 for `a`, so add 1 to number the letters from 1.' },
+
+  { id: 'L3-53', lec: 3, topic: 'Generator expressions', d: 3, type: 'fib',
+    t: 'Interleave two tuples',
+    q: 'Complete `interleave(a, b)` for equal-length tuples, e.g. `interleave((1, 2), (3, 4))` is `(1, 3, 2, 4)`.',
+    code: `
+      def interleave(a, b):
+          return tuple(x for i in range(len(a))
+                         for x in {{1}})`,
+    blanks: [['(a[i], b[i])', '[a[i], b[i]]', 'a[i:i + 1] + b[i:i + 1]']],
+    test: 'assert interleave((1, 2), (3, 4)) == (1, 3, 2, 4)\nassert interleave((), ()) == ()',
+    exp: 'For each index, the inner `for` walks a little pair holding `a[i]` then `b[i]`, so they come out alternately.' },
+
+  { id: 'L3-54', lec: 3, topic: 'Slicing', d: 2, type: 'out',
+    t: 'Forward and backward steps',
+    code: `
+      s = 'python'
+      print(s[1::2], s[::-2])`,
+    ans: 'yhn nhy',
+    exp: '`s[1::2]` takes indices 1, 3, 5: y, h, n. `s[::-2]` starts from the end and takes indices 5, 3, 1: n, h, y.' },
+
+  { id: 'L3-55', lec: 3, topic: 'Higher-order functions', d: 2, type: 'out',
+    t: 'Functions made by map',
+    code: `
+      def make(n):
+          return lambda x: x * n
+
+      fs = tuple(map(make, range(1, 4)))
+      print(tuple(f(10) for f in fs))`,
+    ans: '(10, 20, 30)',
+    exp: 'Each call to `make` has its own parameter `n`, so every lambda keeps a different value (1, 2, 3). This contrasts with lambdas built in a loop, which all share one loop variable.' },
+
+  { id: 'L3-56', lec: 3, topic: 'Slicing', d: 2, type: 'mcq', run: true,
+    t: 'Out-of-range slices',
+    q: 'What is printed?',
+    code: `
+      t = (1, 2, 3)
+      print(t[5:], t[-10:2])`,
+    opts: ['() (1, 2)', 'IndexError', '() (1, 2, 3)', '(3,) (1, 2)'],
+    ans: 0,
+    exp: 'Slices clip their bounds to the sequence and never raise errors. A start past the end gives an empty tuple, and `-10` is treated as the beginning. Only **indexing** past the end, as in `t[5]`, raises `IndexError`.' },
+
+  { id: 'L3-57', lec: 3, topic: 'reduce', d: 3, type: 'out',
+    t: 'reduce with a pair accumulator',
+    code: `
+      from functools import reduce
+      s, n = reduce(lambda acc, x: (acc[0] + x, acc[1] + 1),
+                    (4, 8, 6), (0, 0))
+      print(s / n)`,
+    ans: '6.0',
+    exp: 'The accumulator is a (sum, count) pair: (4, 1) → (12, 2) → (18, 3). Then 18 / 3 = 6.0, a float because `/` was used.' },
+
+  { id: 'L3-58', lec: 3, topic: 'Strings', d: 2, type: 'mcq', run: true,
+    t: 'Chained string comparisons',
+    q: 'What is printed?',
+    code: `
+      print('abc' < 'abd' < 'ab', 'Z' < 'a' < 'z')`,
+    opts: ['False True', 'True True', 'True False', 'False False'],
+    ans: 0,
+    exp: 'A chain means **both** comparisons must hold. `\'abd\' < \'ab\'` is false because a prefix is smaller than the longer string. In ASCII every uppercase letter comes before every lowercase one, so `\'Z\' < \'a\'`.' }
 ]);
 </script>
 <script>
@@ -1516,7 +1639,215 @@ practice([
           steps += 1
       print(steps)`,
     ans: '8',
-    exp: '37 → 36 → 18 → 9 → 8 → 4 → 2 → 1 → 0 is 8 steps. Odd numbers lose 1 and even numbers are halved.' }
+    exp: '37 → 36 → 18 → 9 → 8 → 4 → 2 → 1 → 0 is 8 steps. Odd numbers lose 1 and even numbers are halved.' },
+
+  { id: 'L4-35', lec: 4, topic: 'Nested loops', d: 1, type: 'fib',
+    t: 'Right-aligned staircase',
+    q: '`staircase(n)` prints a right-aligned staircase of `#`. For example, `staircase(3)` prints:',
+    code: `
+      def staircase(n):
+          for i in range(1, n + 1):
+              print({{1}})`,
+    q2: 'Output of `staircase(3)` (dots stand for spaces): `..#`, `.##`, `###`.',
+    blanks: [["' ' * (n - i) + '#' * i", "' ' * (n - i) + i * '#'", "(n - i) * ' ' + '#' * i"]],
+    test: "staircase(3)\nassert OUT() == '  #\\n ##\\n###\\n', repr(OUT())",
+    exp: 'Row `i` has `i` hashes, padded on the left by `n - i` spaces so that every row is `n` characters wide.' },
+
+  { id: 'L4-36', lec: 4, topic: 'Selection', d: 1, type: 'fib',
+    t: 'FizzBuzz order of tests',
+    q: 'Complete `fizz(n)`: return `\'FizzBuzz\'` for multiples of both 3 and 5, `\'Fizz\'` for multiples of 3, `\'Buzz\'` for multiples of 5, and otherwise the number as a string.',
+    code: `
+      def fizz(n):
+          if {{1}}:
+              return 'FizzBuzz'
+          elif n % 3 == 0:
+              return 'Fizz'
+          elif n % 5 == 0:
+              return 'Buzz'
+          return str(n)`,
+    blanks: [['n % 15 == 0', 'n % 3 == 0 and n % 5 == 0', 'n % 5 == 0 and n % 3 == 0', 'not n % 15']],
+    test: "assert [fizz(i) for i in (1, 3, 5, 15, 30, 7)] == ['1', 'Fizz', 'Buzz', 'FizzBuzz', 'FizzBuzz', '7']",
+    exp: 'The combined case must be tested **first**. Otherwise 15 would stop at the `n % 3 == 0` branch and return `Fizz`.' },
+
+  { id: 'L4-37', lec: 4, topic: 'for loops', d: 3, type: 'fib',
+    t: 'Second largest distinct value',
+    q: '`second_largest(t)` returns the second largest **distinct** value in `t`, or `None` if there is none, without sorting. E.g. `(3, 7, 7, 5)` gives `5`. Complete the update when a new maximum is found.',
+    code: `
+      def second_largest(t):
+          first = second = None
+          for x in t:
+              if first is None or x > first:
+                  {{1}}
+              elif x != first and (second is None or x > second):
+                  second = x
+          return second`,
+    blanks: [['first, second = x, first', 'second, first = first, x', 'second = first; first = x']],
+    test: 'assert second_largest((3, 7, 7, 5)) == 5\nassert second_largest((4, 4)) is None\nassert second_largest((1, 2, 3)) == 2\nassert second_largest((5, 1)) == 1',
+    exp: 'When a new maximum arrives, the old maximum is pushed down to second place. Tuple assignment does both at once. Doing `first = x` first would overwrite the value that `second` needs.' },
+
+  { id: 'L4-38', lec: 4, topic: 'for loops', d: 3, type: 'fib',
+    t: 'Maximum subarray sum (Kadane)',
+    q: '`max_sub(t)` returns the largest sum of any non-empty run of **consecutive** elements, e.g. `(-2, 1, -3, 4, -1, 2, 1, -5, 4)` gives `6` (from `4, -1, 2, 1`). Complete the single pass.',
+    code: `
+      def max_sub(t):
+          best = cur = t[0]
+          for x in t[1:]:
+              cur = {{1}}
+              best = {{2}}
+          return best`,
+    blanks: [['max(x, cur + x)', 'max(cur + x, x)', 'x if x > cur + x else cur + x'], ['max(best, cur)', 'max(cur, best)']],
+    test: 'assert max_sub((-2, 1, -3, 4, -1, 2, 1, -5, 4)) == 6\nassert max_sub((-3, -1, -2)) == -1\nassert max_sub((5,)) == 5',
+    exp: '`cur` is the best sum of a run that **ends at x**: either extend the previous run or start fresh at `x`. `best` remembers the largest `cur` seen so far. This takes one pass instead of trying every pair of start and end.' },
+
+  { id: 'L4-39', lec: 4, topic: 'for loops', d: 2, type: 'fib',
+    t: 'Longest run of equal characters',
+    q: 'Complete `longest_run(s)` for a non-empty string, e.g. `longest_run(\'aabbbc\')` is `3`.',
+    code: `
+      def longest_run(s):
+          best = cur = 1
+          for i in range(1, len(s)):
+              if s[i] == s[i - 1]:
+                  cur += 1
+              else:
+                  {{1}}
+              best = max(best, cur)
+          return best`,
+    blanks: [['cur = 1']],
+    test: "assert longest_run('aabbbc') == 3\nassert longest_run('a') == 1\nassert longest_run('abc') == 1\nassert longest_run('xxxxy') == 4",
+    exp: 'A character that differs from its neighbour starts a new run of length 1.' },
+
+  { id: 'L4-40', lec: 4, topic: 'while loops', d: 2, type: 'fib',
+    t: 'Lowest common multiple',
+    q: 'Complete `lcm(a, b)` for positive integers. It tries multiples of the larger number until one is divisible by both.',
+    code: `
+      def lcm(a, b):
+          m = max(a, b)
+          while {{1}}:
+              m += max(a, b)
+          return m`,
+    blanks: [['m % a != 0 or m % b != 0', 'm % b != 0 or m % a != 0', 'not (m % a == 0 and m % b == 0)', 'm % a or m % b']],
+    test: 'assert lcm(4, 6) == 12\nassert lcm(5, 5) == 5\nassert lcm(7, 3) == 21\nassert lcm(1, 9) == 9',
+    exp: 'Keep going **while** `m` fails at least one of the two divisibility tests, i.e. `or`. Writing `and` would stop as soon as **either** one divides `m`.' },
+
+  { id: 'L4-41', lec: 4, topic: 'while loops', d: 1, type: 'fib',
+    t: 'Palindrome number without strings',
+    q: 'Complete `is_pal_num(n)` for `n ≥ 0`, e.g. `12321` gives `True`, without converting to a string.',
+    code: `
+      def is_pal_num(n):
+          orig, rev = n, 0
+          while n > 0:
+              rev = rev * 10 + n % 10
+              n //= 10
+          return {{1}}`,
+    blanks: [['rev == orig', 'orig == rev']],
+    test: 'assert is_pal_num(12321) and is_pal_num(7) and is_pal_num(0)\nassert not is_pal_num(123) and not is_pal_num(10)',
+    exp: 'The loop builds the reversed number. Compare it with a **saved copy** of the input, because `n` itself has been reduced to 0 by then.' },
+
+  { id: 'L4-42', lec: 4, topic: 'for loops', d: 2, type: 'fib',
+    t: 'Balanced parentheses',
+    q: 'Complete `balanced(s)`, which checks that the `(` and `)` in `s` are properly matched, e.g. `\'(()())\'` is `True` and `\')(\'` is `False`.',
+    code: `
+      def balanced(s):
+          depth = 0
+          for c in s:
+              if c == '(':
+                  depth += 1
+              elif c == ')':
+                  depth -= 1
+                  if {{1}}:
+                      return False
+          return {{2}}`,
+    blanks: [['depth < 0', 'depth == -1'], ['depth == 0', 'not depth']],
+    test: "assert balanced('(()())') and balanced('') and balanced('a(b)c')\nassert not balanced(')(') and not balanced('(()') and not balanced('())(')",
+    exp: 'A `)` with nothing open drops the depth below 0, which is an immediate failure. At the end, every `(` must have been closed, so the depth must be back to 0.' },
+
+  { id: 'L4-43', lec: 4, topic: 'Nested loops', d: 1, type: 'fib',
+    t: 'Number triangle',
+    q: '`tri(3)` should print `1`, `12` and `123` on three lines. Complete it.',
+    code: `
+      def tri(n):
+          for i in range(1, n + 1):
+              row = ''
+              for j in range(1, i + 1):
+                  row += {{1}}
+              print(row)`,
+    blanks: [['str(j)', 'f"{j}"']],
+    test: "tri(3)\nassert OUT() == '1\\n12\\n123\\n', repr(OUT())",
+    exp: '`row` is a string, so the number `j` has to be converted with `str` before concatenating. `row += j` would raise `TypeError`.' },
+
+  { id: 'L4-44', lec: 4, topic: 'Nested loops', d: 2, type: 'fib',
+    t: 'Counting inversions',
+    q: 'An inversion is a pair of positions i < j with `t[i] > t[j]`. Complete `inversions(t)`, e.g. `(4, 1, 3, 2)` has 4.',
+    code: `
+      def inversions(t):
+          c = 0
+          for i in range(len(t)):
+              for j in range({{1}}, len(t)):
+                  if {{2}}:
+                      c += 1
+          return c`,
+    blanks: [['i + 1', '1 + i'], ['t[i] > t[j]', 't[j] < t[i]']],
+    test: 'assert inversions((4, 1, 3, 2)) == 4\nassert inversions((1, 2, 3)) == 0\nassert inversions((3, 2, 1)) == 3',
+    exp: 'Each pair is checked once with `j` after `i`. The count of inversions is exactly how many swaps bubble sort makes (Lecture 10).' },
+
+  { id: 'L4-45', lec: 4, topic: 'while loops', d: 3, type: 'out',
+    t: 'A while loop that skips ahead',
+    code: `
+      i, s = 0, ''
+      while i < 10:
+          if i % 3 == 0:
+              s += 'a'
+          elif i % 3 == 1:
+              i += 1
+          else:
+              s += 'b'
+          i += 1
+      print(s)`,
+    ans: 'aaaa',
+    exp: 'Whenever `i % 3 == 1`, `i` goes up by 2 in that pass and skips the value with remainder 2. The loop visits 0, 1, 3, 4, 6, 7, 9 and never reaches the `b` branch.' },
+
+  { id: 'L4-46', lec: 4, topic: 'Return in loops', d: 2, type: 'out',
+    t: 'Returning from inside a nested loop',
+    code: `
+      def f(n):
+          total = 0
+          for i in range(n):
+              for j in range(i, n):
+                  if (i + j) % 4 == 3:
+                      return total
+                  total += j
+          return total
+
+      print(f(5))`,
+    ans: '3',
+    exp: 'With i = 0, j goes 0, 1, 2 (total becomes 0 + 1 + 2 = 3). At j = 3, `(0 + 3) % 4 == 3`, so the function returns at once and the outer loop never continues.' },
+
+  { id: 'L4-47', lec: 4, topic: 'Selection', d: 2, type: 'out',
+    t: 'Short-circuit inside if/elif',
+    code: `
+      x, y = 7, 0
+      if x % 2 and x > 5:
+          y += 1
+      if x > 6 or x / 0:
+          y += 10
+      elif x > 2:
+          y += 100
+      else:
+          y += 1000
+      print(y)`,
+    ans: '11',
+    exp: '`x % 2` is 1 (truthy) and `7 > 5`, so `y` becomes 1. In the second `if`, `x > 6` is already true, so `or` never evaluates `x / 0` and there is no error. Only the `+10` branch runs.' },
+
+  { id: 'L4-48', lec: 4, topic: 'for loops', d: 2, type: 'out',
+    t: 'Swapping pairs into the front',
+    code: `
+      s = 'abcdef'
+      r = ''
+      for i in range(0, len(s), 2):
+          r = s[i + 1] + s[i] + r
+      print(r)`,
+    ans: 'fedcba',
+    exp: 'Each pair goes in swapped (`ba`, `dc`, `fe`) and is put **in front** of what was built before. Together that reverses the whole string.' }
 ]);
 </script>
 <script>
@@ -1925,7 +2256,193 @@ practice([
 
       print(h('python'))`,
     ans: 'nohtyp',
-    exp: 'At every level the first and last characters change places around the recursively processed middle, which reverses the string.' }
+    exp: 'At every level the first and last characters change places around the recursively processed middle, which reverses the string.' },
+
+  { id: 'L5-33', lec: 5, topic: 'Recursion on strings', d: 3, type: 'fib',
+    t: 'All permutations of a string',
+    q: '`perms(s)` returns every permutation of `s` (distinct characters), e.g. `perms(\'abc\')` is `[\'abc\', \'acb\', \'bac\', \'bca\', \'cab\', \'cba\']`. Complete it.',
+    code: `
+      def perms(s):
+          if len(s) <= 1:
+              return [s]
+          out = []
+          for i in range(len(s)):
+              for p in perms({{1}}):
+                  out.append({{2}})
+          return out`,
+    blanks: [['s[:i] + s[i + 1:]', 's[0:i] + s[i + 1:]', 's[:i] + s[i+1:len(s)]'], ['s[i] + p']],
+    test: "assert perms('abc') == ['abc', 'acb', 'bac', 'bca', 'cab', 'cba']\nassert perms('a') == ['a']\nassert len(perms('abcd')) == 24",
+    exp: 'Pick each character in turn to go first, then put it in front of every permutation of the **remaining** characters (the string with position `i` cut out).' },
+
+  { id: 'L5-34', lec: 5, topic: 'Counting paths', d: 3, type: 'fib',
+    t: 'Ways to make change',
+    q: '`ways(n, coins)` counts how many ways to pay `n` using the coin values in the tuple `coins` (unlimited supply, order does not matter), e.g. `ways(5, (1, 2, 5))` is `4`. Complete it.',
+    code: `
+      def ways(n, coins):
+          if n == 0:
+              return 1
+          if n < 0 or not coins:
+              return 0
+          return {{1}} + {{2}}`,
+    blanks: [['ways(n - coins[0], coins)'], ['ways(n, coins[1:])']],
+    test: 'assert ways(5, (1, 2, 5)) == 4\nassert ways(3, (2,)) == 0\nassert ways(0, ()) == 1\nassert ways(10, (2, 5, 3, 6)) == 5',
+    exp: 'Either use at least one of the first coin (pay it and keep all the coins available) or never use it (drop it from the tuple). These two cases never overlap, so their counts add up.' },
+
+  { id: 'L5-35', lec: 5, topic: 'Recursion on strings', d: 2, type: 'fib',
+    t: 'Count overlapping occurrences',
+    q: 'Complete `count_sub(s, t)`, which counts occurrences of `t` in `s`, **including overlapping ones**, e.g. `count_sub(\'aaaa\', \'aa\')` is `3`.',
+    code: `
+      def count_sub(s, t):
+          if len(s) < len(t):
+              return 0
+          return (1 if {{1}} else 0) + count_sub(s[1:], t)`,
+    blanks: [['s[:len(t)] == t', 's[0:len(t)] == t', 't == s[:len(t)]']],
+    test: "assert count_sub('aaaa', 'aa') == 3\nassert count_sub('banana', 'ana') == 2\nassert count_sub('abc', 'd') == 0",
+    exp: 'Check whether `s` **starts with** `t`, then slide the window along by one character. Moving by one rather than by `len(t)` is what counts overlapping matches.' },
+
+  { id: 'L5-36', lec: 5, topic: 'Recursion on tuples', d: 1, type: 'fib',
+    t: 'Is it sorted? (recursive)',
+    q: 'Complete `is_sorted(t)` in one line: `True` when `t` is in non-decreasing order.',
+    code: `
+      def is_sorted(t):
+          if len(t) < 2:
+              return True
+          return {{1}}`,
+    blanks: [['t[0] <= t[1] and is_sorted(t[1:])', 'is_sorted(t[1:]) and t[0] <= t[1]', 't[1] >= t[0] and is_sorted(t[1:])']],
+    test: 'assert is_sorted((1, 2, 2, 5)) and is_sorted(()) and is_sorted((4,))\nassert not is_sorted((1, 3, 2))',
+    exp: 'The first pair must be in order **and** the rest must be sorted. Putting the cheap comparison first lets `and` stop early.' },
+
+  { id: 'L5-37', lec: 5, topic: 'Recursion', d: 2, type: 'fib',
+    t: "Pascal's triangle row",
+    q: '`pascal(n)` returns row `n` of Pascal\'s triangle, e.g. `pascal(4)` is `[1, 4, 6, 4, 1]`. Complete it.',
+    code: `
+      def pascal(n):
+          if n == 0:
+              return [1]
+          prev = pascal(n - 1)
+          return [1] + [{{1}} for i in range(len(prev) - 1)] + [1]`,
+    blanks: [['prev[i] + prev[i + 1]', 'prev[i + 1] + prev[i]']],
+    test: 'assert pascal(4) == [1, 4, 6, 4, 1]\nassert pascal(1) == [1, 1]\nassert pascal(0) == [1]',
+    exp: 'Every inner entry is the sum of the two entries above it in the previous row. The ends are always 1.' },
+
+  { id: 'L5-38', lec: 5, topic: 'Counting paths', d: 2, type: 'fib',
+    t: 'Paths across a grid',
+    q: 'Moving only down or right, how many paths lead from the top-left to a corner `r` steps down and `c` steps right? Complete `paths(r, c)`, e.g. `paths(2, 2)` is `6`.',
+    code: `
+      def paths(r, c):
+          if r == 0 or c == 0:
+              return 1
+          return {{1}}`,
+    blanks: [['paths(r - 1, c) + paths(r, c - 1)', 'paths(r, c - 1) + paths(r - 1, c)']],
+    test: 'assert paths(2, 2) == 6\nassert paths(3, 3) == 20\nassert paths(0, 5) == 1',
+    exp: 'The last step is either down (from (r−1, c)) or right (from (r, c−1)). Along an edge only one straight path is possible. The answer is the binomial coefficient C(r+c, r).' },
+
+  { id: 'L5-39', lec: 5, topic: 'Recursion on tuples', d: 1, type: 'fib',
+    t: 'Maximum, recursively',
+    q: 'Complete `rmax(t)` for a non-empty tuple.',
+    code: `
+      def rmax(t):
+          if len(t) == 1:
+              return t[0]
+          m = rmax(t[1:])
+          return {{1}}`,
+    blanks: [['t[0] if t[0] > m else m', 'm if m >= t[0] else t[0]', 'max(t[0], m)', 'max(m, t[0])']],
+    test: 'assert rmax((3, 9, 2)) == 9\nassert rmax((-5,)) == -5\nassert rmax((4, 4, 1)) == 4',
+    exp: 'Trust the recursion to find the maximum of the tail, then compare it with the head.' },
+
+  { id: 'L5-40', lec: 5, topic: 'Recursion on strings', d: 2, type: 'fib',
+    t: 'Run-length encoding',
+    q: '`rle(s)` compresses runs of characters, e.g. `rle(\'aaabcc\')` is `\'a3b1c2\'`. Complete it.',
+    code: `
+      def rle(s):
+          if not s:
+              return ''
+          i = 1
+          while i < len(s) and s[i] == s[0]:
+              i += 1
+          return {{1}} + rle(s[i:])`,
+    blanks: [['s[0] + str(i)', 'f"{s[0]}{i}"']],
+    test: "assert rle('aaabcc') == 'a3b1c2'\nassert rle('') == ''\nassert rle('zzzz') == 'z4'",
+    exp: 'The loop measures how long the first run is (`i` characters). Encode that run, then recurse on everything after it.' },
+
+  { id: 'L5-41', lec: 5, topic: 'Recursion', d: 2, type: 'fib',
+    t: 'All binary strings of length n',
+    q: '`bins(n)` returns all binary strings of length `n` in increasing order, e.g. `bins(2)` is `[\'00\', \'01\', \'10\', \'11\']`. Complete it.',
+    code: `
+      def bins(n):
+          if n == 0:
+              return ['']
+          return [{{1}} for s in bins(n - 1) for b in '01']`,
+    blanks: [['s + b']],
+    test: "assert bins(2) == ['00', '01', '10', '11']\nassert bins(0) == ['']\nassert len(bins(5)) == 32",
+    exp: 'For each shorter string (outer loop), append each bit (inner loop). Writing `b + s` gives the same strings in a different order: `00, 10, 01, 11`.' },
+
+  { id: 'L5-42', lec: 5, topic: 'Recursion', d: 2, type: 'out',
+    t: 'Weighted recurrence',
+    code: `
+      def f(n):
+          if n <= 1:
+              return 1
+          return f(n - 1) + 2 * f(n - 2)
+
+      print(f(5))`,
+    ans: '21',
+    exp: 'Build up from the base: f(0) = f(1) = 1, f(2) = 3, f(3) = 5, f(4) = 11, f(5) = 11 + 2·5 = 21.' },
+
+  { id: 'L5-43', lec: 5, topic: 'Winding / unwinding', d: 3, type: 'out',
+    t: 'Print between two recursive calls',
+    code: `
+      def p(n):
+          if n == 0:
+              return
+          p(n - 1)
+          print(n, end='')
+          p(n - 1)
+
+      p(3)`,
+    ans: '1213121',
+    exp: 'p(1) prints `1`. p(2) prints p(1), then 2, then p(1): `121`. p(3) prints `121`, then 3, then `121`.' },
+
+  { id: 'L5-44', lec: 5, topic: 'Base case', d: 3, type: 'mcq', run: true,
+    t: 'A branch that forgets to return',
+    q: 'What happens?',
+    code: `
+      def g(t):
+          if not t:
+              return 0
+          if t[0] < 0:
+              g(t[1:])
+          else:
+              return t[0] + g(t[1:])
+
+      print(g((1, -2, 3)))`,
+    opts: ['TypeError', '4', '1', 'None'],
+    ans: 0,
+    exp: 'The negative branch makes the recursive call but never **returns** its value, so `g((-2, 3))` returns `None`. Then `1 + None` raises `TypeError`. It should read `return g(t[1:])`.' },
+
+  { id: 'L5-45', lec: 5, topic: 'Recursion on strings', d: 3, type: 'out',
+    t: 'Outside in, two at a time',
+    code: `
+      def z(s):
+          if len(s) <= 2:
+              return s
+          return s[0] + z(s[2:]) + s[1]
+
+      print(z('abcdefg'))`,
+    ans: 'acegfdb',
+    exp: 'z(\'efg\') = e + z(\'g\') + f = `egf`. z(\'cdefg\') = c + `egf` + d = `cegfd`. z(\'abcdefg\') = a + `cegfd` + b.' },
+
+  { id: 'L5-46', lec: 5, topic: 'Call stack', d: 2, type: 'out',
+    t: 'Counting calls of a binary recursion',
+    q: 'How many times is `h` called in total by `h(4)`? Type a number.',
+    code: `
+      def h(n):
+          if n <= 1:
+              return 1
+          return h(n - 1) + h(n - 1)`,
+    ans: '15',
+    verify: 'c = [0]\ndef h(n):\n    c[0] += 1\n    if n <= 1:\n        return 1\n    return h(n - 1) + h(n - 1)\nh(4)\nassert c[0] == 15, c[0]',
+    exp: 'Each call above the base makes two calls with n − 1: 1 + 2 + 4 + 8 = 15 calls (2ⁿ − 1). Writing `2 * h(n - 1)` would compute the same value with only 4 calls.' }
 ]);
 </script>
 <script>
@@ -2557,7 +3074,77 @@ practice([
       B[1] = B[1] + [4]
       print(A, B)`,
     ans: '[1, 2, 3] [[1, 2, 3], [1, 2, 3, 4]]',
-    exp: '`B[0].append(3)` mutates `A` itself. `B[1] + [4]` builds a **new** list, and that goes into slot 1 only, so `A` does not get the 4.' }
+    exp: '`B[0].append(3)` mutates `A` itself. `B[1] + [4]` builds a **new** list, and that goes into slot 1 only, so `A` does not get the 4.' },
+
+  { id: 'L7-29', lec: 7, topic: 'Deep processing', d: 3, type: 'fib',
+    t: 'Depth-weighted sum',
+    q: '`weighted(lst)` multiplies every number by its nesting depth (top level = 1) and sums them, e.g. `weighted([1, [2, [3]]])` is `1·1 + 2·2 + 3·3 = 14`. Complete the depth passed down.',
+    code: `
+      def weighted(lst):
+          def w(x, d):
+              if type(x) != list:
+                  return x * d
+              return sum(w(e, {{1}}) for e in x)
+          return w(lst, 0)`,
+    blanks: [['d + 1', '1 + d']],
+    test: 'assert weighted([1, [2, [3]]]) == 14\nassert weighted([]) == 0\nassert weighted([[5]]) == 10',
+    exp: 'Entering a list one level deeper means its elements sit at depth `d + 1`. The outer list starts at 0, so its own elements are at depth 1.' },
+
+  { id: 'L7-30', lec: 7, topic: 'List methods', d: 1, type: 'fib',
+    t: 'Remove every copy in place',
+    q: 'Complete `remove_all(L, x)`, which deletes every `x` from `L` **in place**.',
+    code: `
+      def remove_all(L, x):
+          while {{1}}:
+              L.remove(x)`,
+    blanks: [['x in L']],
+    test: 'L = [1, 2, 1, 3, 1]\nM = L\nremove_all(L, 1)\nassert L == [2, 3] and M is L\nremove_all(L, 9)\nassert L == [2, 3]',
+    exp: '`remove` deletes only the first copy and raises `ValueError` if there is none, so loop while another copy remains. Unlike a for loop over `L`, this never skips elements.' },
+
+  { id: 'L7-31', lec: 7, topic: 'List methods', d: 2, type: 'fib',
+    t: 'Rotate right by one, in place',
+    q: 'Complete `rotate_right(L)` with one statement that mutates `L`, e.g. `[1, 2, 3]` becomes `[3, 1, 2]`.',
+    code: `
+      def rotate_right(L):
+          if L:
+              {{1}}`,
+    blanks: [['L.insert(0, L.pop())', 'L[:] = L[-1:] + L[:-1]', 'L[:] = [L[-1]] + L[:-1]']],
+    test: 'L = [1, 2, 3]\nM = L\nrotate_right(L)\nassert L == [3, 1, 2] and M is L\nE = []\nrotate_right(E)\nassert E == []',
+    exp: '`pop()` removes and returns the last element, and `insert(0, …)` puts it at the front. Slice assignment `L[:] = …` also mutates in place, whereas `L = …` would only re-bind the local name.' },
+
+  { id: 'L7-32', lec: 7, topic: 'Deep processing', d: 2, type: 'fib',
+    t: 'Deep membership test',
+    q: 'Complete `contains(lst, x)`, which looks for `x` at any depth of a nested list.',
+    code: `
+      def contains(lst, x):
+          for e in lst:
+              if e == x or (type(e) == list and {{1}}):
+                  return True
+          return False`,
+    blanks: [['contains(e, x)']],
+    test: 'assert contains([1, [2, [3, 4]]], 4)\nassert not contains([1, [2, [3]]], 5)\nassert contains([[], [[7]]], 7)',
+    exp: 'A sub-list is searched recursively. Short-circuit `and` makes sure only lists are passed to `contains`.' },
+
+  { id: 'L7-33', lec: 7, topic: 'Nested lists', d: 1, type: 'fib',
+    t: 'Split a list into chunks',
+    q: 'Complete `chunk(L, k)`, e.g. `chunk([1, 2, 3, 4, 5], 2)` is `[[1, 2], [3, 4], [5]]`.',
+    code: `
+      def chunk(L, k):
+          return [{{1}} for i in range(0, len(L), k)]`,
+    blanks: [['L[i:i + k]', 'L[i:k + i]', 'L[i:i+k]']],
+    test: 'assert chunk([1, 2, 3, 4, 5], 2) == [[1, 2], [3, 4], [5]]\nassert chunk([], 3) == []\nassert chunk([1, 2], 5) == [[1, 2]]',
+    exp: '`i` steps through the start of each chunk, and a slice past the end simply stops early, so the last chunk can be shorter without any error.' },
+
+  { id: 'L7-34', lec: 7, topic: 'List mutation', d: 3, type: 'out',
+    t: 'Slice assignment, del and extend',
+    code: `
+      L = [1, 2, 3, 4, 5, 6]
+      L[1::2] = [0] * 3
+      del L[:2]
+      L.extend(L[:1])
+      print(L)`,
+    ans: '[3, 0, 5, 0, 3]',
+    exp: 'The stepped slice replaces indices 1, 3, 5: `[1, 0, 3, 0, 5, 0]`. A stepped slice needs exactly the same number of new values. `del L[:2]` leaves `[3, 0, 5, 0]`, and `extend` appends a copy of the first element.' }
 ]);
 </script>
 <script>
@@ -2807,7 +3394,100 @@ practice([
       scores['cat'].append(100)
       print(len(scores['ann']), sum(scores['bob']))`,
     ans: '3 150',
-    exp: '`scores[\'cat\'] = scores[\'ann\']` stores the same list object under two keys, so appending through `cat` also grows `ann` to 3 items. Bob\'s scores add up to 90 + 60 = 150.' }
+    exp: '`scores[\'cat\'] = scores[\'ann\']` stores the same list object under two keys, so appending through `cat` also grows `ann` to 3 items. Bob\'s scores add up to 90 + 60 = 150.' },
+
+  { id: 'L8-26', lec: 8, topic: 'Frequency counting', d: 1, type: 'fib',
+    t: 'Word counts',
+    q: 'Complete `count_words` in one statement, e.g. `count_words([\'a\', \'b\', \'a\'])` is `{\'a\': 2, \'b\': 1}`.',
+    code: `
+      def count_words(words):
+          d = {}
+          for w in words:
+              {{1}}
+          return d`,
+    blanks: [['d[w] = d.get(w, 0) + 1', 'd[w] = 1 + d.get(w, 0)']],
+    test: "assert count_words(['a', 'b', 'a']) == {'a': 2, 'b': 1}\nassert count_words([]) == {}",
+    exp: '`get(w, 0)` returns 0 for a word seen for the first time, so a single line handles both new and existing words.' },
+
+  { id: 'L8-27', lec: 8, topic: 'Lookup', d: 2, type: 'fib',
+    t: 'Two-sum with a dictionary',
+    q: '`two_sum(t, target)` returns the indices `(i, j)`, i < j, of two elements adding up to `target`, in one pass. Complete the check.',
+    code: `
+      def two_sum(t, target):
+          seen = {}
+          for i in range(len(t)):
+              need = target - t[i]
+              if {{1}}:
+                  return (seen[need], i)
+              seen[t[i]] = i
+          return None`,
+    blanks: [['need in seen']],
+    test: 'assert two_sum((2, 7, 11, 15), 9) == (0, 1)\nassert two_sum((3, 3), 6) == (0, 1)\nassert two_sum((1, 2), 5) is None\nassert two_sum((4, 1, 5), 6) == (1, 2)',
+    exp: 'The dictionary maps each value seen so far to its index, so "have I already seen the partner?" is a fast lookup. Checking **before** storing `t[i]` stops an element pairing with itself.' },
+
+  { id: 'L8-28', lec: 8, topic: 'Memoisation', d: 2, type: 'fib',
+    t: 'Memoised grid paths',
+    q: 'Complete the memoised path counter, so that `count_paths(10, 10)` returns `184756` instantly.',
+    code: `
+      def count_paths(R, C):
+          memo = {}
+          def p(r, c):
+              if r == 0 or c == 0:
+                  return 1
+              if (r, c) not in memo:
+                  memo[(r, c)] = {{1}}
+              return memo[(r, c)]
+          return p(R, C)`,
+    blanks: [['p(r - 1, c) + p(r, c - 1)', 'p(r, c - 1) + p(r - 1, c)']],
+    test: 'assert count_paths(10, 10) == 184756\nassert count_paths(2, 2) == 6\nassert count_paths(16, 16) == 601080390',
+    exp: 'The same (r, c) is reached by many different routes, which is overlapping subproblems. Storing each answer under the key `(r, c)`, a tuple and so hashable, means each is computed only once.' },
+
+  { id: 'L8-29', lec: 8, topic: 'Grouping', d: 3, type: 'fib',
+    t: 'Group anagrams',
+    q: 'Complete the key so that words with the same letters land in the same group, e.g. `eat`, `tea` and `ate` together.',
+    code: `
+      def group_anagrams(words):
+          g = {}
+          for w in words:
+              key = {{1}}
+              g[key] = g.get(key, []) + [w]
+          return g`,
+    blanks: [['tuple(sorted(w))', "''.join(sorted(w))"]],
+    test: "g = group_anagrams(['eat', 'tea', 'tan', 'ate', 'nat', 'bat'])\nassert sorted(map(sorted, g.values())) == [['ate', 'eat', 'tea'], ['bat'], ['nat', 'tan']]",
+    exp: 'Anagrams have the same letters in sorted order. `sorted(w)` returns a **list**, which cannot be a dictionary key (unhashable), so convert it to a tuple or a string.' },
+
+  { id: 'L8-30', lec: 8, topic: 'Inverting a dict', d: 1, type: 'fib',
+    t: 'Swap keys and values',
+    q: 'Complete `swap_kv(d)` for a dictionary whose values are all different, e.g. `{\'a\': 1, \'b\': 2}` becomes `{1: \'a\', 2: \'b\'}`.',
+    code: `
+      def swap_kv(d):
+          out = {}
+          for k, v in d.items():
+              {{1}}
+          return out`,
+    blanks: [['out[v] = k']],
+    test: "assert swap_kv({'a': 1, 'b': 2}) == {1: 'a', 2: 'b'}\nassert swap_kv({}) == {}",
+    exp: 'Each value becomes a key. This only works because the values are unique; with repeated values you need lists, as in `invert_dict`.' },
+
+  { id: 'L8-31', lec: 8, topic: 'Modifying dicts', d: 2, type: 'out',
+    t: 'Insertion order after updates',
+    code: `
+      d = {'b': 1, 'a': 2}
+      d['c'] = 3
+      d['b'] = 4
+      del d['a']
+      d['a'] = 5
+      print(list(d))`,
+    ans: "['b', 'c', 'a']",
+    exp: 'Updating an existing key (`b`) keeps its position. Deleting `a` and adding it back puts it at the **end**.' },
+
+  { id: 'L8-32', lec: 8, topic: 'Nested data', d: 2, type: 'out',
+    t: 'Looking up through a dict',
+    code: `
+      d = {'x': {'y': {'z': 1}}, 'y': 'x'}
+      print(d[d['y']]['y'], len(d['x']))`,
+    ans: "{'z': 1} 1",
+    exp: '`d[\'y\']` is `\'x\'`, so `d[d[\'y\']]` is `d[\'x\']`, and its `\'y\'` entry is `{\'z\': 1}`. `d[\'x\']` has a single key.' }
 ]);
 </script>
 <script>
@@ -3022,7 +3702,169 @@ practice([
       print([M[i][j] for i in range(3)
              for j in range(3) if i + j == 2])`,
     ans: '[3, 5, 7]',
-    exp: 'The cells where `i + j == 2` form the anti-diagonal: (0,2), (1,1) and (2,0).' }
+    exp: 'The cells where `i + j == 2` form the anti-diagonal: (0,2), (1,1) and (2,0).' },
+
+  { id: 'L9-22', lec: 9, topic: 'Matrices', d: 1, type: 'fib',
+    t: 'Diagonal difference',
+    q: 'Complete `diag_diff(M)` for a square matrix: the absolute difference between the sums of its two diagonals.',
+    code: `
+      def diag_diff(M):
+          n = len(M)
+          d1 = sum(M[i][i] for i in range(n))
+          d2 = sum({{1}} for i in range(n))
+          return abs(d1 - d2)`,
+    blanks: [['M[i][n - 1 - i]', 'M[i][n - i - 1]', 'M[i][-1 - i]', 'M[i][-i - 1]', 'M[n - 1 - i][i]']],
+    test: 'assert diag_diff([[11, 2, 4], [4, 5, 6], [10, 8, -12]]) == 15\nassert diag_diff([[1]]) == 0',
+    exp: 'On the anti-diagonal, the column runs backwards as the row goes forwards: column `n - 1 - i` in row `i`. Here (11 + 5 − 12) − (4 + 5 + 10) = 4 − 19, so the answer is 15.' },
+
+  { id: 'L9-23', lec: 9, topic: '2D arrays', d: 2, type: 'fib',
+    t: 'Border of a matrix',
+    q: 'Complete `border(M)`, which lists the elements on the outer edge of `M` row by row, e.g. a 3×3 matrix numbered 1–9 gives `[1, 2, 3, 4, 6, 7, 8, 9]`.',
+    code: `
+      def border(M):
+          R, C = len(M), len(M[0])
+          return [M[r][c] for r in range(R) for c in range(C)
+                  if {{1}}]`,
+    blanks: [['r == 0 or r == R - 1 or c == 0 or c == C - 1', 'r in (0, R - 1) or c in (0, C - 1)',
+              'c == 0 or c == C - 1 or r == 0 or r == R - 1', 'not (0 < r < R - 1 and 0 < c < C - 1)']],
+    test: 'assert border([[1, 2, 3], [4, 5, 6], [7, 8, 9]]) == [1, 2, 3, 4, 6, 7, 8, 9]\nassert border([[1, 2], [3, 4]]) == [1, 2, 3, 4]\nassert border([[5]]) == [5]',
+    exp: 'A cell is on the border if its row is the first or last row, **or** its column is the first or last column.' },
+
+  { id: 'L9-24', lec: 9, topic: 'Matrices', d: 1, type: 'fib',
+    t: 'Mirror a matrix left to right',
+    q: 'Complete `mirror(M)`, which returns a new matrix with each row reversed and leaves `M` unchanged.',
+    code: `
+      def mirror(M):
+          return [{{1}} for row in M]`,
+    blanks: [['row[::-1]', 'list(reversed(row))']],
+    test: 'M = [[1, 2, 3], [4, 5, 6]]\nassert mirror(M) == [[3, 2, 1], [6, 5, 4]]\nassert M == [[1, 2, 3], [4, 5, 6]]',
+    exp: 'Slicing makes a reversed **copy** of each row. `row.reverse()` would mutate `M` and return `None`.' },
+
+  { id: 'L9-25', lec: 9, topic: 'Grids', d: 3, type: 'fib',
+    t: 'Sum of in-bounds neighbours',
+    q: 'Complete `neighbours(M, r, c)`, which sums the up to 8 cells around `(r, c)` that lie inside the grid.',
+    code: `
+      def neighbours(M, r, c):
+          total = 0
+          for dr in (-1, 0, 1):
+              for dc in (-1, 0, 1):
+                  rr, cc = r + dr, c + dc
+                  if (dr, dc) != (0, 0) and {{1}}:
+                      total += M[rr][cc]
+          return total`,
+    blanks: [['0 <= rr < len(M) and 0 <= cc < len(M[0])', '0 <= cc < len(M[0]) and 0 <= rr < len(M)',
+              'rr >= 0 and rr < len(M) and cc >= 0 and cc < len(M[0])']],
+    test: 'M = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]\nassert neighbours(M, 1, 1) == 40\nassert neighbours(M, 0, 0) == 11\nassert neighbours(M, 2, 2) == 19',
+    exp: 'Both indices must be checked against **both** ends. A negative index would not crash in Python: `M[-1]` silently reads the last row, which is exactly the bug the `0 <=` checks prevent.' },
+
+  { id: 'L9-26', lec: 9, topic: 'Creating 2D arrays', d: 2, type: 'fib',
+    t: 'Fill a matrix column by column',
+    q: '`to_cols(A, R, C)` builds an R×C matrix by filling **columns** first, e.g. `to_cols([1, 2, 3, 4, 5, 6], 2, 3)` is `[[1, 3, 5], [2, 4, 6]]`. Complete the index.',
+    code: `
+      def to_cols(A, R, C):
+          return [[A[{{1}}] for c in range(C)]
+                  for r in range(R)]`,
+    blanks: [['c * R + r', 'r + c * R', 'R * c + r', 'r + R * c']],
+    test: 'assert to_cols([1, 2, 3, 4, 5, 6], 2, 3) == [[1, 3, 5], [2, 4, 6]]\nassert to_cols([1, 2, 3, 4, 5, 6], 3, 2) == [[1, 4], [2, 5], [3, 6]]',
+    exp: 'Column `c` starts at `A[c * R]`, because each earlier column used R elements. Row `r` within that column is `r` further on. Compare row-major order, where it is `r * C + c`.' },
+
+  { id: 'L9-27', lec: 9, topic: 'Matrices', d: 2, type: 'fib',
+    t: 'Is it the identity matrix?',
+    q: 'Complete `is_identity(M)` for a square matrix.',
+    code: `
+      def is_identity(M):
+          n = len(M)
+          for r in range(n):
+              for c in range(n):
+                  if M[r][c] != {{1}}:
+                      return False
+          return True`,
+    blanks: [['(1 if r == c else 0)', 'int(r == c)', '(r == c)']],
+    test: 'assert is_identity([[1, 0], [0, 1]]) and is_identity([[1]])\nassert not is_identity([[1, 0], [1, 1]]) and not is_identity([[0, 0], [0, 1]])',
+    exp: 'Diagonal cells must be 1 and all others 0. The parentheses matter: `M[r][c] != 1 if r == c else 0` parses as `(M[r][c] != 1) if r == c else 0`, which never fails off the diagonal.' },
+
+  { id: 'L9-28', lec: 9, topic: 'Matrices', d: 2, type: 'fib',
+    t: 'Is it symmetric?',
+    q: 'Complete the range of the inner loop of `is_symmetric(M)`. Several answers work; the most efficient checks each pair only once.',
+    code: `
+      def is_symmetric(M):
+          n = len(M)
+          for r in range(n):
+              for c in range({{1}}):
+                  if M[r][c] != M[c][r]:
+                      return False
+          return True`,
+    blanks: [['r', 'r + 1', 'n', 'len(M)']],
+    test: 'assert is_symmetric([[1, 2], [2, 3]]) and is_symmetric([[4]])\nassert not is_symmetric([[1, 2], [3, 1]])',
+    exp: '`range(r)` compares only the cells below the diagonal with their mirror images above it: each pair once, and the diagonal is skipped since it always matches itself. `range(n)` is also correct, just twice the work.' },
+
+  { id: 'L9-29', lec: 9, topic: 'Grids', d: 3, type: 'fib',
+    t: 'Paths through a grid with walls',
+    q: '`count_paths(G)` counts paths from the top-left to the bottom-right cell of a grid of strings, moving only right or down and never entering `#`. Complete the table update.',
+    code: `
+      def count_paths(G):
+          R, C = len(G), len(G[0])
+          W = [[0] * C for r in range(R)]
+          for r in range(R):
+              for c in range(C):
+                  if G[r][c] == '#':
+                      W[r][c] = 0
+                  elif r == 0 and c == 0:
+                      W[r][c] = 1
+                  else:
+                      up = W[r - 1][c] if r > 0 else 0
+                      left = W[r][c - 1] if c > 0 else 0
+                      W[r][c] = {{1}}
+          return W[R - 1][C - 1]`,
+    blanks: [['up + left', 'left + up']],
+    test: "assert count_paths(['...', '.#.', '...']) == 2\nassert count_paths(['..', '..']) == 2\nassert count_paths(['.#', '#.']) == 0",
+    exp: 'Every path into a cell arrives from above or from the left, so its count is the sum of theirs. Filling the table row by row means those two cells are always computed first. This is the loop version of memoised grid-path recursion.' },
+
+  { id: 'L9-30', lec: 9, topic: 'Matrices', d: 1, type: 'out',
+    t: 'Transpose by comprehension',
+    code: `
+      M = [[1, 2, 3], [4, 5, 6]]
+      T = [[M[r][c] for r in range(2)]
+           for c in range(3)]
+      print(T[2], len(T))`,
+    ans: '[3, 6] 3',
+    exp: 'The outer loop runs over the 3 columns, so `T` has 3 rows. Row 2 of `T` is column 2 of `M`.' },
+
+  { id: 'L9-31', lec: 9, topic: 'Creating 2D arrays', d: 3, type: 'out',
+    t: 'Copied rows versus repeated rows',
+    code: `
+      row = [0, 0]
+      G = [row[:] for _ in range(2)]
+      G[0][0] = 5
+      H = [row] * 2
+      H[1][1] = 7
+      print(G, H)`,
+    ans: '[[5, 0], [0, 0]] [[0, 7], [0, 7]]',
+    exp: '`row[:]` gives each row of `G` its own copy, so only `G[0]` changes. `[row] * 2` repeats the **same** list, so `H[1][1] = 7` changes `row` itself, which is both rows of `H`.' },
+
+  { id: 'L9-32', lec: 9, topic: 'Grids', d: 2, type: 'out',
+    t: 'Counting cells off the diagonal',
+    code: `
+      G = ['#.#',
+           '.#.',
+           '#.#']
+      print(sum(1 for r in range(3) for c in range(3)
+                if G[r][c] == '#' and r != c))`,
+    ans: '2',
+    exp: 'There are five `#` cells. Three of them lie on the main diagonal (r == c), leaving (0, 2) and (2, 0).' },
+
+  { id: 'L9-33', lec: 9, topic: 'Copying 2D arrays', d: 2, type: 'mcq', run: true, optCode: true,
+    t: 'Replacing a row versus changing a cell',
+    q: 'What is printed?',
+    code: `
+      A = [[1, 2], [3, 4]]
+      B = A[:]
+      B[0] = [9, 9]
+      B[1][0] = 8
+      print(A)`,
+    opts: ['[[1, 2], [8, 4]]', '[[9, 9], [8, 4]]', '[[1, 2], [3, 4]]', '[[9, 9], [3, 4]]'],
+    ans: 0,
+    exp: '`A[:]` copies only the outer list. Replacing `B[0]` affects `B` alone, but `B[1]` is still the same row object as `A[1]`, so changing one of its cells shows in `A`.' }
 ]);
 </script>
 <script>
@@ -3440,7 +4282,174 @@ practice([
       L = [1, 3, 3, 5, 8]
       print(lower(L, 3, 0, 4), lower(L, 6, 0, 4), lower(L, 9, 0, 4))`,
     ans: '1 4 5',
-    exp: 'This returns the first index whose value is ≥ v, i.e. where v would be inserted to keep L sorted. That is index 1 for 3 (the first 3), index 4 for 6 (before the 8), and index 5 for 9 (past the end).' }
+    exp: 'This returns the first index whose value is ≥ v, i.e. where v would be inserted to keep L sorted. That is index 1 for 3 (the first 3), index 4 for 6 (before the 8), and index 5 for 9 (past the end).' },
+
+  { id: 'L10-30', lec: 10, topic: 'Binary search', d: 3, type: 'fib',
+    t: 'First occurrence by binary search',
+    q: '`first_index(L, v)` returns the index of the **first** occurrence of `v` in the ascending list `L`, or −1, in O(log N). Complete what happens on a match.',
+    code: `
+      def first_index(L, v):
+          lo, hi, ans = 0, len(L) - 1, -1
+          while lo <= hi:
+              mid = (lo + hi) // 2
+              if L[mid] == v:
+                  ans = mid
+                  {{1}}
+              elif L[mid] < v:
+                  lo = mid + 1
+              else:
+                  hi = mid - 1
+          return ans`,
+    blanks: [['hi = mid - 1', 'hi = mid-1']],
+    test: 'assert first_index([1, 2, 2, 2, 3], 2) == 1\nassert first_index([1, 3], 2) == -1\nassert first_index([5, 5, 5, 5], 5) == 0\nassert first_index([], 1) == -1',
+    exp: 'Record the match, but keep searching **left**, since an earlier copy may exist. Returning straight away would give whichever copy `mid` happened to land on.' },
+
+  { id: 'L10-31', lec: 10, topic: 'Bubble sort', d: 2, type: 'fib',
+    t: 'Bubble sort that stops early',
+    q: 'Complete this bubble sort so it stops as soon as a whole pass makes no swaps.',
+    code: `
+      def bubble(L):
+          swapped = True
+          while swapped:
+              swapped = False
+              for i in range(len(L) - 1):
+                  if L[i] > L[i + 1]:
+                      L[i], L[i + 1] = L[i + 1], L[i]
+                      {{1}}`,
+    blanks: [['swapped = True']],
+    test: 'for L in ([5, 1, 4, 2, 8], [], [1], [2, 1], [1, 2, 3]):\n    want = sorted(L)\n    bubble(L)\n    assert L == want',
+    exp: 'A pass with no swaps proves the list is sorted. On already-sorted input this makes bubble sort O(N), unlike selection sort, which is always O(N²).' },
+
+  { id: 'L10-32', lec: 10, topic: 'Two pointers', d: 2, type: 'fib',
+    t: 'Pair with a given sum in a sorted list',
+    q: '`has_pair(L, x)` checks whether two different elements of the ascending list `L` add up to `x`, in O(N). Complete the pointer moves.',
+    code: `
+      def has_pair(L, x):
+          i, j = 0, len(L) - 1
+          while i < j:
+              s = L[i] + L[j]
+              if s == x:
+                  return True
+              elif s < x:
+                  {{1}}
+              else:
+                  {{2}}
+          return False`,
+    blanks: [['i += 1', 'i = i + 1'], ['j -= 1', 'j = j - 1']],
+    test: 'assert has_pair([1, 2, 4, 7, 11], 9)\nassert not has_pair([1, 2, 4, 7, 11], 10)\nassert not has_pair([5], 10)\nassert has_pair([3, 3], 6)',
+    exp: 'If the sum is too small, the only way to increase it is to move the left pointer to a bigger value. If it is too big, move the right pointer down. Each step discards one element for good.' },
+
+  { id: 'L10-33', lec: 10, topic: 'Selection sort', d: 2, type: 'fib',
+    t: 'Recursive selection sort',
+    q: 'Complete this recursive version of the lecture\'s (not in-place) selection sort.',
+    code: `
+      def ssort(L):
+          if not L:
+              return []
+          m = min(L)
+          rest = L.copy()
+          rest.remove(m)
+          return {{1}}`,
+    blanks: [['[m] + ssort(rest)']],
+    test: 'L = [4, 5, 1, 3, 1]\nassert ssort(L) == [1, 1, 3, 4, 5]\nassert L == [4, 5, 1, 3, 1]\nassert ssort([]) == []',
+    exp: 'The smallest element comes first, followed by the sorted rest. Working on a copy keeps the caller\'s list unchanged.' },
+
+  { id: 'L10-34', lec: 10, topic: 'Merge', d: 3, type: 'fib',
+    t: 'Union of sorted lists without duplicates',
+    q: '`union(A, B)` merges two ascending lists into one ascending list with **no repeated values**. Complete the test before appending.',
+    code: `
+      def union(A, B):
+          i, j, out = 0, 0, []
+          while i < len(A) or j < len(B):
+              if j == len(B) or (i < len(A) and A[i] < B[j]):
+                  x = A[i]
+                  i += 1
+              else:
+                  x = B[j]
+                  j += 1
+              if {{1}}:
+                  out.append(x)
+          return out`,
+    blanks: [['not out or out[-1] != x', 'out == [] or out[-1] != x', 'len(out) == 0 or out[-1] != x', 'x not in out']],
+    test: 'assert union([1, 3, 3, 5], [2, 3, 6]) == [1, 2, 3, 5, 6]\nassert union([], [1, 1]) == [1]\nassert union([], []) == []',
+    exp: 'The values arrive in sorted order, so a duplicate can only be equal to the **last** value appended. Checking `out[-1]` is O(1), while `x not in out` also works but scans the whole list each time. The `not out` part guards against indexing an empty list.' },
+
+  { id: 'L10-35', lec: 10, topic: 'Selection sort', d: 2, type: 'fib',
+    t: 'Sort records by mark, highest first',
+    q: 'Complete this selection sort, which orders `(name, mark)` pairs by mark, **highest first**.',
+    code: `
+      def sort_by_mark(data):
+          data = list(data)
+          for i in range(len(data) - 1):
+              m = i
+              for j in range(i + 1, len(data)):
+                  if {{1}}:
+                      m = j
+              data[i], data[m] = data[m], data[i]
+          return data`,
+    blanks: [['data[j][1] > data[m][1]', 'data[m][1] < data[j][1]']],
+    test: "assert sort_by_mark((('A', 70), ('B', 90), ('C', 80))) == [('B', 90), ('C', 80), ('A', 70)]\nassert sort_by_mark(()) == []",
+    exp: 'Compare the marks (index 1 of each pair), and select the **largest** remaining one each round to get descending order.' },
+
+  { id: 'L10-36', lec: 10, topic: 'Binary search', d: 2, type: 'out',
+    t: 'Binary search over strings',
+    code: `
+      L = ['ant', 'bee', 'cat', 'dog', 'eel', 'fox']
+      lo, hi, steps, found = 0, len(L) - 1, 0, False
+      while lo <= hi and not found:
+          mid = (lo + hi) // 2
+          steps += 1
+          if L[mid] == 'eel':
+              found = True
+          elif L[mid] < 'eel':
+              lo = mid + 1
+          else:
+              hi = mid - 1
+      print(mid, steps)`,
+    ans: '4 2',
+    exp: 'Strings compare alphabetically, so binary search works on a sorted list of words too. mid = 2 (`cat` < `eel`), so go right: lo = 3, mid = 4 is `eel`, found in 2 steps.' },
+
+  { id: 'L10-37', lec: 10, topic: 'Selection sort', d: 2, type: 'out',
+    t: 'Counting real swaps',
+    code: `
+      L = [3, 1, 2]
+      swaps = 0
+      for i in range(len(L) - 1):
+          m = i
+          for j in range(i + 1, len(L)):
+              if L[j] < L[m]:
+                  m = j
+          if m != i:
+              L[i], L[m] = L[m], L[i]
+              swaps += 1
+      print(L, swaps)`,
+    ans: '[1, 2, 3] 2',
+    exp: 'i = 0: the smallest is 1, so swap to get `[1, 3, 2]`. i = 1: the smallest of the rest is 2, so swap to get `[1, 2, 3]`. Two swaps, each with `m != i`.' },
+
+  { id: 'L10-38', lec: 10, topic: 'Complexity', d: 2, type: 'mcq',
+    t: 'Cost of in inside a comprehension',
+    q: 'What is the worst-case running time of `common`, with A and B as lists?',
+    code: `
+      def common(A, B):
+          return [x for x in A if x in B]`,
+    opts: ['O(len(A) × len(B))', 'O(len(A) + len(B))', 'O(len(A) × log len(B))', 'O(len(A))'],
+    ans: 0,
+    exp: '`x in B` on a list is a linear search, O(len(B)), and it runs once for every element of A. Turning B into a dictionary (or set) makes each lookup about constant time.' },
+
+  { id: 'L10-39', lec: 10, topic: 'Merge sort', d: 3, type: 'out',
+    t: 'Order of merges in merge sort',
+    code: `
+      def ms(L):
+          if len(L) < 2:
+              return L
+          mid = len(L) // 2
+          a, b = ms(L[:mid]), ms(L[mid:])
+          print(len(a) + len(b), end=' ')
+          return sorted(a + b)
+
+      ms([5, 1, 4, 2, 3])`,
+    ans: '2 2 3 5',
+    exp: '[5, 1] merges first (size 2). Then the right half [4, 2, 3] splits into [4] and [2, 3]; [2, 3] merges (2), then [4] joins it (3). Finally the two halves merge (5).' }
 ]);
 </script>
 <script>

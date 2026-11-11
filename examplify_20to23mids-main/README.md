@@ -24,17 +24,21 @@ the move. It has a LeetCode-style problem list, no timer and instant marking,
 and it does not touch the Examplify exam clone. Open it from the picker
 (*On-the-go practice*) or directly.
 
-- **277 original questions** written for this mode, covering lectures 1–11. None
-  of them are copied from the past papers, tutorials or assignments. They come
-  in three types: multiple choice (tap to answer, marked at once), fill in the
-  blank (code with numbered blanks, plus a symbol row for phone keyboards) and
-  predict the output.
-- **Weighted towards what the finals test.** The 211 past-final questions were
-  classified by lecture, and the bank is weighted the same way: L3 sequences
-  and higher-order functions (46), L4 loops (34), L5 recursion (32) and L10
-  searching and sorting (29) are biggest, because L10 rose sharply in the last
-  two papers. L1, L2 and L8 were trimmed but keep their exam-relevant core
-  (scope, short-circuiting, memoisation).
+- **352 original questions** written for this mode, covering lectures 1–11. None
+  of them are copied from the past papers, tutorials or assignments. Some are
+  modelled on classic coding-test problem types (two-sum, maximum subarray,
+  run-length encoding, matrix diagonals, grid paths, permutations), rewritten
+  to fit the lectures. They come in three types: multiple choice (tap to
+  answer, marked at once), fill in the blank (code with numbered blanks, plus a
+  symbol row for phone keyboards) and predict the output.
+- **Weighted towards what the finals test.** All 211 past-final questions were
+  classified by lecture and weighted by marks, averaging all six papers with
+  the two most recent. The bank follows that weighting: L3 sequences and
+  higher-order functions (58), L4 loops (48), L5 recursion (46), L10 searching
+  and sorting (39) and L9 2D arrays (30) are biggest. L1, L2 and L8 were trimmed
+  but keep their exam-relevant core (scope, short-circuiting, memoisation).
+- **Fill-in practice matches the marks.** Fill-in questions carry 43% of final
+  exam marks, so 101 of the 352 questions are fill-in code completions.
 - **Lecture 9 onwards is flagged** with an orange *not revised yet* pill on
   every question and list row. The *L1–8* / *L9–11* buttons filter by it.
 - **Marking.** Fill-in answers ignore spacing and quote style and accept the

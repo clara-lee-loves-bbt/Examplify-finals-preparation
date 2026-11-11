@@ -332,5 +332,75 @@ practice([
       B[1] = B[1] + [4]
       print(A, B)`,
     ans: '[1, 2, 3] [[1, 2, 3], [1, 2, 3, 4]]',
-    exp: '`B[0].append(3)` mutates `A` itself. `B[1] + [4]` builds a **new** list, and that goes into slot 1 only, so `A` does not get the 4.' }
+    exp: '`B[0].append(3)` mutates `A` itself. `B[1] + [4]` builds a **new** list, and that goes into slot 1 only, so `A` does not get the 4.' },
+
+  { id: 'L7-29', lec: 7, topic: 'Deep processing', d: 3, type: 'fib',
+    t: 'Depth-weighted sum',
+    q: '`weighted(lst)` multiplies every number by its nesting depth (top level = 1) and sums them, e.g. `weighted([1, [2, [3]]])` is `1·1 + 2·2 + 3·3 = 14`. Complete the depth passed down.',
+    code: `
+      def weighted(lst):
+          def w(x, d):
+              if type(x) != list:
+                  return x * d
+              return sum(w(e, {{1}}) for e in x)
+          return w(lst, 0)`,
+    blanks: [['d + 1', '1 + d']],
+    test: 'assert weighted([1, [2, [3]]]) == 14\nassert weighted([]) == 0\nassert weighted([[5]]) == 10',
+    exp: 'Entering a list one level deeper means its elements sit at depth `d + 1`. The outer list starts at 0, so its own elements are at depth 1.' },
+
+  { id: 'L7-30', lec: 7, topic: 'List methods', d: 1, type: 'fib',
+    t: 'Remove every copy in place',
+    q: 'Complete `remove_all(L, x)`, which deletes every `x` from `L` **in place**.',
+    code: `
+      def remove_all(L, x):
+          while {{1}}:
+              L.remove(x)`,
+    blanks: [['x in L']],
+    test: 'L = [1, 2, 1, 3, 1]\nM = L\nremove_all(L, 1)\nassert L == [2, 3] and M is L\nremove_all(L, 9)\nassert L == [2, 3]',
+    exp: '`remove` deletes only the first copy and raises `ValueError` if there is none, so loop while another copy remains. Unlike a for loop over `L`, this never skips elements.' },
+
+  { id: 'L7-31', lec: 7, topic: 'List methods', d: 2, type: 'fib',
+    t: 'Rotate right by one, in place',
+    q: 'Complete `rotate_right(L)` with one statement that mutates `L`, e.g. `[1, 2, 3]` becomes `[3, 1, 2]`.',
+    code: `
+      def rotate_right(L):
+          if L:
+              {{1}}`,
+    blanks: [['L.insert(0, L.pop())', 'L[:] = L[-1:] + L[:-1]', 'L[:] = [L[-1]] + L[:-1]']],
+    test: 'L = [1, 2, 3]\nM = L\nrotate_right(L)\nassert L == [3, 1, 2] and M is L\nE = []\nrotate_right(E)\nassert E == []',
+    exp: '`pop()` removes and returns the last element, and `insert(0, …)` puts it at the front. Slice assignment `L[:] = …` also mutates in place, whereas `L = …` would only re-bind the local name.' },
+
+  { id: 'L7-32', lec: 7, topic: 'Deep processing', d: 2, type: 'fib',
+    t: 'Deep membership test',
+    q: 'Complete `contains(lst, x)`, which looks for `x` at any depth of a nested list.',
+    code: `
+      def contains(lst, x):
+          for e in lst:
+              if e == x or (type(e) == list and {{1}}):
+                  return True
+          return False`,
+    blanks: [['contains(e, x)']],
+    test: 'assert contains([1, [2, [3, 4]]], 4)\nassert not contains([1, [2, [3]]], 5)\nassert contains([[], [[7]]], 7)',
+    exp: 'A sub-list is searched recursively. Short-circuit `and` makes sure only lists are passed to `contains`.' },
+
+  { id: 'L7-33', lec: 7, topic: 'Nested lists', d: 1, type: 'fib',
+    t: 'Split a list into chunks',
+    q: 'Complete `chunk(L, k)`, e.g. `chunk([1, 2, 3, 4, 5], 2)` is `[[1, 2], [3, 4], [5]]`.',
+    code: `
+      def chunk(L, k):
+          return [{{1}} for i in range(0, len(L), k)]`,
+    blanks: [['L[i:i + k]', 'L[i:k + i]', 'L[i:i+k]']],
+    test: 'assert chunk([1, 2, 3, 4, 5], 2) == [[1, 2], [3, 4], [5]]\nassert chunk([], 3) == []\nassert chunk([1, 2], 5) == [[1, 2]]',
+    exp: '`i` steps through the start of each chunk, and a slice past the end simply stops early, so the last chunk can be shorter without any error.' },
+
+  { id: 'L7-34', lec: 7, topic: 'List mutation', d: 3, type: 'out',
+    t: 'Slice assignment, del and extend',
+    code: `
+      L = [1, 2, 3, 4, 5, 6]
+      L[1::2] = [0] * 3
+      del L[:2]
+      L.extend(L[:1])
+      print(L)`,
+    ans: '[3, 0, 5, 0, 3]',
+    exp: 'The stepped slice replaces indices 1, 3, 5: `[1, 0, 3, 0, 5, 0]`. A stepped slice needs exactly the same number of new values. `del L[:2]` leaves `[3, 0, 5, 0]`, and `extend` appends a copy of the first element.' }
 ]);

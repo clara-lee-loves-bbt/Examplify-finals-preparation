@@ -243,5 +243,98 @@ practice([
       scores['cat'].append(100)
       print(len(scores['ann']), sum(scores['bob']))`,
     ans: '3 150',
-    exp: '`scores[\'cat\'] = scores[\'ann\']` stores the same list object under two keys, so appending through `cat` also grows `ann` to 3 items. Bob\'s scores add up to 90 + 60 = 150.' }
+    exp: '`scores[\'cat\'] = scores[\'ann\']` stores the same list object under two keys, so appending through `cat` also grows `ann` to 3 items. Bob\'s scores add up to 90 + 60 = 150.' },
+
+  { id: 'L8-26', lec: 8, topic: 'Frequency counting', d: 1, type: 'fib',
+    t: 'Word counts',
+    q: 'Complete `count_words` in one statement, e.g. `count_words([\'a\', \'b\', \'a\'])` is `{\'a\': 2, \'b\': 1}`.',
+    code: `
+      def count_words(words):
+          d = {}
+          for w in words:
+              {{1}}
+          return d`,
+    blanks: [['d[w] = d.get(w, 0) + 1', 'd[w] = 1 + d.get(w, 0)']],
+    test: "assert count_words(['a', 'b', 'a']) == {'a': 2, 'b': 1}\nassert count_words([]) == {}",
+    exp: '`get(w, 0)` returns 0 for a word seen for the first time, so a single line handles both new and existing words.' },
+
+  { id: 'L8-27', lec: 8, topic: 'Lookup', d: 2, type: 'fib',
+    t: 'Two-sum with a dictionary',
+    q: '`two_sum(t, target)` returns the indices `(i, j)`, i < j, of two elements adding up to `target`, in one pass. Complete the check.',
+    code: `
+      def two_sum(t, target):
+          seen = {}
+          for i in range(len(t)):
+              need = target - t[i]
+              if {{1}}:
+                  return (seen[need], i)
+              seen[t[i]] = i
+          return None`,
+    blanks: [['need in seen']],
+    test: 'assert two_sum((2, 7, 11, 15), 9) == (0, 1)\nassert two_sum((3, 3), 6) == (0, 1)\nassert two_sum((1, 2), 5) is None\nassert two_sum((4, 1, 5), 6) == (1, 2)',
+    exp: 'The dictionary maps each value seen so far to its index, so "have I already seen the partner?" is a fast lookup. Checking **before** storing `t[i]` stops an element pairing with itself.' },
+
+  { id: 'L8-28', lec: 8, topic: 'Memoisation', d: 2, type: 'fib',
+    t: 'Memoised grid paths',
+    q: 'Complete the memoised path counter, so that `count_paths(10, 10)` returns `184756` instantly.',
+    code: `
+      def count_paths(R, C):
+          memo = {}
+          def p(r, c):
+              if r == 0 or c == 0:
+                  return 1
+              if (r, c) not in memo:
+                  memo[(r, c)] = {{1}}
+              return memo[(r, c)]
+          return p(R, C)`,
+    blanks: [['p(r - 1, c) + p(r, c - 1)', 'p(r, c - 1) + p(r - 1, c)']],
+    test: 'assert count_paths(10, 10) == 184756\nassert count_paths(2, 2) == 6\nassert count_paths(16, 16) == 601080390',
+    exp: 'The same (r, c) is reached by many different routes, which is overlapping subproblems. Storing each answer under the key `(r, c)`, a tuple and so hashable, means each is computed only once.' },
+
+  { id: 'L8-29', lec: 8, topic: 'Grouping', d: 3, type: 'fib',
+    t: 'Group anagrams',
+    q: 'Complete the key so that words with the same letters land in the same group, e.g. `eat`, `tea` and `ate` together.',
+    code: `
+      def group_anagrams(words):
+          g = {}
+          for w in words:
+              key = {{1}}
+              g[key] = g.get(key, []) + [w]
+          return g`,
+    blanks: [['tuple(sorted(w))', "''.join(sorted(w))"]],
+    test: "g = group_anagrams(['eat', 'tea', 'tan', 'ate', 'nat', 'bat'])\nassert sorted(map(sorted, g.values())) == [['ate', 'eat', 'tea'], ['bat'], ['nat', 'tan']]",
+    exp: 'Anagrams have the same letters in sorted order. `sorted(w)` returns a **list**, which cannot be a dictionary key (unhashable), so convert it to a tuple or a string.' },
+
+  { id: 'L8-30', lec: 8, topic: 'Inverting a dict', d: 1, type: 'fib',
+    t: 'Swap keys and values',
+    q: 'Complete `swap_kv(d)` for a dictionary whose values are all different, e.g. `{\'a\': 1, \'b\': 2}` becomes `{1: \'a\', 2: \'b\'}`.',
+    code: `
+      def swap_kv(d):
+          out = {}
+          for k, v in d.items():
+              {{1}}
+          return out`,
+    blanks: [['out[v] = k']],
+    test: "assert swap_kv({'a': 1, 'b': 2}) == {1: 'a', 2: 'b'}\nassert swap_kv({}) == {}",
+    exp: 'Each value becomes a key. This only works because the values are unique; with repeated values you need lists, as in `invert_dict`.' },
+
+  { id: 'L8-31', lec: 8, topic: 'Modifying dicts', d: 2, type: 'out',
+    t: 'Insertion order after updates',
+    code: `
+      d = {'b': 1, 'a': 2}
+      d['c'] = 3
+      d['b'] = 4
+      del d['a']
+      d['a'] = 5
+      print(list(d))`,
+    ans: "['b', 'c', 'a']",
+    exp: 'Updating an existing key (`b`) keeps its position. Deleting `a` and adding it back puts it at the **end**.' },
+
+  { id: 'L8-32', lec: 8, topic: 'Nested data', d: 2, type: 'out',
+    t: 'Looking up through a dict',
+    code: `
+      d = {'x': {'y': {'z': 1}}, 'y': 'x'}
+      print(d[d['y']]['y'], len(d['x']))`,
+    ans: "{'z': 1} 1",
+    exp: '`d[\'y\']` is `\'x\'`, so `d[d[\'y\']]` is `d[\'x\']`, and its `\'y\'` entry is `{\'z\': 1}`. `d[\'x\']` has a single key.' }
 ]);
