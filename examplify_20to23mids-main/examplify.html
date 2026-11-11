@@ -1081,7 +1081,7 @@ a.picker-tool-btn { text-decoration: none; display: inline-flex; align-items: ce
         <button type="button" data-filter="mcq">Multiple choice</button>
         <button type="button" data-filter="fib">Fill in the blank</button>
         <div class="rail-filter-sep"></div>
-        <div class="rail-filter-group">Mid-term scope</div>
+        <div class="rail-filter-group">Exam scope</div>
         <button type="button" data-filter="outofscope">Out of scope</button>
         <button type="button" class="sub" data-filter="scope-total">Totally out of scope</button>
         <button type="button" class="sub" data-filter="scope-crucial">Crucially out of scope</button>
@@ -1463,6 +1463,7 @@ registerExam({
     },
     {
       n: 9, marks: 3, type: 'mcq',
+      scope: { level: 'total', reason: 'multiple inheritance and method resolution order are not covered — L11 covers single inheritance only' },
       stem: [
         { p: 'Consider the following class definitions. What is printed?' },
         { code: 'class NUS:\n    def id(self):\n        return \'NUS\'\nclass SoC(NUS):\n    def id(self):\n        return \'SoC\'\nclass FOE(NUS):\n    def id(self):\n        return \'FOE\'\nclass Student(FOE,SoC):\n    pass\n\n>>> peter = Student()\n>>> print(peter.id())' }
@@ -1667,6 +1668,7 @@ registerExam({
     },
     {
       n: 23, marks: 10, type: 'fib',
+      scope: { level: 'slight', reason: 'uses math.factorial, which is not covered in lectures 1–11' },
       stem: [
         { p: 'The hyperbolic sine is `sinh(x) = sum over n of x^(2n+1)/(2n+1)!`. Sum only the first 50 terms (n from 0 to 49).' },
         { p: 'Write an iterative `sinhI(x)` (meaningful loops allowed), then an "ultimate" `sinhU(x)` with no explicit loop or recursion.' },
@@ -1680,6 +1682,7 @@ registerExam({
     },
     {
       n: 24, marks: 10, type: 'fib',
+      scope: { level: 'slight', reason: 'uses random.randint, which is not covered in lectures 1–11' },
       stem: [
         { p: 'Building on the RPG assignment, `Fighter` has `name`, `maxhp = 1200`, `hp = 1200`, `str = 100` and `cost = 100`; `Mage` has `mana`/`maxmana`, `cost = 200` and `int = 400`. `randAlive(team)` returns the index of a random living member, `randint(a,b)` is imported from `random`, `manaCost`/`manaRecovery` are the lecture constants, and `gotHurt(damage)` applies damage.' },
         { p: 'Write `ClumsyFighter`: same parameters as `Fighter`, `cost` of 50, and a 25% chance of hurting himself for 50 instead of attacking.' },
@@ -1807,6 +1810,7 @@ registerExam({
     },
     {
       n: 9, marks: 2, type: 'mcq',
+      scope: { level: 'total', reason: 'the whole question is about set(), which is not covered in lectures 1–11' },
       stem: [ { p: 'Evaluate:' }, { code: "list(tuple(set('abcabc')))" } ],
       options: [
         { l: 'A', t: "['abcabc']" }, { l: 'B', t: "['b', 'c', 'a']" },
@@ -1945,6 +1949,7 @@ registerExam({
     },
     {
       n: 20, marks: 2, type: 'mcq',
+      scope: { level: 'slight', reason: 'uses str.lower(), which is not among the string operations covered in L3' },
       stem: [
         { p: 'What is the output of the following code?' },
         { code: "def foo(s):\n    return sum(map(lambda x:1+ord(x.lower())-ord('a'), s))\n\nprint(foo('Cab'))" }
@@ -1987,6 +1992,7 @@ registerExam({
     },
     {
       n: 23, marks: 2, type: 'mcq',
+      scope: { level: 'slight', reason: 'one option passes a set, which is not covered in lectures 1–11' },
       stem: [
         { p: 'The following function tries to reverse some collections. Which of the following lines will NOT crash?' },
         { code: 'def reverse(a):\n    if not a:\n        return a\n    return reverse(a[1:]) + a[0]' }
@@ -2173,6 +2179,7 @@ registerExam({
     },
     {
       n: 4, marks: 2, type: 'mcq',
+      scope: { level: 'total', reason: 'the whole question is about set operators, which are not covered in lectures 1–11' },
       stem: [ { code: 'print({1,2,3}&{2,3,4}|{3,4,5})' } ],
       options: [
         { l: 'A', t: '{2, 3, 4, 5}' }, { l: 'B', t: '{1, 2, 3, 4, 5}' },
@@ -2481,6 +2488,7 @@ registerExam({
     },
     {
       n: 30, marks: 2, type: 'mcq',
+      scope: { level: 'total', reason: 'the whole question is about try/except/else/finally, which are not covered' },
       stem: [
         { code: "output = ''\ntry:\n    x = 2\n    y = 'a'\n    q = y + str(x)\n    z = q * x\nexcept TypeError:\n    output += '1'\nelse:\n    output += '2'\nfinally:\n    output += '3'\nprint(output)" }
       ],
@@ -2578,6 +2586,7 @@ registerExam({
     },
     {
       n: 37, marks: 2, type: 'mcq',
+      scope: { level: 'total', reason: 'the whole question is about try/except and assert, which are not covered' },
       stem: [
         { p: 'What is your comment on the following code that asks a user to choose between coffee or tea?' },
         { code: 'try:\n    print("Do you want coffee or tea?")\n    print("If you want coffee, please enter \'c\'")\n    print("Any other choices will be deemed as tea")\n    ans = input()\n    assert ans == \'c\'\nexcept:\n    request = \'Tea\'\nelse:\n    request = \'Coffee\'\nfinally:\n    print("Enjoy your "+request+"!")' }
@@ -2606,6 +2615,7 @@ registerExam({
     },
     {
       n: 39, marks: 2, type: 'mcq',
+      scope: { level: 'total', reason: 'the whole question is about reading a .csv file — file handling is not covered' },
       stem: [ { p: 'What is the best and simplest method to read a `.csv` file into a 2D array?' } ],
       options: [
         { l: 'A', t: 'Use the csv package' },
@@ -2619,6 +2629,7 @@ registerExam({
     },
     {
       n: 40, marks: 2, type: 'mcq',
+      scope: { level: 'total', reason: 'the whole question turns on arbitrary-precision integers, which are not covered' },
       stem: [ { p: 'What is the best data type to store a number bigger than `2**1024`?' } ],
       options: [
         { l: 'A', t: 'integer' }, { l: 'B', t: 'float' }, { l: 'C', t: 'string' },
@@ -3103,6 +3114,7 @@ registerExam({
     },
     {
       n: 36, marks: 1, type: 'mcq',
+      scope: { level: 'total', reason: 'the whole question is about try/except, which are not covered' },
       stem: [
         { code: 'n = 2\nx = 0\ntry:\n    while True:\n        x += 10//n\n        n-=1\nexcept:\n    print(x)' }
       ],
@@ -3115,6 +3127,7 @@ registerExam({
     },
     {
       n: 37, marks: 1, type: 'mcq',
+      scope: { level: 'total', reason: 'the whole question is about try/except/else/finally, which are not covered' },
       stem: [
         { code: 'n = 0\ntry:\n    n += 1\nexcept what:\n    n += 1\nexcept:\n    n += 1\nelse:\n    n += 1\nfinally:\n    n += 1\nprint(n)' }
       ],
@@ -3127,6 +3140,7 @@ registerExam({
     },
     {
       n: 38, marks: 1, type: 'mcq',
+      scope: { level: 'total', reason: 'the whole question is about try/except/assert and ZeroDivisionError, which are not covered' },
       stem: [
         { code: 'x = 0\ntry:\n    assert 0*(1/0)\nexcept AssertionError:\n    x = 1\nexcept ZeroDivisionError:\n    x = 2\nexcept:\n    x = 3\nprint(x)' }
       ],
@@ -3139,6 +3153,7 @@ registerExam({
     },
     {
       n: 39, marks: 1, type: 'mcq',
+      scope: { level: 'total', reason: "the whole question is about the file modes 'w+' and 'r+' — file handling is not covered" },
       stem: [
         { p: 'The two file opening modes `\'w+\'` and `\'r+\'` have some different functionalities.' }
       ],
@@ -3148,6 +3163,7 @@ registerExam({
     },
     {
       n: 40, marks: 1, type: 'mcq',
+      scope: { level: 'total', reason: "the whole question is about round() and banker's rounding, which are not covered" },
       stem: [ { code: 'print(round(2.5)+round(3.5))' } ],
       options: [
         { l: 'A', t: '6' }, { l: 'B', t: '5' }, { l: 'C', t: '7' },
@@ -3334,6 +3350,7 @@ registerExam({
     },
     {
       n: 3, marks: 1, type: 'mcq',
+      scope: { level: 'total', reason: 'the whole question is about set union, which is not covered in lectures 1–11' },
       stem: [
         { p: 'Given the following program fragment:' },
         { code: 'def a(s, i):\n    return s | {i}' },
@@ -3349,6 +3366,7 @@ registerExam({
     },
     {
       n: 4, marks: 1, type: 'mcq',
+      scope: { level: 'total', reason: 'the whole question is about set operators and symmetric difference, which are not covered' },
       stem: [
         { p: 'Given that both `A` and `B` are sets, which of the following is equivalent to' },
         { code: '(A | B) - (A & B)' }
@@ -3491,6 +3509,7 @@ registerExam({
     },
     {
       n: 13, marks: 1, type: 'mcq',
+      scope: { level: 'total', reason: 'the whole question is about the imageio package, which is not covered in lectures 1–11' },
       stem: [ { p: 'What package did we mention in lecture for image processing?' } ],
       options: [
         { l: 'A', t: 'IMAGEIO' }, { l: 'B', t: 'IMGPY' }, { l: 'C', t: 'PILLOWS' },
@@ -3501,6 +3520,7 @@ registerExam({
     },
     {
       n: 14, marks: 1, type: 'mcq',
+      scope: { level: 'total', reason: 'the whole question is about EXIF image metadata, which is not covered' },
       stem: [ { p: 'What is the meaning of "EXIF" mentioned in our class?' } ],
       options: [
         { l: 'A', t: 'Some information about an image' }, { l: 'B', t: 'A kind of exceptions' },
@@ -3512,6 +3532,7 @@ registerExam({
     },
     {
       n: 15, marks: 1, type: 'mcq',
+      scope: { level: 'total', reason: 'the whole question is about matplotlib bar charts, which are not covered' },
       stem: [
         { p: 'The paper shows a chart of vertical bars, one per category, drawn with `matplotlib.pyplot`. Which of the following functions produces it?' }
       ],
@@ -3555,6 +3576,7 @@ registerExam({
     },
     {
       n: 18, marks: 3, type: 'mcq',
+      scope: { level: 'crucial', reason: "you must understand QuickSort's partition, which L10 does not teach (it covers selection and merge sort)" },
       stem: [
         { p: 'The following `partition` function is used in QuickSort:' },
         { code: 'def partition(lst,x):\n    lsta = []\n    lstb = []\n    for i in lst:\n        if i != x:\n            if i < x:\n                lsta.append(i)\n            else:\n                lstb.append(i)\n    return (lsta,lstb)' },
@@ -3574,6 +3596,7 @@ registerExam({
     },
     {
       n: 19, marks: 3, type: 'mcq',
+      scope: { level: 'crucial', reason: 'needs multi-key sort stability, which L10 does not cover' },
       stem: [
         { p: 'Given any list of tuples, `gbsort` sorts it by one component with a chosen comparison:' },
         { code: 'def bubbleC(lst,idx,cmp):\n    n = len(lst)\n    lst1 = lst.copy()\n    for i in range(1,n):\n        if cmp(lst1[i-1][idx],lst1[i][idx]):\n            lst1[i-1],lst1[i] = lst1[i],lst1[i-1]\n    return lst1\n\ndef gbsort(lst, idx, cmp):\n    n = len(lst)\n    lst1 = lst.copy()\n    for i in range(n):\n        lst1 = bubbleC(lst1,idx,cmp)\n    return lst1' },
@@ -3626,6 +3649,7 @@ registerExam({
     },
     {
       n: 22, marks: 3, type: 'fib',
+      scope: { level: 'total', reason: 'the whole question is about turtle graphics, which are not covered' },
       stem: [
         { p: 'The following Turtle program draws an analog clock face. It takes integer hours `hh` (0-23) and minutes `mm` (0-59).' },
         { code: 'def clock(hh,mm):\n    clearscreen()\n    right(({{1}} * mm) - 90)\n    forward(200)\n    home()\n    right({{2}} * (hh * 60 + mm) - 90)\n    forward(160)\n    hideturtle()\n\n# (c) Deployed for a full day, the hour hand coincides with\n#     the minute hand {{3}} times.' },
@@ -7950,7 +7974,7 @@ registerExam({
 
   function scopeBadge(scope) {
     var b = el('span', 'scope-badge ' + scope.level);
-    b.title = 'Out of the mid-term scope (' + (SCOPE_WORD[scope.level] || scope.level) +
+    b.title = 'Out of the exam scope (' + (SCOPE_WORD[scope.level] || scope.level) +
               ' out of scope): ' + scope.reason;
     b.appendChild(el('span', 'scope-tag', 'OUT OF SCOPE'));
     b.appendChild(el('span', 'scope-level', SCOPE_WORD[scope.level] || scope.level));

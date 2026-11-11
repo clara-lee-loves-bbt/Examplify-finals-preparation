@@ -53,6 +53,7 @@ registerExam({
     },
     {
       n: 4, marks: 2, type: 'mcq',
+      scope: { level: 'total', reason: 'the whole question is about set operators, which are not covered in lectures 1–11' },
       stem: [ { code: 'print({1,2,3}&{2,3,4}|{3,4,5})' } ],
       options: [
         { l: 'A', t: '{2, 3, 4, 5}' }, { l: 'B', t: '{1, 2, 3, 4, 5}' },
@@ -361,6 +362,7 @@ registerExam({
     },
     {
       n: 30, marks: 2, type: 'mcq',
+      scope: { level: 'total', reason: 'the whole question is about try/except/else/finally, which are not covered' },
       stem: [
         { code: "output = ''\ntry:\n    x = 2\n    y = 'a'\n    q = y + str(x)\n    z = q * x\nexcept TypeError:\n    output += '1'\nelse:\n    output += '2'\nfinally:\n    output += '3'\nprint(output)" }
       ],
@@ -458,6 +460,7 @@ registerExam({
     },
     {
       n: 37, marks: 2, type: 'mcq',
+      scope: { level: 'total', reason: 'the whole question is about try/except and assert, which are not covered' },
       stem: [
         { p: 'What is your comment on the following code that asks a user to choose between coffee or tea?' },
         { code: 'try:\n    print("Do you want coffee or tea?")\n    print("If you want coffee, please enter \'c\'")\n    print("Any other choices will be deemed as tea")\n    ans = input()\n    assert ans == \'c\'\nexcept:\n    request = \'Tea\'\nelse:\n    request = \'Coffee\'\nfinally:\n    print("Enjoy your "+request+"!")' }
@@ -486,6 +489,7 @@ registerExam({
     },
     {
       n: 39, marks: 2, type: 'mcq',
+      scope: { level: 'total', reason: 'the whole question is about reading a .csv file — file handling is not covered' },
       stem: [ { p: 'What is the best and simplest method to read a `.csv` file into a 2D array?' } ],
       options: [
         { l: 'A', t: 'Use the csv package' },
@@ -499,6 +503,7 @@ registerExam({
     },
     {
       n: 40, marks: 2, type: 'mcq',
+      scope: { level: 'total', reason: 'the whole question turns on arbitrary-precision integers, which are not covered' },
       stem: [ { p: 'What is the best data type to store a number bigger than `2**1024`?' } ],
       options: [
         { l: 'A', t: 'integer' }, { l: 'B', t: 'float' }, { l: 'C', t: 'string' },

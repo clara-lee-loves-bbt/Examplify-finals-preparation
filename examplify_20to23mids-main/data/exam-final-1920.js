@@ -132,6 +132,7 @@ registerExam({
     },
     {
       n: 9, marks: 3, type: 'mcq',
+      scope: { level: 'total', reason: 'multiple inheritance and method resolution order are not covered — L11 covers single inheritance only' },
       stem: [
         { p: 'Consider the following class definitions. What is printed?' },
         { code: 'class NUS:\n    def id(self):\n        return \'NUS\'\nclass SoC(NUS):\n    def id(self):\n        return \'SoC\'\nclass FOE(NUS):\n    def id(self):\n        return \'FOE\'\nclass Student(FOE,SoC):\n    pass\n\n>>> peter = Student()\n>>> print(peter.id())' }
@@ -336,6 +337,7 @@ registerExam({
     },
     {
       n: 23, marks: 10, type: 'fib',
+      scope: { level: 'slight', reason: 'uses math.factorial, which is not covered in lectures 1–11' },
       stem: [
         { p: 'The hyperbolic sine is `sinh(x) = sum over n of x^(2n+1)/(2n+1)!`. Sum only the first 50 terms (n from 0 to 49).' },
         { p: 'Write an iterative `sinhI(x)` (meaningful loops allowed), then an "ultimate" `sinhU(x)` with no explicit loop or recursion.' },
@@ -349,6 +351,7 @@ registerExam({
     },
     {
       n: 24, marks: 10, type: 'fib',
+      scope: { level: 'slight', reason: 'uses random.randint, which is not covered in lectures 1–11' },
       stem: [
         { p: 'Building on the RPG assignment, `Fighter` has `name`, `maxhp = 1200`, `hp = 1200`, `str = 100` and `cost = 100`; `Mage` has `mana`/`maxmana`, `cost = 200` and `int = 400`. `randAlive(team)` returns the index of a random living member, `randint(a,b)` is imported from `random`, `manaCost`/`manaRecovery` are the lecture constants, and `gotHurt(damage)` applies damage.' },
         { p: 'Write `ClumsyFighter`: same parameters as `Fighter`, `cost` of 50, and a 25% chance of hurting himself for 50 instead of attacking.' },

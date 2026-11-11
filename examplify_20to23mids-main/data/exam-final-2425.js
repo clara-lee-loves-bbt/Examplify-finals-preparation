@@ -51,6 +51,7 @@ registerExam({
     },
     {
       n: 3, marks: 1, type: 'mcq',
+      scope: { level: 'total', reason: 'the whole question is about set union, which is not covered in lectures 1–11' },
       stem: [
         { p: 'Given the following program fragment:' },
         { code: 'def a(s, i):\n    return s | {i}' },
@@ -66,6 +67,7 @@ registerExam({
     },
     {
       n: 4, marks: 1, type: 'mcq',
+      scope: { level: 'total', reason: 'the whole question is about set operators and symmetric difference, which are not covered' },
       stem: [
         { p: 'Given that both `A` and `B` are sets, which of the following is equivalent to' },
         { code: '(A | B) - (A & B)' }
@@ -208,6 +210,7 @@ registerExam({
     },
     {
       n: 13, marks: 1, type: 'mcq',
+      scope: { level: 'total', reason: 'the whole question is about the imageio package, which is not covered in lectures 1–11' },
       stem: [ { p: 'What package did we mention in lecture for image processing?' } ],
       options: [
         { l: 'A', t: 'IMAGEIO' }, { l: 'B', t: 'IMGPY' }, { l: 'C', t: 'PILLOWS' },
@@ -218,6 +221,7 @@ registerExam({
     },
     {
       n: 14, marks: 1, type: 'mcq',
+      scope: { level: 'total', reason: 'the whole question is about EXIF image metadata, which is not covered' },
       stem: [ { p: 'What is the meaning of "EXIF" mentioned in our class?' } ],
       options: [
         { l: 'A', t: 'Some information about an image' }, { l: 'B', t: 'A kind of exceptions' },
@@ -229,6 +233,7 @@ registerExam({
     },
     {
       n: 15, marks: 1, type: 'mcq',
+      scope: { level: 'total', reason: 'the whole question is about matplotlib bar charts, which are not covered' },
       stem: [
         { p: 'The paper shows a chart of vertical bars, one per category, drawn with `matplotlib.pyplot`. Which of the following functions produces it?' }
       ],
@@ -272,6 +277,7 @@ registerExam({
     },
     {
       n: 18, marks: 3, type: 'mcq',
+      scope: { level: 'crucial', reason: "you must understand QuickSort's partition, which L10 does not teach (it covers selection and merge sort)" },
       stem: [
         { p: 'The following `partition` function is used in QuickSort:' },
         { code: 'def partition(lst,x):\n    lsta = []\n    lstb = []\n    for i in lst:\n        if i != x:\n            if i < x:\n                lsta.append(i)\n            else:\n                lstb.append(i)\n    return (lsta,lstb)' },
@@ -291,6 +297,7 @@ registerExam({
     },
     {
       n: 19, marks: 3, type: 'mcq',
+      scope: { level: 'crucial', reason: 'needs multi-key sort stability, which L10 does not cover' },
       stem: [
         { p: 'Given any list of tuples, `gbsort` sorts it by one component with a chosen comparison:' },
         { code: 'def bubbleC(lst,idx,cmp):\n    n = len(lst)\n    lst1 = lst.copy()\n    for i in range(1,n):\n        if cmp(lst1[i-1][idx],lst1[i][idx]):\n            lst1[i-1],lst1[i] = lst1[i],lst1[i-1]\n    return lst1\n\ndef gbsort(lst, idx, cmp):\n    n = len(lst)\n    lst1 = lst.copy()\n    for i in range(n):\n        lst1 = bubbleC(lst1,idx,cmp)\n    return lst1' },
@@ -343,6 +350,7 @@ registerExam({
     },
     {
       n: 22, marks: 3, type: 'fib',
+      scope: { level: 'total', reason: 'the whole question is about turtle graphics, which are not covered' },
       stem: [
         { p: 'The following Turtle program draws an analog clock face. It takes integer hours `hh` (0-23) and minutes `mm` (0-59).' },
         { code: 'def clock(hh,mm):\n    clearscreen()\n    right(({{1}} * mm) - 90)\n    forward(200)\n    home()\n    right({{2}} * (hh * 60 + mm) - 90)\n    forward(160)\n    hideturtle()\n\n# (c) Deployed for a full day, the hour hand coincides with\n#     the minute hand {{3}} times.' },

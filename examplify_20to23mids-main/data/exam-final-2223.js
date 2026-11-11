@@ -414,6 +414,7 @@ registerExam({
     },
     {
       n: 36, marks: 1, type: 'mcq',
+      scope: { level: 'total', reason: 'the whole question is about try/except, which are not covered' },
       stem: [
         { code: 'n = 2\nx = 0\ntry:\n    while True:\n        x += 10//n\n        n-=1\nexcept:\n    print(x)' }
       ],
@@ -426,6 +427,7 @@ registerExam({
     },
     {
       n: 37, marks: 1, type: 'mcq',
+      scope: { level: 'total', reason: 'the whole question is about try/except/else/finally, which are not covered' },
       stem: [
         { code: 'n = 0\ntry:\n    n += 1\nexcept what:\n    n += 1\nexcept:\n    n += 1\nelse:\n    n += 1\nfinally:\n    n += 1\nprint(n)' }
       ],
@@ -438,6 +440,7 @@ registerExam({
     },
     {
       n: 38, marks: 1, type: 'mcq',
+      scope: { level: 'total', reason: 'the whole question is about try/except/assert and ZeroDivisionError, which are not covered' },
       stem: [
         { code: 'x = 0\ntry:\n    assert 0*(1/0)\nexcept AssertionError:\n    x = 1\nexcept ZeroDivisionError:\n    x = 2\nexcept:\n    x = 3\nprint(x)' }
       ],
@@ -450,6 +453,7 @@ registerExam({
     },
     {
       n: 39, marks: 1, type: 'mcq',
+      scope: { level: 'total', reason: "the whole question is about the file modes 'w+' and 'r+' — file handling is not covered" },
       stem: [
         { p: 'The two file opening modes `\'w+\'` and `\'r+\'` have some different functionalities.' }
       ],
@@ -459,6 +463,7 @@ registerExam({
     },
     {
       n: 40, marks: 1, type: 'mcq',
+      scope: { level: 'total', reason: "the whole question is about round() and banker's rounding, which are not covered" },
       stem: [ { code: 'print(round(2.5)+round(3.5))' } ],
       options: [
         { l: 'A', t: '6' }, { l: 'B', t: '5' }, { l: 'C', t: '7' },

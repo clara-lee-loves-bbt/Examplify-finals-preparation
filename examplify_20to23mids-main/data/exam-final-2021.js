@@ -104,6 +104,7 @@ registerExam({
     },
     {
       n: 9, marks: 2, type: 'mcq',
+      scope: { level: 'total', reason: 'the whole question is about set(), which is not covered in lectures 1–11' },
       stem: [ { p: 'Evaluate:' }, { code: "list(tuple(set('abcabc')))" } ],
       options: [
         { l: 'A', t: "['abcabc']" }, { l: 'B', t: "['b', 'c', 'a']" },
@@ -242,6 +243,7 @@ registerExam({
     },
     {
       n: 20, marks: 2, type: 'mcq',
+      scope: { level: 'slight', reason: 'uses str.lower(), which is not among the string operations covered in L3' },
       stem: [
         { p: 'What is the output of the following code?' },
         { code: "def foo(s):\n    return sum(map(lambda x:1+ord(x.lower())-ord('a'), s))\n\nprint(foo('Cab'))" }
@@ -284,6 +286,7 @@ registerExam({
     },
     {
       n: 23, marks: 2, type: 'mcq',
+      scope: { level: 'slight', reason: 'one option passes a set, which is not covered in lectures 1–11' },
       stem: [
         { p: 'The following function tries to reverse some collections. Which of the following lines will NOT crash?' },
         { code: 'def reverse(a):\n    if not a:\n        return a\n    return reverse(a[1:]) + a[0]' }

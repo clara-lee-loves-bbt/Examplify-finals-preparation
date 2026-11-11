@@ -140,7 +140,7 @@
 
   function scopeBadge(scope) {
     var b = el('span', 'scope-badge ' + scope.level);
-    b.title = 'Out of the mid-term scope (' + (SCOPE_WORD[scope.level] || scope.level) +
+    b.title = 'Out of the exam scope (' + (SCOPE_WORD[scope.level] || scope.level) +
               ' out of scope): ' + scope.reason;
     b.appendChild(el('span', 'scope-tag', 'OUT OF SCOPE'));
     b.appendChild(el('span', 'scope-level', SCOPE_WORD[scope.level] || scope.level));
