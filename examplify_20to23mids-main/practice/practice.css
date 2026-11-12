@@ -276,8 +276,13 @@ a { color: var(--accent-text); }
 .chip-blank {
   display: inline-block; border: 1.5px dashed var(--accent); color: var(--accent-text);
   background: color-mix(in srgb, var(--accent) 12%, transparent);
-  border-radius: 6px; padding: 0 6px; margin: 0 1px; min-width: 2.2em; text-align: center;
-  font: inherit; line-height: 1.35; cursor: pointer; white-space: pre;
+  border-radius: 6px; padding: 0 6px; margin: 0 1px; min-width: 2.2em; text-align: left;
+  font: inherit; line-height: 1.35; cursor: pointer;
+  /* The code line sets a negative text-indent for its hanging indent; inline-blocks
+     inherit it, which would push the chip's text out to the left of its own box. */
+  text-indent: 0;
+  /* Long answers wrap inside the chip rather than running off a phone screen. */
+  white-space: pre-wrap; overflow-wrap: anywhere; max-width: 100%; vertical-align: top;
 }
 .chip-blank.filled { border-style: solid; color: var(--ink); }
 .chip-blank.ok { border-color: var(--ok); background: var(--ok-bg); }
