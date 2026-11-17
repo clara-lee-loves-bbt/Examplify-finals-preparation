@@ -79,5 +79,35 @@ for (const e of exams) {
   }
 }
 
+// The mistakes log must point at real questions, with answers shaped like them.
+const log = global.EXAMPLIFY_MISTAKES;
+if (log) {
+  console.log(`\nmistakes log — ${log.items.length} entries, ${(log.patterns || []).length} patterns`);
+  const seen = new Set();
+  for (const m of log.items) {
+    const tag = `mistakes ${m.paper} Q${m.n}`;
+    const e = exams.find(x => x.id === m.paper);
+    const q = e && e.questions.find(x => x.n === m.n);
+    if (!q) { fail(`${tag}: no such question`); continue; }
+    if (seen.has(m.paper + ':' + m.n)) fail(`${tag}: listed twice`);
+    seen.add(m.paper + ':' + m.n);
+    if (!(m.lec >= 1 && m.lec <= 11)) fail(`${tag}: lec must be 1..11`);
+    if (m.kind !== 'wrong' && m.kind !== 'skipped') fail(`${tag}: kind must be wrong or skipped`);
+    for (const k of ['title', 'mistake', 'misconception', 'tip']) if (!m[k]) fail(`${tag}: missing ${k}`);
+    if (q.scope && (q.scope.level === 'total' || q.scope.level === 'crucial')) fail(`${tag}: question is out of scope`);
+    if (m.kind === 'wrong') {
+      if (q.type === 'mcq') {
+        if (!q.options.some(o => o.l === m.given)) fail(`${tag}: given "${m.given}" is not an option`);
+        if (m.given === q.answer) fail(`${tag}: given answer is the correct one`);
+      } else if (!Array.isArray(m.given) || m.given.length !== q.blanks.length) {
+        fail(`${tag}: given must list one answer per blank (${q.blanks.length})`);
+      }
+    } else if (m.given != null) fail(`${tag}: a skipped question has no given answer`);
+  }
+  for (const p of log.patterns || []) {
+    for (const r of p.refs || []) if (!seen.has(r)) fail(`mistakes pattern "${p.title}": ref ${r} is not in the log`);
+  }
+}
+
 console.log(`\n${exams.length} papers, ${problems} problem(s).`);
 process.exit(problems ? 1 : 0);

@@ -200,6 +200,19 @@ is already transcribed into `data/`, so a fresh clone runs fine without them.
   without losing anything. The picker shows "In progress — n of 31 answered" or
   your score for a finished paper (times included). Export the lot from the picker
   if you want a copy that git and a browser wipe cannot take away.
+- **My mistakes & tips.** `data/mistakes.js` is a personal mistakes log: every
+  in-scope question answered wrongly or left blank in the attempts exported on
+  2026-11-17 (AY 2019/20, 2020/21 and 2021/22 finals — 42 questions). Each entry
+  records the answer given and three notes: *what went wrong*, the *misconception*
+  behind it, and a tip for *next time*, tagged by lecture. The picker's
+  **My mistakes & tips** button opens a screen with a per-lecture chart, the
+  patterns that repeat across papers, lecture and type filters, and one card per
+  question with an **Open this question** jump (back with *Back to mistakes*).
+  The same notes appear under the matching card on each paper's results screen.
+  The log is read-only — it never touches saved attempts — and
+  `tools/validate-data.js` checks that every entry points at a real, in-scope
+  question with an answer shaped like it. To add a new paper's mistakes, append
+  entries with the same fields.
 - **Scope labels.** Every past paper is tagged against its syllabus: the three
   mid-term past papers (`2021S1`, `2122S1`, `2223S1`) use the lectures 1–5
   scope sheet, and all six final papers use lectures 1–11. A question that
@@ -213,6 +226,27 @@ is already transcribed into `data/`, so a fresh clone runs fine without them.
   or any single level: **totally** (the question is only about the off-syllabus
   item), **crucially** (you must understand that item to answer), or **slightly**
   (the item is incidental — the tested idea is in the lectures).
+
+## Keeping attempts safe across updates
+
+Attempts are stored in the browser, never in the code, so pushing a new version
+does not touch them. Each paper is one `localStorage` entry named
+`examplify:v1:<paper id>`, with answers keyed by question number. On
+2026-11-17 a real backup was imported into an empty browser, the scores checked
+(37 / 37 / 44), the page reloaded on a new build, and the file exported again:
+every answer, flag, strike, time and timestamp came back identical.
+
+To keep it that way:
+
+- **Never change** the `STORE` prefix in `app.js`, a paper's `id`, or its
+  question numbering — saved attempts are looked up by exactly those.
+- **One address, one storage.** The Vercel production URL, the GitHub Pages URL,
+  a Vercel preview URL, a local server and a `file://` copy each keep separate
+  storage. Always practise on the same address, and use Export / Import to move
+  attempts between them.
+- **Export after every paper.** Clearing site data, private windows, or a
+  different browser profile start empty; a backup file is the only copy that
+  survives those. Import with **Keep newest** never overwrites a newer attempt.
 
 ## Layout
 

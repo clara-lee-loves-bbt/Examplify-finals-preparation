@@ -282,7 +282,7 @@ registerExam({
         { l: 'E', t: 'The code will crash for any length of lst' }
       ],
       answer: 'E',
-      explanation: 'There is no base case: `lst[1:]` eventually becomes `[]`, and `l2[-1]` on an empty list raises `IndexError` — every length ends there.'
+      explanation: 'There is no base case: `lst[1:]` shrinks to `[]` and then stays `[]`, and the recursive call is made before `l2[-1]` is ever evaluated, so every length recurses forever and ends in `RecursionError`.'
     },
     {
       n: 23, marks: 2, type: 'mcq',
@@ -313,7 +313,7 @@ registerExam({
         { l: 'E', t: 'The function will always crash' }
       ],
       answer: 'D',
-      explanation: 'It never compares list *lengths*, so it reports `True` whenever every element of `l1` is found in `l2` — even when `l2` is longer, which is wrong. It does handle empty inputs without crashing.'
+      explanation: 'Elements of `l1` that are missing from `l2` are simply skipped, and the result only checks that `l2c` was emptied. So `compareTwoList([1,2,3], [1,2])` wrongly returns `True`, while equal lists in any order, or a longer `l2`, are judged correctly — right sometimes and wrong sometimes. It does handle empty inputs without crashing.'
     },
     {
       n: 25, marks: 2, type: 'fib',
