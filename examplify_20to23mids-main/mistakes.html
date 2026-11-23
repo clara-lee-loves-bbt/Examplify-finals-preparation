@@ -3,19 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#EEF3F6" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#17171a" media="(prefers-color-scheme: dark)">
 <title>CS1010E — My mistakes</title>
 <style>
-/* My mistakes — compact, mobile-first study cards; prints to a plain PDF. */
+/* My mistakes — compact, mobile-first study cards; prints to a plain PDF.
+   Light mode uses Examplify's own page background (#EEF3F6, as on its results
+   screen). The theme follows the device unless the ☀/☾ button picks one, which
+   sets data-theme on <html>. */
 :root {
-  --bg: #fbfaf7;
+  --bg: #EEF3F6;
   --card: #ffffff;
   --ink: #1d1f23;
-  --ink-2: #444a52;
-  --muted: #7a818b;
-  --line: #e7e4dc;
-  --chip: #f1efe9;
+  --ink-2: #3f4a54;
+  --muted: #6f7c87;
+  --line: #d9e2e8;
+  --chip: #e4ebf0;
   --accent: #2f6f5e;
   --bad: #b3261e;
   --bad-bg: #fbeceb;
@@ -23,8 +26,8 @@
   --ok-bg: #e9f5ee;
   --rule-bg: #fff6df;
   --rule-ink: #6b4e00;
-  --code-bg: #f6f5f1;
-  --code-num: #b0aca2;
+  --code-bg: #f6f8fa;
+  --code-num: #a3adb6;
   --tk-kw: #a1255e;
   --tk-bi: #6a3fb0;
   --tk-str: #0b6b3a;
@@ -34,7 +37,7 @@
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #17171a; --card: #212126; --ink: #ececef; --ink-2: #c7c9cf; --muted: #8d929b;
     --line: #34343b; --chip: #2b2b31; --accent: #6cc2a8; --bad: #ff8a80; --bad-bg: #3a2224;
     --ok: #6fd49a; --ok-bg: #1d3327; --rule-bg: #352d17; --rule-ink: #f2d58a;
@@ -42,6 +45,14 @@
     --tk-kw: #ff7eb6; --tk-bi: #c3a6ff; --tk-str: #8fe3b0; --tk-num: #ffb86b; --tk-com: #7d8188; --tk-fn: #86b7ff;
     color-scheme: dark;
   }
+}
+:root[data-theme="dark"] {
+  --bg: #17171a; --card: #212126; --ink: #ececef; --ink-2: #c7c9cf; --muted: #8d929b;
+  --line: #34343b; --chip: #2b2b31; --accent: #6cc2a8; --bad: #ff8a80; --bad-bg: #3a2224;
+  --ok: #6fd49a; --ok-bg: #1d3327; --rule-bg: #352d17; --rule-ink: #f2d58a;
+  --code-bg: #1a1a1e; --code-num: #5d6068;
+  --tk-kw: #ff7eb6; --tk-bi: #c3a6ff; --tk-str: #8fe3b0; --tk-num: #ffb86b; --tk-com: #7d8188; --tk-fn: #86b7ff;
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -162,7 +173,9 @@ code, pre, .code, .opt-t { font-family: ui-monospace, SFMono-Regular, Menlo, Con
 /* ---------- print / PDF: everything revealed, compact, no chrome ---------- */
 @page { size: A4; margin: 12mm 12mm 14mm; }
 @media print {
-  :root {
+  /* Same specificity as the dark-theme selectors and later in the file, so a
+     printed page is always light whatever theme is on screen. */
+  :root, :root[data-theme], :root:not([data-theme="light"]) {
     --bg: #fff; --card: #fff; --ink: #000; --ink-2: #222; --muted: #555; --line: #c9c6bd; --chip: #efede7;
     --accent: #1f5c4d; --bad: #a01c14; --bad-bg: #fbeae8; --ok: #17623a; --ok-bg: #e6f3eb;
     --rule-bg: #fff3d6; --rule-ink: #4d3800; --code-bg: #f7f6f2; --code-num: #999;
@@ -196,6 +209,7 @@ code, pre, .code, .opt-t { font-family: ui-monospace, SFMono-Regular, Menlo, Con
       <button type="button" data-mode="quiz">Quiz</button>
       <button type="button" data-mode="read">Read</button>
     </div>
+    <button type="button" class="icon" id="theme" aria-label="Switch light or dark mode" title="Light / dark mode">&#9790;</button>
     <button type="button" class="icon" id="shuffle" aria-label="Shuffle" title="Shuffle (mix lectures)">&#8645;</button>
     <button type="button" class="icon" id="print" aria-label="Print or save as PDF" title="Print / save as PDF">&#9113;</button>
   </div>
@@ -3851,6 +3865,19 @@ registerMistakes({
 
   function render() { renderFilters(); renderList(); renderMode(); }
 
+  /* Theme: follow the device until the button picks light or dark. */
+  var darkQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  function isDark() { return view.theme ? view.theme === 'dark' : !!(darkQuery && darkQuery.matches); }
+  function applyTheme() {
+    if (view.theme) document.documentElement.setAttribute('data-theme', view.theme);
+    else document.documentElement.removeAttribute('data-theme');
+    var b = $('theme');
+    b.innerHTML = isDark() ? '&#9728;' : '&#9790;';
+    b.title = isDark() ? 'Switch to light mode' : 'Switch to dark mode';
+    b.setAttribute('aria-label', b.title);
+  }
+  if (darkQuery && darkQuery.addEventListener) darkQuery.addEventListener('change', applyTheme);
+
   /* ---------------- events ---------------- */
   document.addEventListener('click', function (ev) {
     var t = ev.target.closest('button');
@@ -3866,6 +3893,7 @@ registerMistakes({
       renderList(); renderMode(); window.scrollTo(0, 0); return;
     }
     if (t.id === 'print') { window.print(); return; }
+    if (t.id === 'theme') { view.theme = isDark() ? 'light' : 'dark'; saveView(); applyTheme(); return; }
     if (t.dataset.f) {
       var f = t.dataset.f, v = t.dataset.v;
       if (f === 'all') { view.lec = 0; view.paper = ''; view.type = ''; }
@@ -3896,7 +3924,8 @@ registerMistakes({
     ' finals · grouped by lecture · ✗ what I thought · ✓ what is true · → rule · updated ' + (LOG.compiled || '');
 
   // ?print opens straight in print layout (used to build mistakes.pdf).
-  if (/[?&]print\b/.test(location.search)) { view = { mode: 'read', lec: 0, paper: '', type: '' }; }
+  if (/[?&]print\b/.test(location.search)) { view = { mode: 'read', lec: 0, paper: '', type: '', theme: 'light' }; }
+  applyTheme();
   renderPatterns();
   render();
   if (/[?&]print\b/.test(location.search)) $('patterns').open = true;

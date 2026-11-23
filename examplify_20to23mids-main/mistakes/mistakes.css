@@ -1,12 +1,15 @@
-/* My mistakes — compact, mobile-first study cards; prints to a plain PDF. */
+/* My mistakes — compact, mobile-first study cards; prints to a plain PDF.
+   Light mode uses Examplify's own page background (#EEF3F6, as on its results
+   screen). The theme follows the device unless the ☀/☾ button picks one, which
+   sets data-theme on <html>. */
 :root {
-  --bg: #fbfaf7;
+  --bg: #EEF3F6;
   --card: #ffffff;
   --ink: #1d1f23;
-  --ink-2: #444a52;
-  --muted: #7a818b;
-  --line: #e7e4dc;
-  --chip: #f1efe9;
+  --ink-2: #3f4a54;
+  --muted: #6f7c87;
+  --line: #d9e2e8;
+  --chip: #e4ebf0;
   --accent: #2f6f5e;
   --bad: #b3261e;
   --bad-bg: #fbeceb;
@@ -14,8 +17,8 @@
   --ok-bg: #e9f5ee;
   --rule-bg: #fff6df;
   --rule-ink: #6b4e00;
-  --code-bg: #f6f5f1;
-  --code-num: #b0aca2;
+  --code-bg: #f6f8fa;
+  --code-num: #a3adb6;
   --tk-kw: #a1255e;
   --tk-bi: #6a3fb0;
   --tk-str: #0b6b3a;
@@ -25,7 +28,7 @@
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #17171a; --card: #212126; --ink: #ececef; --ink-2: #c7c9cf; --muted: #8d929b;
     --line: #34343b; --chip: #2b2b31; --accent: #6cc2a8; --bad: #ff8a80; --bad-bg: #3a2224;
     --ok: #6fd49a; --ok-bg: #1d3327; --rule-bg: #352d17; --rule-ink: #f2d58a;
@@ -33,6 +36,14 @@
     --tk-kw: #ff7eb6; --tk-bi: #c3a6ff; --tk-str: #8fe3b0; --tk-num: #ffb86b; --tk-com: #7d8188; --tk-fn: #86b7ff;
     color-scheme: dark;
   }
+}
+:root[data-theme="dark"] {
+  --bg: #17171a; --card: #212126; --ink: #ececef; --ink-2: #c7c9cf; --muted: #8d929b;
+  --line: #34343b; --chip: #2b2b31; --accent: #6cc2a8; --bad: #ff8a80; --bad-bg: #3a2224;
+  --ok: #6fd49a; --ok-bg: #1d3327; --rule-bg: #352d17; --rule-ink: #f2d58a;
+  --code-bg: #1a1a1e; --code-num: #5d6068;
+  --tk-kw: #ff7eb6; --tk-bi: #c3a6ff; --tk-str: #8fe3b0; --tk-num: #ffb86b; --tk-com: #7d8188; --tk-fn: #86b7ff;
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -153,7 +164,9 @@ code, pre, .code, .opt-t { font-family: ui-monospace, SFMono-Regular, Menlo, Con
 /* ---------- print / PDF: everything revealed, compact, no chrome ---------- */
 @page { size: A4; margin: 12mm 12mm 14mm; }
 @media print {
-  :root {
+  /* Same specificity as the dark-theme selectors and later in the file, so a
+     printed page is always light whatever theme is on screen. */
+  :root, :root[data-theme], :root:not([data-theme="light"]) {
     --bg: #fff; --card: #fff; --ink: #000; --ink-2: #222; --muted: #555; --line: #c9c6bd; --chip: #efede7;
     --accent: #1f5c4d; --bad: #a01c14; --bad-bg: #fbeae8; --ok: #17623a; --ok-bg: #e6f3eb;
     --rule-bg: #fff3d6; --rule-ink: #4d3800; --code-bg: #f7f6f2; --code-num: #999;

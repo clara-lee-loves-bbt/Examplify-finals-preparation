@@ -219,6 +219,19 @@
 
   function render() { renderFilters(); renderList(); renderMode(); }
 
+  /* Theme: follow the device until the button picks light or dark. */
+  var darkQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  function isDark() { return view.theme ? view.theme === 'dark' : !!(darkQuery && darkQuery.matches); }
+  function applyTheme() {
+    if (view.theme) document.documentElement.setAttribute('data-theme', view.theme);
+    else document.documentElement.removeAttribute('data-theme');
+    var b = $('theme');
+    b.innerHTML = isDark() ? '&#9728;' : '&#9790;';
+    b.title = isDark() ? 'Switch to light mode' : 'Switch to dark mode';
+    b.setAttribute('aria-label', b.title);
+  }
+  if (darkQuery && darkQuery.addEventListener) darkQuery.addEventListener('change', applyTheme);
+
   /* ---------------- events ---------------- */
   document.addEventListener('click', function (ev) {
     var t = ev.target.closest('button');
@@ -234,6 +247,7 @@
       renderList(); renderMode(); window.scrollTo(0, 0); return;
     }
     if (t.id === 'print') { window.print(); return; }
+    if (t.id === 'theme') { view.theme = isDark() ? 'light' : 'dark'; saveView(); applyTheme(); return; }
     if (t.dataset.f) {
       var f = t.dataset.f, v = t.dataset.v;
       if (f === 'all') { view.lec = 0; view.paper = ''; view.type = ''; }
@@ -264,7 +278,8 @@
     ' finals · grouped by lecture · ✗ what I thought · ✓ what is true · → rule · updated ' + (LOG.compiled || '');
 
   // ?print opens straight in print layout (used to build mistakes.pdf).
-  if (/[?&]print\b/.test(location.search)) { view = { mode: 'read', lec: 0, paper: '', type: '' }; }
+  if (/[?&]print\b/.test(location.search)) { view = { mode: 'read', lec: 0, paper: '', type: '', theme: 'light' }; }
+  applyTheme();
   renderPatterns();
   render();
   if (/[?&]print\b/.test(location.search)) $('patterns').open = true;
