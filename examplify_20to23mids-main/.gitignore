@@ -11,3 +11,6 @@ tools/text/
 Thumbs.db
 .DS_Store
 desktop.ini
+
+# The generated mistakes PDF is published with the app (no source papers in it).
+!mistakes.pdf

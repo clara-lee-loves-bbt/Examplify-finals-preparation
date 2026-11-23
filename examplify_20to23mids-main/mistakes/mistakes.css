@@ -1,0 +1,178 @@
+/* My mistakes — compact, mobile-first study cards; prints to a plain PDF. */
+:root {
+  --bg: #fbfaf7;
+  --card: #ffffff;
+  --ink: #1d1f23;
+  --ink-2: #444a52;
+  --muted: #7a818b;
+  --line: #e7e4dc;
+  --chip: #f1efe9;
+  --accent: #2f6f5e;
+  --bad: #b3261e;
+  --bad-bg: #fbeceb;
+  --ok: #1f7a45;
+  --ok-bg: #e9f5ee;
+  --rule-bg: #fff6df;
+  --rule-ink: #6b4e00;
+  --code-bg: #f6f5f1;
+  --code-num: #b0aca2;
+  --tk-kw: #a1255e;
+  --tk-bi: #6a3fb0;
+  --tk-str: #0b6b3a;
+  --tk-num: #9a4a00;
+  --tk-com: #8a8a8a;
+  --tk-fn: #1f5aa6;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #17171a; --card: #212126; --ink: #ececef; --ink-2: #c7c9cf; --muted: #8d929b;
+    --line: #34343b; --chip: #2b2b31; --accent: #6cc2a8; --bad: #ff8a80; --bad-bg: #3a2224;
+    --ok: #6fd49a; --ok-bg: #1d3327; --rule-bg: #352d17; --rule-ink: #f2d58a;
+    --code-bg: #1a1a1e; --code-num: #5d6068;
+    --tk-kw: #ff7eb6; --tk-bi: #c3a6ff; --tk-str: #8fe3b0; --tk-num: #ffb86b; --tk-com: #7d8188; --tk-fn: #86b7ff;
+    color-scheme: dark;
+  }
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 15px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+code, pre, .code, .opt-t { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Roboto Mono", monospace; }
+
+/* ---------- top bar ---------- */
+.bar {
+  position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 92%, transparent);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line);
+  padding-top: env(safe-area-inset-top);
+}
+.bar-in { max-width: 760px; margin: 0 auto; display: flex; align-items: center; gap: 8px; padding: 8px 12px 6px; }
+.back { color: var(--ink-2); text-decoration: none; font-size: 26px; line-height: 1; padding: 0 6px 2px 0; }
+.bar-title { flex: 1; font-weight: 700; font-size: 16px; white-space: nowrap; }
+.bar-title span { color: var(--muted); font-weight: 500; font-size: 13px; }
+.seg { display: flex; background: var(--chip); border-radius: 9px; padding: 2px; }
+.seg button { border: 0; background: none; padding: 5px 10px; border-radius: 7px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.seg button.on { background: var(--card); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+.icon { border: 0; background: var(--chip); width: 34px; height: 32px; border-radius: 9px; font-size: 16px; }
+.icon.on { background: var(--accent); color: #fff; }
+.filters { max-width: 760px; margin: 0 auto; padding: 0 12px 8px; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.filters::-webkit-scrollbar { display: none; }
+.chip {
+  flex: none; border: 1px solid var(--line); background: var(--card); border-radius: 999px;
+  padding: 4px 10px; font-size: 12.5px; font-weight: 600; color: var(--ink-2); white-space: nowrap;
+}
+.chip small { color: var(--muted); font-weight: 500; margin-left: 3px; }
+.chip.on { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.chip.on small { color: inherit; opacity: .7; }
+.sep { flex: none; width: 1px; background: var(--line); margin: 3px 2px; }
+
+/* ---------- layout ---------- */
+.wrap { max-width: 760px; margin: 0 auto; padding: 10px 12px calc(40px + env(safe-area-inset-bottom)); }
+.print-head { display: none; }
+.lec-head { margin: 18px 2px 8px; font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; }
+.patterns { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 0 12px; margin: 4px 0 6px; }
+.patterns summary { padding: 10px 0; font-weight: 700; font-size: 14px; cursor: pointer; }
+.pattern { border-top: 1px solid var(--line); padding: 8px 0; font-size: 13.5px; }
+.pattern b { display: block; margin-bottom: 2px; }
+.pattern p { margin: 0 0 4px; color: var(--ink-2); }
+.pattern .refs { color: var(--muted); font-size: 12px; }
+.foot { color: var(--muted); font-size: 12.5px; margin-top: 18px; }
+.foot a { color: var(--accent); font-weight: 600; }
+.empty { color: var(--muted); padding: 20px 4px; }
+
+/* ---------- card ---------- */
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px 12px; margin-bottom: 10px; }
+.meta { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.meta .lec { font-weight: 700; color: var(--accent); }
+.meta .tag { border-radius: 5px; padding: 0 6px; font-weight: 600; font-size: 11px; background: var(--chip); color: var(--ink-2); }
+.meta .tag.blank { background: var(--rule-bg); color: var(--rule-ink); }
+.title { font-weight: 700; font-size: 15px; margin: 2px 0 6px; }
+.stem p { margin: 0 0 6px; font-size: 14px; color: var(--ink-2); }
+.stem code, .note code, .pattern code { font-size: .9em; background: var(--chip); border-radius: 4px; padding: 0 4px; overflow-wrap: anywhere; }
+
+.code { background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; margin: 0 0 6px; padding: 6px 0; font-size: 12.5px; line-height: 1.5; }
+.cl { display: flex; }
+.cn { flex: none; width: 2.1em; padding-right: .7em; text-align: right; color: var(--code-num); user-select: none; -webkit-user-select: none; }
+.cc { flex: 1; min-width: 0; padding-right: 8px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.tk-kw { color: var(--tk-kw); } .tk-bi { color: var(--tk-bi); } .tk-str { color: var(--tk-str); }
+.tk-num { color: var(--tk-num); } .tk-com { color: var(--tk-com); font-style: italic; } .tk-fn { color: var(--tk-fn); font-weight: 600; }
+.bk { display: inline-block; text-indent: 0; border: 1.5px dashed var(--accent); color: var(--accent); border-radius: 5px; padding: 0 5px; font-weight: 700; line-height: 1.3; }
+
+/* options: compact list; the two that matter are marked after reveal */
+.opts { list-style: none; margin: 2px 0 6px; padding: 0; font-size: 13px; }
+.opts li { display: flex; gap: 8px; padding: 3px 8px; border-radius: 6px; border: 1px solid transparent; }
+.opts .opt-l { font-weight: 700; color: var(--muted); flex: none; width: 1em; }
+.opts .opt-t { flex: 1; min-width: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12.5px; }
+.opts .opt-m { flex: none; font-weight: 700; }
+.revealed .opts li.yours { background: var(--bad-bg); border-color: color-mix(in srgb, var(--bad) 35%, transparent); }
+.revealed .opts li.yours .opt-m { color: var(--bad); }
+.revealed .opts li.key { background: var(--ok-bg); border-color: color-mix(in srgb, var(--ok) 35%, transparent); }
+.revealed .opts li.key .opt-m { color: var(--ok); }
+.revealed .opts li.key .opt-l, .revealed .opts li.yours .opt-l { color: inherit; }
+
+/* fill-in answers: yours (struck) beside the key */
+.blanks { margin: 2px 0 6px; display: grid; gap: 3px; font-size: 12.5px; }
+.brow { display: grid; grid-template-columns: 1.6em 1fr; gap: 6px; align-items: start; }
+.bno { font-weight: 700; color: var(--accent); }
+.bval { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.bval code { font-size: 12.5px; padding: 1px 5px; border-radius: 4px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.bval .k { background: var(--ok-bg); color: var(--ok); }
+.bval .y { background: var(--bad-bg); color: var(--bad); text-decoration: line-through; text-decoration-thickness: 1px; }
+.bval .same { background: var(--ok-bg); color: var(--ok); }
+.bval .alt { font-size: 11.5px; color: var(--muted); }
+.bval .alt code { background: var(--chip); color: var(--ink-2); padding: 0 4px; font-size: 11.5px; }
+
+/* reveal: quiz mode hides the answer part until tapped */
+.reveal-btn {
+  width: 100%; border: 1px dashed var(--line); background: none; border-radius: 8px; padding: 8px;
+  font-size: 13px; font-weight: 600; color: var(--accent); margin-top: 2px;
+}
+.ans { display: none; }
+.revealed .ans { display: block; }
+.revealed .reveal-btn { display: none; }
+.quiz .card:not(.revealed) .title { display: none; }
+
+/* the three lines: refute the belief, state the fact, give the trigger */
+.note { margin-top: 6px; display: grid; gap: 4px; font-size: 13.5px; }
+.note div { display: grid; grid-template-columns: 1.3em 1fr; gap: 4px; }
+.note .i { font-weight: 800; text-align: center; }
+.note .w { color: var(--ink-2); } .note .w .i { color: var(--bad); }
+.note .r .i { color: var(--ok); }
+.note .rule { background: var(--rule-bg); color: var(--rule-ink); border-radius: 6px; padding: 4px 6px 4px 2px; font-weight: 600; }
+
+@media (min-width: 640px) {
+  body { font-size: 15.5px; }
+  .code, .opts .opt-t, .blanks, .bval code { font-size: 13px; }
+}
+
+/* ---------- print / PDF: everything revealed, compact, no chrome ---------- */
+@page { size: A4; margin: 12mm 12mm 14mm; }
+@media print {
+  :root {
+    --bg: #fff; --card: #fff; --ink: #000; --ink-2: #222; --muted: #555; --line: #c9c6bd; --chip: #efede7;
+    --accent: #1f5c4d; --bad: #a01c14; --bad-bg: #fbeae8; --ok: #17623a; --ok-bg: #e6f3eb;
+    --rule-bg: #fff3d6; --rule-ink: #4d3800; --code-bg: #f7f6f2; --code-num: #999;
+    --tk-kw: #8a1a4f; --tk-bi: #5a2f9e; --tk-str: #0a5a31; --tk-num: #7f3d00; --tk-com: #777; --tk-fn: #17488a;
+  }
+  body { font-size: 9.6pt; line-height: 1.35; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .bar, .patterns summary::marker, .foot, .reveal-btn { display: none !important; }
+  .wrap { max-width: none; padding: 0; }
+  .print-head { display: block; margin-bottom: 6pt; }
+  .print-head h1 { font-size: 15pt; margin: 0 0 2pt; }
+  .print-head p { margin: 0; color: var(--muted); font-size: 9pt; }
+  .patterns { border: 1px solid var(--line); break-inside: avoid; }
+  .patterns > :not(summary) { display: block !important; }
+  .ans { display: block !important; }
+  .card .title { display: block !important; }
+  .card { break-inside: avoid; padding: 6pt 8pt; margin-bottom: 6pt; border-radius: 6pt; }
+  .lec-head { break-after: avoid; margin: 10pt 0 4pt; font-size: 9.5pt; color: #333; }
+  .code { font-size: 8.4pt; padding: 3pt 0; }
+  .opts .opt-t, .blanks, .bval code { font-size: 8.4pt; }
+  .stem p, .note { font-size: 9.2pt; }
+  .opts li.yours { background: var(--bad-bg) !important; } .opts li.key { background: var(--ok-bg) !important; }
+}

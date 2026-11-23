@@ -46,6 +46,12 @@ for (const e of exams) {
       for (const b of q.blanks) {
         if (!b.freeform && typeof b.answer !== 'string') fail(`Q${q.n} blank ${b.n}: no answer`);
       }
+      // accepted alternatives are whole answers: one string per blank
+      for (const set of q.accept || []) {
+        if (!Array.isArray(set) || set.length !== q.blanks.length || set.some(s => typeof s !== 'string' || !s.trim())) {
+          fail(`Q${q.n}: every accept set needs ${q.blanks.length} non-empty answers`);
+        }
+      }
       // every {{k}} marker in the code must have a matching blank and vice versa
       const markers = [];
       for (const blk of q.stem) {
@@ -93,7 +99,13 @@ if (log) {
     seen.add(m.paper + ':' + m.n);
     if (!(m.lec >= 1 && m.lec <= 11)) fail(`${tag}: lec must be 1..11`);
     if (m.kind !== 'wrong' && m.kind !== 'skipped') fail(`${tag}: kind must be wrong or skipped`);
-    for (const k of ['title', 'mistake', 'misconception', 'tip']) if (!m[k]) fail(`${tag}: missing ${k}`);
+    if (!['concept', 'trace', 'blank'].includes(m.type)) fail(`${tag}: type must be concept, trace or blank`);
+    if ((m.kind === 'skipped') !== (m.type === 'blank')) fail(`${tag}: skipped questions (and only those) are type blank`);
+    for (const k of ['title', 'wrong', 'right', 'rule']) if (!m[k]) fail(`${tag}: missing ${k}`);
+    if (m.rule && !/^If\b/.test(m.rule)) fail(`${tag}: rule should start "If …, then …"`);
+    for (const b of m.fine || []) {
+      if (q.type !== 'fib' || !(b >= 1 && b <= q.blanks.length)) fail(`${tag}: fine blank ${b} does not exist`);
+    }
     if (q.scope && (q.scope.level === 'total' || q.scope.level === 'crucial')) fail(`${tag}: question is out of scope`);
     if (m.kind === 'wrong') {
       if (q.type === 'mcq') {

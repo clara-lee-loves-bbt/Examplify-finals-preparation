@@ -273,7 +273,7 @@ registerExam({
         { l: 'D', t: '13' }, { l: 'E', t: '15' }
       ],
       answer: 'A',
-      explanation: 'With `a = 1` and `b = 12`, `mid - a = 4` and `b - mid = 6`; the recursion is bounded by `n = 5` and returns `[1, [], 6, [], 12]`, whose length is 5.'
+      explanation: 'Every non-empty call returns the five items `[a, left, mid, right, b]`, however deeply `left` and `right` are nested, and `len` only counts the top level. Here it returns `[1, [2, [], 3, [], 5], 6, [7, [], 9, [], 11], 12]`, whose length is 5.'
     },
     {
       n: 18, marks: 3, type: 'mcq',
@@ -374,7 +374,9 @@ registerExam({
         { n: 1, answer: 'len(s)' },
         { n: 2, answer: '(len(s) + 1)' }
       ],
-      explanation: 'Compare the first `len(s)//2` characters with the *last* `len(s)//2` characters read backwards. For odd lengths the middle character is skipped, so the second slice starts at `(len(s) + 1)//2`.'
+      /* Whole alternative answers, checked by running them on every string of length 1-6. */
+      accept: [['(len(s) + 1)', 'len(s)']],
+      explanation: 'Compare the first `len(s)//2` characters with the *last* `len(s)//2` characters read backwards. For odd lengths the middle character is skipped, so the second slice starts at `(len(s) + 1)//2`. Also accepted: `(len(s) + 1)` then `len(s)`, which keeps the middle character on both sides and compares it with itself.'
     },
     {
       n: 24, marks: 3, type: 'fib',
@@ -454,7 +456,8 @@ registerExam({
         { n: 1, answer: 'range(len(L)-1)' },
         { n: 2, answer: 'L[i] > L[i+1]' }
       ],
-      explanation: 'Each element is compared with its successor, so the index stops one short of the end; an empty or single-element list never enters the loop and is increasing.'
+      accept: [['range(1, len(L))', 'L[i - 1] > L[i]']],
+      explanation: 'Each element is compared with its successor, so the index stops one short of the end; an empty or single-element list never enters the loop and is increasing. Also accepted: `range(1, len(L))` with `L[i - 1] > L[i]`, which compares each element with its predecessor instead.'
     },
     {
       n: 30, marks: 6, type: 'fib',
@@ -481,7 +484,8 @@ registerExam({
         { n: 2, answer: 'check_increasing_r(L[1:])' },
         { n: 3, answer: 'False' }
       ],
-      explanation: 'In an increasing list the first element is the smallest, so `min(L) == L[0]` — then recurse on the tail. If the first element is not the minimum, the list cannot be increasing. (The printed model answer calls `check_increasing`, the non-recursive version from Q29; the recursive name is what the question asks for.)'
+      accept: [['len(L) == 1', 'True', 'False if L[1] < L[0] else check_increasing_r(L[1:])']],
+      explanation: 'Also accepted: `len(L) == 1` → `True`, otherwise `False if L[1] < L[0] else check_increasing_r(L[1:])`, which compares neighbours instead of using `min`. In an increasing list the first element is the smallest, so `min(L) == L[0]` — then recurse on the tail. If the first element is not the minimum, the list cannot be increasing. (The printed model answer calls `check_increasing`, the non-recursive version from Q29; the recursive name is what the question asks for.)'
     },
     {
       n: 32, marks: 6, type: 'fib',

@@ -198,6 +198,22 @@
     return false;
   }
 
+  /* A fill-in is right when every blank matches the key, or every blank matches
+     one of the question's `accept` sets — whole alternative answers that were
+     checked by running them. Sets are never mixed blank by blank, because one
+     blank from the key plus one from an alternative can be wrong. */
+  function blanksRight(q, given) {
+    var sets = [q.blanks.map(function (b) { return b.answer; })].concat(q.accept || []);
+    return sets.some(function (set) {
+      return q.blanks.every(function (b, i) {
+        var got = String((given && given[b.n]) || '');
+        if (got.trim() === '') return false;
+        if (b.freeform) return true;
+        return normalize(got) === normalize(set[i]);
+      });
+    });
+  }
+
   function gradeQuestion(q) {
     var a = session.answers[q.n];
     var res = { question: q, state: 'skipped', given: '', expected: '', marks: 0 };
@@ -216,16 +232,9 @@
     if (!a || !a.blanks) return res;
     res.given = blanks.map(function (b) { return b.n + '. ' + (a.blanks[b.n] || '(blank)'); }).join('   ');
 
-    var allGood = true, anyGiven = false;
-    for (var i = 0; i < blanks.length; i++) {
-      var b = blanks[i];
-      var got = String((a.blanks && a.blanks[b.n]) || '');
-      if (got.trim() === '') { allGood = false; continue; }
-      anyGiven = true;
-      if (b.freeform) continue;
-      if (normalize(got) !== normalize(b.answer)) allGood = false;
-    }
+    var anyGiven = blanks.some(function (b) { return String((a.blanks && a.blanks[b.n]) || '').trim() !== ''; });
     if (!anyGiven) return res;
+    var allGood = blanksRight(q, a.blanks);
     res.state = allGood ? 'ok' : 'bad';
     res.marks = allGood ? q.marks : 0;
     return res;
@@ -244,7 +253,6 @@
     $('screen-exam').hidden = which !== 'exam';
     $('screen-review').hidden = which !== 'review';
     $('screen-stats').hidden = which !== 'stats';
-    $('screen-mistakes').hidden = which !== 'mistakes';
   }
 
   /* --------------------------------------------------------------- picker */
@@ -297,7 +305,7 @@
     if (mk) {
       var nMistakes = mistakeItems().length;
       mk.hidden = !nMistakes;
-      mk.textContent = 'My mistakes & tips (' + nMistakes + ')';
+      mk.textContent = 'My mistakes & tips (' + nMistakes + ') →';
     }
     var list = $('exam-list');
     list.innerHTML = '';
@@ -357,14 +365,7 @@
         if (a.sel === q.answer) { correct++; earned += q.marks; } else wrong++;
         return;
       }
-      var allGood = true;
-      for (var i = 0; i < q.blanks.length; i++) {
-        var b = q.blanks[i];
-        var got = String((a.blanks && a.blanks[b.n]) || '');
-        if (got.trim() === '' || b.freeform) { if (got.trim() === '') allGood = false; continue; }
-        if (normalize(got) !== normalize(b.answer)) allGood = false;
-      }
-      if (allGood) { correct++; earned += q.marks; } else wrong++;
+      if (blanksRight(q, a.blanks)) { correct++; earned += q.marks; } else wrong++;
     });
     return { total: total, earned: earned, correct: correct, wrong: wrong, skipped: skipped };
   }
@@ -657,7 +658,8 @@
         if (String(blanks[b.n] || '') !== '') row.classList.add('solved');
         if (reviewing) {
           var got = String(blanks[b.n] || '');
-          var ok = b.freeform ? got.trim() !== '' : (got.trim() !== '' && normalize(got) === normalize(b.answer));
+          var ok = blanksRight(q, blanks) ||
+            (b.freeform ? got.trim() !== '' : (got.trim() !== '' && normalize(got) === normalize(b.answer)));
           row.classList.add(ok ? 'correct' : 'wrong');
         }
         row.appendChild(el('span', 'fib-num', b.n + '.'));
@@ -716,7 +718,7 @@
     if (reviewLook) {
       $('footer-progress').textContent = 'REVIEW';
       $('prev-btn').disabled = false;
-      $('next-btn').textContent = lookFrom === 'mistakes' ? 'Back to mistakes' : 'Back to results';
+      $('next-btn').textContent = 'Back to results';
       $('next-btn').classList.remove('finish');
       return;
     }
@@ -729,19 +731,7 @@
   }
 
   function nextQuestion() {
-    if (reviewLook) {
-      reviewLook = false;
-      if (lookFrom === 'mistakes') {
-        lookFrom = null;
-        stopTrack();
-        session = null; exam = null;
-        showScreen('mistakes');
-        paintMistakes();
-        return;
-      }
-      renderReview();
-      return;
-    }
+    if (reviewLook) { reviewLook = false; renderReview(); return; }
     var idx = exam.questions.map(function (q) { return q.n; }).indexOf(session.current);
     if (idx < exam.questions.length - 1) gotoQuestion(exam.questions[idx + 1].n);
     else confirmSubmit();
@@ -889,7 +879,6 @@
       var jump = el('button', 'review-back-btn', 'Open this question');
       jump.type = 'button';
       jump.addEventListener('click', function () {
-        lookFrom = null;
         reviewLook = true;
         showScreen('exam');
         gotoQuestion(r.question.n);
@@ -904,19 +893,10 @@
 
   /* ========================================================== mistakes log
      data/mistakes.js holds personal notes on questions answered wrongly or
-     left blank: what went wrong, the misconception and a tip. They are shown
-     on a screen of their own (grouped by lecture) and under the matching
-     card on a paper's results screen. Notes are read-only: nothing here ever
-     writes to the saved attempts. */
+     left blank. The full log lives on its own page (mistakes.html); here the
+     note is only shown under the matching card on a paper's results screen.
+     Notes are read-only: nothing here ever writes to the saved attempts. */
   var MISTAKES = window.EXAMPLIFY_MISTAKES || null;
-  var LECTURE_NAMES = {
-    1: 'Problem solving', 2: 'Expressions & functions', 3: 'Sequences & iterables',
-    4: 'Statements & control flow', 5: 'Recursion', 6: 'Objects & mutable sequences',
-    7: 'List processing', 8: 'Dictionaries', 9: 'Multi-dimensional arrays',
-    10: 'Searching & sorting', 11: 'Object-oriented programming'
-  };
-  var MISTAKE_STATE = { lec: 0, kind: 'all' };
-  var lookFrom = null;   // 'mistakes' while a question opened from the log is on screen
 
   function mistakeItems() { return (MISTAKES && MISTAKES.items) || []; }
 
@@ -926,16 +906,6 @@
       if (items[i].paper === examId && items[i].n === n) return items[i];
     }
     return null;
-  }
-
-  function examById(id) {
-    for (var i = 0; i < EXAMS.length; i++) if (EXAMS[i].id === id) return EXAMS[i];
-    return null;
-  }
-
-  function paperShort(e) {
-    var m = /AY\s*(\d{4}\/\d{2})/.exec(e.title || '');
-    return m ? 'AY ' + m[1] : e.title;
   }
 
   /* Text with `code` and **bold** — escaped, then marked up. */
@@ -948,26 +918,10 @@
     return n;
   }
 
-  function mistakeGivenText(q, m) {
-    if (m.kind === 'skipped' || m.given == null) return '(not answered)';
-    if (q.type === 'mcq') return m.given + '. ' + optionText(q, m.given);
-    return q.blanks.map(function (b, i) {
-      var g = m.given[i];
-      return b.n + '. ' + (g && String(g).trim() ? g : '(blank)');
-    }).join('   ');
-  }
-
-  function mistakeExpectedText(q) {
-    if (q.type === 'mcq') return q.answer + '. ' + optionText(q, q.answer);
-    return q.blanks.map(function (b) { return b.n + '. ' + (b.answer || '(free response)'); }).join('   ');
-  }
-
-  /* The three labelled notes, shared by the log and the results screen. */
+  /* You thought / Actually / Rule — the same three lines as the mistakes page. */
   function mistakeNotes(m) {
     var box = el('div', 'mistake-notes');
-    [['What went wrong', m.mistake, 'what'],
-     ['Misconception', m.misconception, 'why'],
-     ['Next time', m.tip, 'tip']].forEach(function (row) {
+    [['You thought', m.wrong, 'why'], ['Actually', m.right, 'what'], ['Rule', m.rule, 'tip']].forEach(function (row) {
       if (!row[1]) return;
       var line = el('div', 'mistake-note ' + row[2]);
       line.appendChild(el('span', 'mistake-note-k', row[0]));
@@ -975,192 +929,6 @@
       box.appendChild(line);
     });
     return box;
-  }
-
-  function openMistakes() {
-    accrue();
-    save();
-    stopTrack();
-    showScreen('mistakes');
-    paintMistakes();
-    $('mistakes-root').parentNode.scrollTop = 0;
-  }
-
-  /* Open a question from the log in the paper's review look. Only possible when
-     this browser holds a submitted attempt for that paper — opening a paper
-     with no attempt would create an empty one, so that case only explains. */
-  function openMistakeQuestion(m) {
-    var e = examById(m.paper);
-    var saved = e && loadSaved(e.id);
-    if (!e || !saved || !saved.submitted) return false;
-    exam = e;
-    session = normalizeSession(saved);
-    reviewLook = true;
-    lookFrom = 'mistakes';
-    showScreen('exam');
-    $('exam-title').textContent = exam.headerName;
-    gotoQuestion(m.n);
-    return true;
-  }
-
-  function paintMistakes() {
-    var root = $('mistakes-root');
-    root.innerHTML = '';
-    var items = mistakeItems().filter(function (m) { return examById(m.paper); });
-    if (!items.length) {
-      root.appendChild(el('p', 'mistakes-empty', 'No mistakes log has been compiled yet.'));
-      return;
-    }
-
-    var papers = [];
-    items.forEach(function (m) { if (papers.indexOf(m.paper) < 0) papers.push(m.paper); });
-    var intro = el('div', 'mistakes-intro');
-    intro.appendChild(el('h2', null, 'Mistakes & tips'));
-    intro.appendChild(el('p', null,
-      'Every in-scope question answered wrongly or left blank in ' +
-      papers.map(function (id) { return paperShort(examById(id)); }).join(', ') +
-      ' (attempts exported ' + (MISTAKES.compiled || '') + '). Out-of-scope questions are left out. ' +
-      'Each note says what went wrong, the misconception behind it, and what to do next time.'));
-    root.appendChild(intro);
-
-    // Count per lecture, biggest first.
-    var counts = {};
-    items.forEach(function (m) {
-      var c = counts[m.lec] || (counts[m.lec] = { wrong: 0, skipped: 0 });
-      c[m.kind === 'skipped' ? 'skipped' : 'wrong']++;
-    });
-    var lecs = Object.keys(counts).map(Number).sort(function (a, b) {
-      var ta = counts[a].wrong + counts[a].skipped, tb = counts[b].wrong + counts[b].skipped;
-      return tb - ta || a - b;
-    });
-    var maxN = Math.max.apply(null, lecs.map(function (l) { return counts[l].wrong + counts[l].skipped; }));
-
-    var sum = el('div', 'mistakes-summary');
-    sum.appendChild(el('h3', null, 'By lecture'));
-    lecs.forEach(function (l) {
-      var c = counts[l];
-      var row = el('button', 'mistakes-bar-row' + (MISTAKE_STATE.lec === l ? ' on' : ''));
-      row.type = 'button';
-      row.appendChild(el('span', 'mistakes-bar-label', 'L' + l + ' ' + LECTURE_NAMES[l]));
-      var track = el('span', 'mistakes-bar-track');
-      var w = el('span', 'mistakes-bar wrong');
-      w.style.width = (100 * c.wrong / maxN) + '%';
-      var s = el('span', 'mistakes-bar skipped');
-      s.style.width = (100 * c.skipped / maxN) + '%';
-      track.appendChild(w); track.appendChild(s);
-      row.appendChild(track);
-      row.appendChild(el('span', 'mistakes-bar-n', String(c.wrong + c.skipped)));
-      row.addEventListener('click', function () {
-        MISTAKE_STATE.lec = MISTAKE_STATE.lec === l ? 0 : l;
-        paintMistakes();
-      });
-      sum.appendChild(row);
-    });
-    var legend = el('div', 'mistakes-legend');
-    legend.appendChild(el('span', 'dot wrong'));
-    legend.appendChild(el('span', null, 'wrong'));
-    legend.appendChild(el('span', 'dot skipped'));
-    legend.appendChild(el('span', null, 'not answered'));
-    legend.appendChild(el('span', 'hint', '— click a lecture to filter'));
-    sum.appendChild(legend);
-    root.appendChild(sum);
-
-    // Recurring patterns across papers.
-    if (MISTAKES.patterns && MISTAKES.patterns.length) {
-      var pat = el('div', 'mistakes-patterns');
-      pat.appendChild(el('h3', null, 'Patterns that repeat across papers'));
-      MISTAKES.patterns.forEach(function (p) {
-        var card = el('div', 'mistakes-pattern');
-        card.appendChild(el('div', 'mistakes-pattern-title', p.title));
-        card.appendChild(richLine('p', null, p.text));
-        var refs = el('div', 'mistakes-pattern-refs');
-        (p.refs || []).forEach(function (r) {
-          var bits = r.split(':');
-          var e = examById(bits[0]);
-          if (e) refs.appendChild(el('span', 'chip alt', paperShort(e) + ' Q' + bits[1]));
-        });
-        card.appendChild(refs);
-        pat.appendChild(card);
-      });
-      root.appendChild(pat);
-    }
-
-    // Filters.
-    var bar = el('div', 'mistakes-filters');
-    var lecSel = el('div', 'time-paper-chips');
-    var allBtn = el('button', 'time-paper-chip' + (MISTAKE_STATE.lec === 0 ? ' on' : ''), 'All lectures');
-    allBtn.type = 'button';
-    allBtn.addEventListener('click', function () { MISTAKE_STATE.lec = 0; paintMistakes(); });
-    lecSel.appendChild(allBtn);
-    lecs.slice().sort(function (a, b) { return a - b; }).forEach(function (l) {
-      var b = el('button', 'time-paper-chip' + (MISTAKE_STATE.lec === l ? ' on' : ''), 'L' + l);
-      b.type = 'button';
-      b.title = LECTURE_NAMES[l];
-      b.addEventListener('click', function () { MISTAKE_STATE.lec = l; paintMistakes(); });
-      lecSel.appendChild(b);
-    });
-    bar.appendChild(lecSel);
-    var kindSel = el('div', 'time-paper-chips');
-    [['all', 'Wrong & not answered'], ['wrong', 'Wrong only'], ['skipped', 'Not answered only']].forEach(function (k) {
-      var b = el('button', 'time-paper-chip' + (MISTAKE_STATE.kind === k[0] ? ' on' : ''), k[1]);
-      b.type = 'button';
-      b.addEventListener('click', function () { MISTAKE_STATE.kind = k[0]; paintMistakes(); });
-      kindSel.appendChild(b);
-    });
-    bar.appendChild(kindSel);
-    root.appendChild(bar);
-
-    // Cards, grouped by lecture in lecture order.
-    var shown = items.filter(function (m) {
-      if (MISTAKE_STATE.lec && m.lec !== MISTAKE_STATE.lec) return false;
-      if (MISTAKE_STATE.kind !== 'all' && (m.kind === 'skipped' ? 'skipped' : 'wrong') !== MISTAKE_STATE.kind) return false;
-      return true;
-    });
-    var byLec = {};
-    shown.forEach(function (m) { (byLec[m.lec] = byLec[m.lec] || []).push(m); });
-    Object.keys(byLec).map(Number).sort(function (a, b) { return a - b; }).forEach(function (l) {
-      var group = el('section', 'mistakes-group');
-      var h = el('h3', 'mistakes-group-title', 'Lecture ' + l + ' — ' + LECTURE_NAMES[l]);
-      h.appendChild(el('span', 'exam-group-count', byLec[l].length + (byLec[l].length === 1 ? ' question' : ' questions')));
-      group.appendChild(h);
-      byLec[l].forEach(function (m) { group.appendChild(mistakeCard(m)); });
-      root.appendChild(group);
-    });
-    if (!shown.length) root.appendChild(el('p', 'mistakes-empty', 'Nothing matches these filters.'));
-  }
-
-  function mistakeCard(m) {
-    var e = examById(m.paper);
-    var q = null;
-    e.questions.forEach(function (x) { if (x.n === m.n) q = x; });
-    var card = el('div', 'review-card mistake-card ' + (m.kind === 'skipped' ? 'skipped' : 'bad'));
-    var head = el('div', 'review-card-head');
-    head.appendChild(el('span', 'num', paperShort(e) + ' · Question ' + m.n));
-    head.appendChild(el('span', 'verdict ' + (m.kind === 'skipped' ? 'skip' : 'bad'),
-      m.kind === 'skipped' ? 'Not answered' : 'Incorrect'));
-    if (q) head.appendChild(el('span', 'marks', q.marks + (q.marks === 1 ? ' mark' : ' marks') + ' · ' + (q.type === 'mcq' ? 'MCQ' : 'fill-in')));
-    card.appendChild(head);
-    if (m.title) card.appendChild(el('div', 'mistake-title', m.title));
-    if (q) {
-      if (m.kind !== 'skipped') card.appendChild(el('div', 'given', 'Your answer:   ' + mistakeGivenText(q, m)));
-      card.appendChild(el('div', 'expected', 'Correct answer: ' + mistakeExpectedText(q)));
-    }
-    card.appendChild(mistakeNotes(m));
-
-    var jump = el('button', 'review-back-btn', 'Open this question');
-    jump.type = 'button';
-    var note = el('div', 'mistake-open-note');
-    note.hidden = true;
-    jump.addEventListener('click', function () {
-      if (!openMistakeQuestion(m)) {
-        note.textContent = 'This browser has no submitted attempt for ' + paperShort(e) +
-          ' — import your attempts (Export / Import on the start screen) to open it here.';
-        note.hidden = false;
-      }
-    });
-    card.appendChild(jump);
-    card.appendChild(note);
-    return card;
   }
 
   /* ============================================================ time chart
@@ -1749,12 +1517,6 @@
       if (f) importFromFile(f);
     });
     $('stats-back').addEventListener('click', function () {
-      renderPicker();
-    });
-
-    $('open-mistakes').addEventListener('click', function () { openMistakes(); });
-    $('mistakes-back').addEventListener('click', function () {
-      lookFrom = null;
       renderPicker();
     });
 

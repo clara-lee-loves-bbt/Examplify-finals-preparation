@@ -48,3 +48,4 @@ function bundle(srcHtml, outName) {
 bundle('index.html', 'examplify.html');
 bundle('practice/index.html', 'practice.html');
 bundle('tutorials/index.html', 'tutorials.html');
+bundle('mistakes/index.html', 'mistakes.html');

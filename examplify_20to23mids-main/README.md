@@ -200,19 +200,27 @@ is already transcribed into `data/`, so a fresh clone runs fine without them.
   without losing anything. The picker shows "In progress — n of 31 answered" or
   your score for a finished paper (times included). Export the lot from the picker
   if you want a copy that git and a browser wipe cannot take away.
-- **My mistakes & tips.** `data/mistakes.js` is a personal mistakes log: every
-  in-scope question answered wrongly or left blank in the attempts exported on
-  2026-11-17 (AY 2019/20, 2020/21 and 2021/22 finals — 42 questions). Each entry
-  records the answer given and three notes: *what went wrong*, the *misconception*
-  behind it, and a tip for *next time*, tagged by lecture. The picker's
-  **My mistakes & tips** button opens a screen with a per-lecture chart, the
-  patterns that repeat across papers, lecture and type filters, and one card per
-  question with an **Open this question** jump (back with *Back to mistakes*).
-  The same notes appear under the matching card on each paper's results screen.
-  The log is read-only — it never touches saved attempts — and
-  `tools/validate-data.js` checks that every entry points at a real, in-scope
-  question with an answer shaped like it. To add a new paper's mistakes, append
-  entries with the same fields.
+- **My mistakes & tips** (`mistakes.html`, linked from the picker). A
+  phone-first study page built from `data/mistakes.js`: every in-scope question
+  answered wrongly or left blank in the attempts exported on 2026-11-23 (AY
+  2019/20, 2020/21, 2021/22, 2022/23 and 2024/25 finals — 69 questions). Each
+  card holds the whole question (highlighted code, options or blanks), your
+  answer against the key, and three lines: **✗** the belief behind the mistake,
+  **✓** what is actually true, and **→** an *If …, then …* rule. **Quiz** mode
+  hides the answer until tapped; **Read** shows everything; **Shuffle** mixes
+  lectures; filters by lecture, paper and type (concept / tracing slip / not
+  attempted). The print button, or `mistakes.pdf`, gives an A4 PDF with every
+  answer shown. The same three lines appear under the matching card on each
+  paper's results screen. The layout follows the research on learning from
+  errors: everything on one card (split-attention), recall before reveal
+  (retrieval practice), stating and refuting the wrong belief (refutation
+  texts), wrong and right side by side (contrasting cases), and one if-then cue
+  per mistake (implementation intentions). The log is read-only — it never
+  touches saved attempts — and `tools/validate-data.js` checks every entry.
+- **Accepted alternative answers.** A fill-in question may list `accept: [[…]]`
+  — whole alternative answers (one string per blank) that were proven correct by
+  running them. They are matched as complete sets, never blank by blank. AY
+  2024/25 Q23, Q29 and Q31 accept the alternatives from the 2026-11-23 attempt.
 - **Scope labels.** Every past paper is tagged against its syllabus: the three
   mid-term past papers (`2021S1`, `2122S1`, `2223S1`) use the lectures 1–5
   scope sheet, and all six final papers use lectures 1–11. A question that
@@ -232,9 +240,11 @@ is already transcribed into `data/`, so a fresh clone runs fine without them.
 Attempts are stored in the browser, never in the code, so pushing a new version
 does not touch them. Each paper is one `localStorage` entry named
 `examplify:v1:<paper id>`, with answers keyed by question number. On
-2026-11-17 a real backup was imported into an empty browser, the scores checked
-(37 / 37 / 44), the page reloaded on a new build, and the file exported again:
-every answer, flag, strike, time and timestamp came back identical.
+2026-11-17 and again on 2026-11-23 a real backup was imported into an empty
+browser on the new build, the scores checked (37 / 37 / 44 / 35 / 41), and the
+file exported again: every answer, flag, strike, time and timestamp came back
+identical. The mistakes page only keeps its own view settings
+(`cs1010e-mistakes-view-v1`) and never reads or writes attempts.
 
 To keep it that way:
 
@@ -255,9 +265,12 @@ examplify.html          built single-file app — open this
 index.html              same app, multi-file version
 styles.css
 app.js
-build.js                inlines each page + css + js -> examplify/practice/tutorials.html
+build.js                inlines each page + css + js -> examplify/practice/tutorials/mistakes.html
 practice/               lecture bank (index.html, practice.css, practice.js, questions/)
 tutorials/              tutorial & assignment bank (index.html, questions/)
+mistakes/               mistakes study page (index.html, mistakes.css, mistakes.js)
+mistakes.pdf            printed mistakes log — rebuild with tools/make-mistakes-pdf.js
+data/mistakes.js        the mistakes log (notes only)
 data/registry.js        registerExam() helper
 data/exam-final-1920.js final papers (category: 'final') — top of the picker
 data/exam-final-2021.js
@@ -280,8 +293,9 @@ tools/validate-data.js  sanity-check the question data
 After editing `index.html`, `styles.css`, `app.js` or anything in `data/`:
 
 ```bash
-node build.js                    # rebuild examplify.html, practice.html and tutorials.html
-node tools/validate-data.js      # verify every paper's data
+node build.js                    # rebuild examplify, practice, tutorials and mistakes.html
+node tools/validate-data.js      # verify every paper's data and the mistakes log
+node tools/make-mistakes-pdf.js  # re-print mistakes.pdf (needs Chrome or Edge)
 node tools/verify-practice.js    # verify the lecture practice bank (runs Python)
 node tools/verify-tutorials.js   # verify the tutorial/assignment bank (runs Python)
 ```

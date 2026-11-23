@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#17171a" media="(prefers-color-scheme: dark)">
+<title>CS1010E — My mistakes</title>
+<link rel="stylesheet" href="mistakes.css">
+</head>
+<body>
+<header class="bar">
+  <div class="bar-in">
+    <a class="back" href="examplify.html" aria-label="Back to Examplify">&#8249;</a>
+    <div class="bar-title">My mistakes <span id="count"></span></div>
+    <div class="seg" role="group" aria-label="Mode">
+      <button type="button" data-mode="quiz">Quiz</button>
+      <button type="button" data-mode="read">Read</button>
+    </div>
+    <button type="button" class="icon" id="shuffle" aria-label="Shuffle" title="Shuffle (mix lectures)">&#8645;</button>
+    <button type="button" class="icon" id="print" aria-label="Print or save as PDF" title="Print / save as PDF">&#9113;</button>
+  </div>
+  <div class="filters" id="filters"></div>
+</header>
+
+<main class="wrap">
+  <section class="print-head">
+    <h1>CS1010E — my final-exam mistakes</h1>
+    <p id="print-meta"></p>
+  </section>
+  <details class="patterns" id="patterns"></details>
+  <div id="list"></div>
+  <p class="foot">Each card: question → your answer vs the answer → <b>✗</b> what you thought → <b>✓</b> what is true → <b>→</b> an <b>If…, then…</b> rule. In <b>Quiz</b> mode answer first, then tap to check. <a href="mistakes.pdf">Download the PDF</a> (all answers shown) or use the print button.</p>
+</main>
+
+<script src="../data/registry.js"></script>
+<script src="../data/exam-final-1920.js"></script>
+<script src="../data/exam-final-2021.js"></script>
+<script src="../data/exam-final-2122.js"></script>
+<script src="../data/exam-final-2223.js"></script>
+<script src="../data/exam-final-2425.js"></script>
+<script src="../data/exam-final-2526.js"></script>
+<script src="../data/mistakes.js"></script>
+<script src="mistakes.js"></script>
+</body>
+</html>
