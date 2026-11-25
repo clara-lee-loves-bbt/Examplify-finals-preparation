@@ -4,3 +4,6 @@ New papers/
 
 # Scratch space used while checking the transcribed questions.
 .audit/
+
+# Python bytecode from tools/*.py
+__pycache__/

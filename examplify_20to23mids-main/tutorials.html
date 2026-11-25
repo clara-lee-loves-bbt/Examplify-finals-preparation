@@ -420,6 +420,68 @@ textarea.sync-text:not([readonly]) { font-size: 16px; }
   .stats { grid-template-columns: repeat(2, 1fr); }
   .code { font-size: 12.5px; }
 }
+
+/* ---------------- retention: review, traps, mistake log ---------------- */
+.retain-note { font-size: 12.5px; color: var(--muted); margin: -6px 2px 14px; }
+.btn.wide { grid-column: 1 / -1; }
+a.btn { text-decoration: none; }
+.flabel-hint { font-size: 11.5px; color: var(--muted); font-weight: 500; }
+.prow-sub .due { color: var(--accent-text); font-weight: 600; }
+
+.traps-card { padding-bottom: 6px; }
+.trap-row {
+  display: grid; grid-template-columns: 40px 1fr auto; gap: 10px; align-items: center; width: 100%;
+  text-align: left; border: 0; border-top: 1px solid var(--line); background: none; color: inherit; padding: 10px 0;
+}
+.traps-card h2 + .trap-row, .traps-card .sync-note + .trap-row { border-top: 0; }
+.trap-row[disabled] { opacity: 1; }
+.trap-n { font-weight: 700; color: var(--bad); font-variant-numeric: tabular-nums; text-align: center; }
+.trap-main b { display: block; font-size: 14.5px; }
+.trap-main small { display: block; color: var(--muted); font-size: 12.5px; margin-top: 2px; line-height: 1.35; }
+.trap-go { color: var(--accent-text); font-weight: 600; font-size: 13px; white-space: nowrap; }
+
+.opt-trap { display: block; margin-top: 6px; font-size: 12px; font-weight: 600; color: var(--muted); }
+.opt.wrong .opt-trap { color: var(--bad); }
+
+.fb-when { margin-top: 8px; font-size: 13px; color: var(--muted); }
+.trapbox { border-radius: 12px; padding: 12px 14px; margin: 0 0 12px; border: 1px solid var(--line); background: var(--card); }
+.trapbox.bad { border-color: var(--warn-line); background: var(--warn-bg); }
+.trapbox > b { font-size: 15px; display: block; }
+.trapbox p { margin: 4px 0 0; font-size: 14px; }
+.trap-lbl { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
+.trapbox.bad .trap-lbl { color: var(--warn); }
+.trap-rule { color: var(--ink-2); font-weight: 600; }
+.trap-meta { font-size: 12.5px; color: var(--muted); }
+.trap-meta a { color: var(--accent-text); }
+.trap-chips { margin: 2px 0 4px; }
+.trap-chips .chip { min-height: 32px; font-size: 13px; }
+.link-btn { border: 0; background: none; color: var(--accent-text); font-weight: 600; padding: 6px 0 2px; font-size: 14px; text-decoration: underline; cursor: pointer; }
+.link-btn.muted { color: var(--muted); }
+.note-lbl { display: block; font-size: 12.5px; color: var(--muted); margin-top: 10px; }
+.note-in, .log-note {
+  display: block; width: 100%; margin-top: 4px; border: 1px solid var(--line); background: var(--card);
+  border-radius: 8px; padding: 8px 10px; font-size: 16px; color: var(--ink); font-family: inherit; resize: vertical;
+}
+
+.log-intro { margin-top: 14px; }
+.log-seg { margin-bottom: 14px; }
+.log-entry { padding: 12px 14px; }
+.log-entry.fixed { opacity: .7; }
+.log-head a { font-weight: 700; color: var(--ink); text-decoration: none; font-size: 15px; }
+.log-head span { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+.log-ans { display: grid; gap: 6px; margin: 10px 0 8px; font-size: 13.5px; }
+.log-ans .lbl { display: inline-block; min-width: 58px; font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; }
+.log-ans code { white-space: pre-wrap; word-break: break-word; background: var(--code-bg); border-radius: 6px; padding: 1px 6px; }
+.log-trap { font-size: 14px; border-left: 3px solid var(--warn-line); padding-left: 10px; margin: 6px 0; }
+.log-trap small { color: var(--muted); font-weight: 500; }
+.log-trap p { margin: 3px 0 0; color: var(--ink-2); font-size: 13.5px; }
+.log-trap.untagged { color: var(--muted); border-left-color: var(--line); }
+.log-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+.log-btns { display: flex; gap: 14px; }
+.log-now { font-size: 12.5px; font-weight: 600; }
+.log-now.ok { color: var(--ok); }
+.log-now.bad { color: var(--bad); }
+.log-export { margin-top: 12px; }
 </style>
 </head>
 <body>
@@ -1927,6 +1989,36 @@ window.PRACTICE_CONFIG = {
   var TYPE = CFG.typeLabels || { mcq: 'Multiple choice', fib: 'Fill in the blank', out: 'Predict the output' };
   var TYPE_SHORT = CFG.typeShort || { mcq: 'MCQ', fib: 'Fill-in', out: 'Output' };
 
+  /* The answer key lives apart from the questions (practice/answers/*.js), so
+     a question file never shows its answer. Merge each key into its question:
+     an MCQ's options are the right answer followed by the wrong ones (shown
+     shuffled), so q.ans is 0 and q.wrong[i] labels option i + 1 with its trap. */
+  var ANSWERS = window.PRACTICE_ANSWERS || {};
+  var TRAPS = window.PRACTICE_TRAPS || {};
+  (window.PRACTICE_QUESTIONS || []).forEach(function (q) {
+    var a = ANSWERS[q.id];
+    if (!a) {
+      // Banks without a separate key (tutorials) keep opts + ans inline: put the right option first too.
+      if (q.type === 'mcq' && q.ans) {
+        var right = q.opts[q.ans];
+        q.opts = [right].concat(q.opts.filter(function (_, i) { return i !== q.ans; }));
+        q.ans = 0;
+      }
+      return;
+    }
+    q.trap = a.trap;
+    q.exp = a.exp;
+    q.wrong = a.wrong || [];
+    if (q.type === 'mcq') {
+      q.opts = [a.ans].concat(q.wrong.map(function (w) { return w.a; }));
+      q.ans = 0;
+    } else if (q.type === 'out') {
+      q.ans = a.ans;
+      q.alts = a.alts;
+    } else {
+      q.blanks = a.blanks;
+    }
+  });
   var QS = (window.PRACTICE_QUESTIONS || []).slice();
   var BY_ID = {};
   QS.forEach(function (q) { BY_ID[q.id] = q; });
@@ -1964,12 +2056,12 @@ window.PRACTICE_CONFIG = {
   var SKEY = CFG.sessionKey || 'cs1010e-practice-session';
   function defaults() {
     var ids = GROUPS ? GROUPS.map(function (g) { return g.id; }) : LECS.slice();
-    return { p: {}, f: { lecs: ids, type: 'all', diff: 0, status: 'all' }, days: {}, theme: null };
+    return { p: {}, f: { lecs: ids, type: 'all', diff: 0, status: 'all', outMode: 'type' }, days: {}, log: [], theme: null };
   }
   function load() {
     try {
       var s = JSON.parse(localStorage.getItem(KEY));
-      if (s && s.p && s.f) { s.days = s.days || {}; return s; }
+      if (s && s.p && s.f) { s.days = s.days || {}; s.log = s.log || []; s.f.outMode = s.f.outMode || 'type'; return s; }
     } catch (e) { /* storage unavailable */ }
     return defaults();
   }
@@ -2013,6 +2105,66 @@ window.PRACTICE_CONFIG = {
     var d = new Date();
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
   }
+  /* ---------------- spaced review ----------------
+     Each question sits in a box 0-5 (Leitner system). A right answer moves it
+     up a box and pushes the next review further out; a wrong answer (or a
+     revealed one) drops it to box 0, due again straight away, and it is also
+     re-asked a few questions later in the same session. A right answer you
+     only guessed counts as box 1. Box 3 or higher counts as "retained".   */
+  var DAY = 864e5;
+  var INTERVAL = [0, 1, 3, 7, 16, 35]; // days until the next review, by box
+  var RETAINED = 3;
+  function dueOf(p) {
+    if (!p || !p.n) return null;
+    if (p.due != null) return p.due;
+    return (p.t || 0) + (p.last === 'ok' ? DAY : 0); // progress saved before boxes existed
+  }
+  function isDue(id) { var d = dueOf(prog(id)); return d != null && d <= Date.now(); }
+  function boxOf(id) { var p = prog(id); return p && p.box != null ? p.box : (p && p.c && p.last === 'ok' ? 1 : 0); }
+  // Call before p.last is updated, so older progress (no box yet) starts from its last result.
+  function schedule(p, result) {
+    var box = p.box != null ? p.box : (p.last === 'ok' ? 1 : 0);
+    if (result === 'ok') box = Math.min(box + 1, INTERVAL.length - 1);
+    else if (result === 'guess') box = 1;
+    else box = 0;
+    p.box = box;
+    p.due = Date.now() + INTERVAL[box] * DAY;
+  }
+  function whenText(p) {
+    if (!p || p.box == null) return '';
+    if (!p.box) return 'Back in a few questions, and due again now';
+    var d = INTERVAL[p.box];
+    return 'Next review in ' + d + ' day' + (d === 1 ? '' : 's') + ' (box ' + p.box + ' of ' + (INTERVAL.length - 1) + ')';
+  }
+
+  /* ---------------- traps ---------------- */
+  function trapInfo(id) { return TRAPS[id] || { name: id === 'slip' ? 'careless slip' : id === 'unsure' ? "didn't know it yet" : id, rule: '' }; }
+  // Which labelled wrong options does this answer match? Returns wrong entries.
+  function matchTraps(q, given) {
+    var wrong = q.wrong || [];
+    if (q.type === 'mcq' || given.choice != null) {
+      var w = given.choice > 0 ? wrong[given.choice - 1] : null;
+      return w ? [w] : [];
+    }
+    if (q.type === 'out') {
+      return wrong.filter(function (w) { return checkOut({ ans: w.a }, given.text); }).slice(0, 1);
+    }
+    var hits = [];
+    given.values.forEach(function (v, i) {
+      var nv = normCode(v);
+      if (!nv) return;
+      wrong.forEach(function (w) { if (w.b === i + 1 && normCode(w.a) === nv) hits.push(w); });
+    });
+    return hits;
+  }
+  function questionTraps(q) {
+    var ids = [];
+    if (q.trap) ids.push(q.trap);
+    (q.wrong || []).forEach(function (w) { if (ids.indexOf(w.trap) < 0) ids.push(w.trap); });
+    return ids;
+  }
+  function testsTrap(q, id) { return questionTraps(q).indexOf(id) >= 0; }
+
   function prog(id) { return store.p[id]; }
   function isSolved(id) { var p = prog(id); return !!(p && p.c); }
   function isWrong(id) { var p = prog(id); return !!(p && (p.last === 'bad' || p.last === 'shown')); }
@@ -2139,10 +2291,13 @@ window.PRACTICE_CONFIG = {
     return true;
   }
   function filtered() { return QS.filter(function (q) { return matches(q, store.f); }); }
+  function inLecs(q) { return store.f.lecs.indexOf(q[GROUP_KEY]) >= 0; }
   function poolFor(mode) {
-    var f = store.f;
-    if (mode === 'mistakes') return QS.filter(function (q) { return f.lecs.indexOf(q[GROUP_KEY]) >= 0 && isWrong(q.id); });
+    if (mode === 'mistakes') return QS.filter(function (q) { return inLecs(q) && isWrong(q.id); });
     if (mode === 'flagged') return QS.filter(function (q) { return isFlagged(q.id); });
+    if (mode === 'review') return QS.filter(function (q) { return inLecs(q) && isDue(q.id); });
+    if (mode === 'new') return QS.filter(function (q) { var p = prog(q.id); return inLecs(q) && !(p && p.n); });
+    if (mode === 'trap') return QS.filter(function (q) { return testsTrap(q, session.trap); });
     return filtered();
   }
   function weight(q) {
@@ -2152,6 +2307,12 @@ window.PRACTICE_CONFIG = {
     return p.flag ? 2 : 1;
   }
   function pickNext(mode, currentId) {
+    // A question missed earlier in this session comes back after a few others:
+    // retrieving it again soon after the correction is what makes it stick.
+    if (mode !== 'list') {
+      var qi = (session.queue || []).findIndex(function (r) { return r.at <= session.done && r.id !== currentId && BY_ID[r.id]; });
+      if (qi >= 0) return BY_ID[session.queue.splice(qi, 1)[0].id];
+    }
     var pool = poolFor(mode);
     if (!pool.length) return null;
     if (mode === 'list') {
@@ -2161,7 +2322,13 @@ window.PRACTICE_CONFIG = {
     var avoid = Math.min(15, pool.length - 1);
     var recent = session.recent.slice(-avoid);
     var cands = pool.filter(function (q) { return recent.indexOf(q.id) < 0 && q.id !== currentId; });
-    if (!cands.length) cands = pool;
+    if (!cands.length) cands = pool.filter(function (q) { return q.id !== currentId; });
+    if (!cands.length) return null;
+    if (mode === 'review') {
+      // Most overdue first, but pick among the five most overdue so lectures interleave.
+      cands.sort(function (a, b) { return dueOf(prog(a.id)) - dueOf(prog(b.id)); });
+      return cands[Math.floor(Math.random() * Math.min(5, cands.length))];
+    }
     var total = cands.reduce(function (s, q) { return s + weight(q); }, 0);
     var r = Math.random() * total;
     for (var k = 0; k < cands.length; k++) {
@@ -2191,11 +2358,36 @@ window.PRACTICE_CONFIG = {
       streak++;
       d.setDate(d.getDate() - 1);
     }
+    var due = 0, kept = 0;
+    QS.forEach(function (q) {
+      if (isDue(q.id)) due++;
+      if (boxOf(q.id) >= RETAINED) kept++;
+    });
     return {
       solved: solved, tried: tried,
       acc: attempts ? Math.round(100 * correct / attempts) : null,
-      today: store.days[today()] || 0, streak: streak
+      today: store.days[today()] || 0, streak: streak, due: due, kept: kept
     };
+  }
+
+  /* ---------------- mistake log ----------------
+     Every wrong or revealed answer adds an entry:
+       { id, t: time, g: your answer, tr: trap id ('' until tagged),
+         auto: trap matched from your answer, n: your note, how: 'bad'|'shown',
+         fx: marked understood }                                            */
+  var LOG_MAX = 2000;
+  function addLog(q, given, how, traps) {
+    var e = { id: q.id, t: Date.now(), g: String(given || '').slice(0, 400), tr: traps.length ? traps[0].trap : '', auto: !!traps.length, n: '', how: how };
+    if (how === 'shown' && !e.tr && q.trap) e.tr = q.trap;
+    store.log.push(e);
+    if (store.log.length > LOG_MAX) store.log.splice(0, store.log.length - LOG_MAX);
+    return e;
+  }
+  function openLog() { return store.log.filter(function (e) { return !e.fx && BY_ID[e.id]; }); }
+  function trapCounts(entries) {
+    var c = {};
+    entries.forEach(function (e) { var k = e.tr || 'untagged'; c[k] = (c[k] || 0) + 1; });
+    return Object.keys(c).map(function (k) { return { id: k, n: c[k] }; }).sort(function (a, b) { return b.n - a.n; });
   }
 
   /* =====================================================================
@@ -2236,22 +2428,42 @@ window.PRACTICE_CONFIG = {
     }
 
     var rows = list.slice(0, shown).map(rowHtml).join('');
+    var review = poolFor('review').length;
+    var unseen = poolFor('new').length;
+    var open = openLog();
+    var top = trapCounts(open).filter(function (t) { return t.id !== 'untagged'; }).slice(0, 5);
 
     app.innerHTML = topbarHome() +
       '<main class="wrap home">' +
       (CFG.intro ? '<section class="card intro"><p class="sync-note">' + CFG.intro + '</p></section>' : '') +
       '<div class="stats">' +
         '<div class="stat"><b>' + s.solved + '<small>/' + QS.length + '</small></b><span>solved</span></div>' +
+        '<div class="stat"><b>' + s.due + '</b><span>due now</span></div>' +
         '<div class="stat"><b>' + (s.acc === null ? '–' : s.acc + '%') + '</b><span>accuracy</span></div>' +
-        '<div class="stat"><b>' + s.today + '</b><span>today</span></div>' +
         '<div class="stat"><b>' + s.streak + '</b><span>day streak</span></div>' +
       '</div>' +
       '<div class="ring-bar" aria-hidden="true"><i style="width:' + pct + '%"></i></div>' +
+      '<p class="retain-note">' + s.kept + ' retained (answered right on spaced reviews) · ' + s.tried + ' tried · ' + s.today + ' today</p>' +
       '<div class="cta">' +
-        '<button class="btn primary big" data-act="start" data-mode="shuffle"' + (list.length ? '' : ' disabled') + '>▶ Shuffle practice <small>(' + list.length + ')</small></button>' +
-        '<button class="btn" data-act="start" data-mode="mistakes"' + (mistakes ? '' : ' disabled') + '>↻ Redo mistakes <small>' + mistakes + '</small></button>' +
+        (review
+          ? '<button class="btn primary big" data-act="start" data-mode="review">↻ Review due <small>(' + review + ')</small></button>' +
+            '<button class="btn" data-act="start" data-mode="shuffle"' + (list.length ? '' : ' disabled') + '>▶ Shuffle <small>' + list.length + '</small></button>'
+          : '<button class="btn primary big" data-act="start" data-mode="shuffle"' + (list.length ? '' : ' disabled') + '>▶ Shuffle practice <small>(' + list.length + ')</small></button>') +
+        '<button class="btn" data-act="start" data-mode="new"' + (unseen ? '' : ' disabled') + '>✦ Unseen <small>' + unseen + '</small></button>' +
+        '<button class="btn" data-act="start" data-mode="mistakes"' + (mistakes ? '' : ' disabled') + '>✗ Redo mistakes <small>' + mistakes + '</small></button>' +
         '<button class="btn" data-act="start" data-mode="flagged"' + (flagged ? '' : ' disabled') + '>⚑ Flagged <small>' + flagged + '</small></button>' +
+        '<a class="btn' + (review ? ' wide' : '') + '" href="#/log">📓 Mistake log <small>' + open.length + '</small></a>' +
       '</div>' +
+      (top.length ? '<section class="card traps-card"><h2>Your top traps</h2>' +
+        '<p class="sync-note">From your mistake log. Tap one to drill every question built on it.</p>' +
+        top.map(function (t) {
+          var info = trapInfo(t.id);
+          var n = QS.filter(function (q) { return testsTrap(q, t.id); }).length;
+          return '<button class="trap-row" data-act="drill" data-trap="' + esc(t.id) + '"' + (n ? '' : ' disabled') + '>' +
+            '<span class="trap-n">' + t.n + '×</span><span class="trap-main"><b>' + esc(info.name) + '</b>' +
+            (info.rule ? '<small>' + esc(info.rule) + '</small>' : '') + '</span>' +
+            '<span class="trap-go">' + (n ? 'Drill ' + n + ' →' : '') + '</span></button>';
+        }).join('') + '</section>' : '') +
       '<section class="card">' +
         '<h2>Filter</h2>' +
         '<div class="frow"><div class="flabel">' + (GROUPS ? 'Source' : 'Lectures') +
@@ -2264,6 +2476,8 @@ window.PRACTICE_CONFIG = {
         '<div class="frow"><div class="flabel">Type</div>' + seg('type', [['all', 'All']].concat(TYPES.map(function (t) { return [t, TYPE_SHORT[t] || TYPE[t]]; }))) + '</div>' +
         '<div class="frow"><div class="flabel">Difficulty</div>' + seg('diff', [[0, 'All'], [1, 'Easy'], [2, 'Medium'], [3, 'Hard']]) + '</div>' +
         '<div class="frow"><div class="flabel">Status</div>' + seg('status', [['all', 'All'], ['new', 'New'], ['wrong', 'Wrong'], ['solved', 'Solved'], ['flagged', '⚑']]) + '</div>' +
+        (TYPES.indexOf('out') >= 0 ? '<div class="frow"><div class="flabel">Output questions<span class="flabel-hint">typing recalls harder, so it sticks better</span></div>' +
+          seg('outMode', [['type', 'Type the output'], ['choose', 'Choose from options']]) + '</div>' : '') +
       '</section>' +
       '<input class="search" type="search" placeholder="Search titles and topics" value="' + esc(f.search || '') + '" data-act="search" autocomplete="off" autocapitalize="off" spellcheck="false">' +
       '<div class="list-head"><h2>Problems</h2><span>' + list.length + ' shown</span></div>' +
@@ -2298,6 +2512,7 @@ window.PRACTICE_CONFIG = {
       '<span class="prow-main"><span class="prow-title">' + esc(q.t) + '</span>' +
       '<span class="prow-sub"><span>' + esc(groupName(q)) + ' · ' + esc(q.topic) + '</span><span>· ' + (TYPE_SHORT[q.type] || TYPE[q.type]) + '</span>' +
       (!GROUPS && q.lec >= NOT_REVISED_FROM ? '<span class="new">· not revised</span>' : '') +
+      (isDue(q.id) ? '<span class="due">· due</span>' : '') +
       (isFlagged(q.id) ? '<span class="flag">⚑</span>' : '') + '</span></span>' +
       '<span class="diff d' + q.d + '">' + DIFF[q.d] + '</span></a>';
   }
@@ -2309,14 +2524,19 @@ window.PRACTICE_CONFIG = {
   var LAST = { ok: 'o', bad: 'b', shown: 's' };
   var LAST_BACK = { o: 'ok', b: 'bad', s: 'shown' };
 
+  // v2 adds the review box and due time to each question, and the mistake log.
   function makeSyncCode() {
     var p = {};
     Object.keys(store.p).forEach(function (id) {
       var e = store.p[id];
       if (!e || (!e.n && !e.flag)) return;
-      p[id] = [e.n || 0, e.c || 0, LAST[e.last] || '', e.flag ? 1 : 0, Math.round((e.t || 0) / 1000)];
+      p[id] = [e.n || 0, e.c || 0, LAST[e.last] || '', e.flag ? 1 : 0, Math.round((e.t || 0) / 1000),
+        e.box == null ? -1 : e.box, e.due == null ? 0 : Math.round(e.due / 1000)];
     });
-    var json = JSON.stringify({ v: 1, p: p, d: store.days });
+    var log = store.log.map(function (e) {
+      return [e.id, Math.round(e.t / 1000), e.g, e.tr || '', e.n || '', e.how === 'shown' ? 's' : 'b', e.fx ? 1 : 0, e.auto ? 1 : 0];
+    });
+    var json = JSON.stringify({ v: 2, p: p, d: store.days, l: log });
     return SYNC_PREFIX + btoa(unescape(encodeURIComponent(json)));
   }
 
@@ -2327,7 +2547,7 @@ window.PRACTICE_CONFIG = {
     var data;
     try { data = JSON.parse(decodeURIComponent(escape(atob(s.slice(i + SYNC_PREFIX.length))))); }
     catch (e) { throw new Error('The code is incomplete or damaged. Copy the whole code and try again.'); }
-    if (!data || data.v !== 1 || typeof data.p !== 'object') throw new Error('This sync code is from an unknown version.');
+    if (!data || (data.v !== 1 && data.v !== 2) || typeof data.p !== 'object') throw new Error('This sync code is from an unknown version.');
     return data;
   }
 
@@ -2338,12 +2558,14 @@ window.PRACTICE_CONFIG = {
     Object.keys(data.p).forEach(function (id) {
       if (!BY_ID[id]) return;
       var r = data.p[id];
-      var inc = { n: r[0] || 0, c: r[1] || 0, last: LAST_BACK[r[2]], flag: !!r[3], t: (r[4] || 0) * 1000 };
+      var inc = { n: r[0] || 0, c: r[1] || 0, last: LAST_BACK[r[2]], flag: !!r[3], t: (r[4] || 0) * 1000,
+        box: r[5] == null || r[5] < 0 ? null : r[5], due: r[6] ? r[6] * 1000 : null };
       var cur = store.p[id];
       if (!cur) {
         var fresh = { n: inc.n, c: inc.c, t: inc.t };
         if (inc.last) fresh.last = inc.last;
         if (inc.flag) fresh.flag = true;
+        if (inc.box != null) { fresh.box = inc.box; fresh.due = inc.due; }
         store.p[id] = fresh;
         changed++;
         return;
@@ -2351,13 +2573,41 @@ window.PRACTICE_CONFIG = {
       var before = JSON.stringify(cur);
       cur.n = Math.max(cur.n || 0, inc.n);
       cur.c = Math.max(cur.c || 0, inc.c);
-      if (inc.t > (cur.t || 0)) { if (inc.last) cur.last = inc.last; cur.t = inc.t; }
+      // The most recent attempt decides the result and the review schedule.
+      if (inc.t > (cur.t || 0)) {
+        if (inc.last) cur.last = inc.last;
+        cur.t = inc.t;
+        if (inc.box != null) { cur.box = inc.box; cur.due = inc.due; }
+      }
       if (inc.flag) cur.flag = true;
       if (JSON.stringify(cur) !== before) changed++;
     });
     Object.keys(data.d || {}).forEach(function (day) {
       store.days[day] = Math.max(store.days[day] || 0, data.d[day] || 0);
     });
+    // Mistake log: entries are matched by question and time; tags, notes and
+    // "understood" marks are kept from whichever side has them.
+    var byKey = {};
+    store.log.forEach(function (e) { byKey[e.id + '@' + Math.round(e.t / 1000)] = e; });
+    (data.l || []).forEach(function (r) {
+      if (!BY_ID[r[0]]) return;
+      var k = r[0] + '@' + r[1];
+      var e = byKey[k];
+      if (!e) {
+        e = { id: r[0], t: r[1] * 1000, g: r[2] || '', tr: r[3] || '', n: r[4] || '', how: r[5] === 's' ? 'shown' : 'bad', auto: !!r[7] };
+        if (r[6]) e.fx = true;
+        store.log.push(e);
+        byKey[k] = e;
+        changed++;
+        return;
+      }
+      var was = JSON.stringify(e);
+      if (!e.tr && r[3]) e.tr = r[3];
+      if ((r[4] || '').length > (e.n || '').length) e.n = r[4];
+      if (r[6]) e.fx = true;
+      if (JSON.stringify(e) !== was) changed++;
+    });
+    store.log.sort(function (a, b) { return a.t - b.t; });
     store.lastSync = Date.now();
     save();
     return changed;
@@ -2430,7 +2680,8 @@ window.PRACTICE_CONFIG = {
   var cur = null; // { q, order, done, result, values }
 
   function modeLabel() {
-    return { shuffle: 'Shuffle', list: 'Problem list', mistakes: 'Mistakes', flagged: 'Flagged' }[session.mode] || 'Practice';
+    if (session.mode === 'trap') return 'Trap: ' + esc(trapInfo(session.trap).name);
+    return { shuffle: 'Shuffle', list: 'Problem list', mistakes: 'Mistakes', flagged: 'Flagged', review: 'Review', 'new': 'Unseen' }[session.mode] || 'Practice';
   }
   function shuffle(a) {
     for (var i = a.length - 1; i > 0; i--) {
@@ -2439,11 +2690,15 @@ window.PRACTICE_CONFIG = {
     }
     return a;
   }
+  // Choose mode: an output question shown as options (the answer and its labelled wrong outputs).
+  function choosing(q) { return q.type === 'out' && store.f.outMode === 'choose' && (q.wrong || []).length >= 2; }
+  function optsOf(q) { return q.type === 'out' ? [q.ans].concat(q.wrong.map(function (w) { return w.a; })) : q.opts; }
   function openQuestion(q) {
+    var asOpts = q.type === 'mcq' || choosing(q);
     cur = {
-      q: q,
-      order: q.type === 'mcq' ? shuffle(q.opts.map(function (_, i) { return i; })) : null,
-      done: false, result: null,
+      q: q, choose: q.type === 'out' && asOpts,
+      order: asOpts ? shuffle(optsOf(q).map(function (_, i) { return i; })) : null,
+      done: false, result: null, traps: [], entry: null, guessed: false,
       values: q.type === 'fib' ? q.blanks.map(function () { return ''; }) : ['']
     };
     renderQuestion();
@@ -2459,11 +2714,13 @@ window.PRACTICE_CONFIG = {
       '<button class="icon-btn" data-act="theme" aria-label="Toggle dark mode">' + (isDark() ? ICON.sun : ICON.moon) + '</button>' +
       '</div></header>';
 
+    var box = prog(q.id) && prog(q.id).n ? boxOf(q.id) : null;
     html += '<main class="wrap qview">';
     html += '<div class="meta">' +
       '<span class="pill">' + esc(groupName(q)) + ' · ' + esc(q.topic) + '</span>' +
       '<span class="pill d' + q.d + '">' + DIFF[q.d] + '</span>' +
-      '<span class="pill">' + TYPE[q.type] + '</span>' +
+      '<span class="pill">' + TYPE[q.type] + (cur.choose ? ' · choose' : '') + '</span>' +
+      (box !== null ? '<span class="pill" title="Review box: right answers move it up, mistakes reset it">Box ' + box + '</span>' : '') +
       (!GROUPS && q.lec >= NOT_REVISED_FROM ? '<span class="pill warn">Lecture ' + q.lec + ' — not revised yet</span>' : '') +
       '</div>';
     html += '<h1 class="qtitle">' + esc(q.t) + '</h1>';
@@ -2480,7 +2737,7 @@ window.PRACTICE_CONFIG = {
     }
     if (q.q2) html += '<div class="prose">' + md(q.q2) + '</div>';
 
-    if (q.type === 'mcq') html += renderOptions();
+    if (cur.order) html += renderOptions();
     else html += renderTyped();
 
     if (cur.done) html += renderFeedback();
@@ -2492,17 +2749,22 @@ window.PRACTICE_CONFIG = {
 
   function renderOptions() {
     var q = cur.q;
+    var opts = optsOf(q);
+    var asCode = q.optCode || cur.choose;
     var letters = 'ABCDEFGH';
     return '<div class="opts' + (cur.done ? ' locked' : '') + '" role="list">' + cur.order.map(function (oi, pos) {
       var cls = 'opt';
       var mark = '';
       if (cur.done) {
-        if (oi === q.ans) { cls += ' right'; mark = '✓'; }
+        if (oi === 0) { cls += ' right'; mark = '✓'; }
         else if (oi === cur.picked) { cls += ' wrong'; mark = '✗'; }
       }
-      var text = q.optCode ? codeBlock(q.opts[oi], null, true) : inline(q.opts[oi]);
+      var text = asCode ? codeBlock(opts[oi], null, true) : inline(opts[oi]);
+      // After answering, every wrong option names the trap it was built to catch.
+      var w = cur.done && oi > 0 && q.wrong ? q.wrong[oi - 1] : null;
+      var tag = w ? '<span class="opt-trap">trap: ' + esc(trapInfo(w.trap).name) + '</span>' : '';
       return '<button class="' + cls + '" data-act="pick" data-i="' + oi + '"><span class="opt-letter">' + letters[pos] + '</span>' +
-        '<span class="opt-text">' + text + '</span><span class="opt-mark">' + mark + '</span></button>';
+        '<span class="opt-text">' + text + tag + '</span><span class="opt-mark">' + mark + '</span></button>';
     }).join('') + '</div>';
   }
 
@@ -2531,6 +2793,41 @@ window.PRACTICE_CONFIG = {
     return html + '</div>';
   }
 
+  // The trap panel: which wrong belief this answer came from, and the if-then rule to fix it.
+  function renderTrapPanel() {
+    var q = cur.q;
+    var r = cur.result;
+    if (r === 'ok') {
+      if (!q.trap) return '';
+      var t = trapInfo(q.trap);
+      return '<div class="trapbox ok"><div class="trap-lbl">This question tests</div><b>' + esc(t.name) + '</b>' +
+        (t.rule ? '<p>' + esc(t.rule) + '</p>' : '') +
+        (cur.guessed ? '<p class="trap-meta">Marked as a guess: it comes back tomorrow.</p>'
+          : '<button class="link-btn" data-act="guess">I guessed — show it again sooner</button>') + '</div>';
+    }
+    var html = '<div class="trapbox bad">';
+    if (cur.traps.length) {
+      html += '<div class="trap-lbl">⚠ You fell into this trap</div>';
+      cur.traps.forEach(function (w) {
+        var t = trapInfo(w.trap);
+        html += '<b>' + esc(t.name) + '</b>' + (w.why ? '<p>' + md(w.why).replace(/^<p>|<\/p>$/g, '') + '</p>' : '') +
+          (t.rule ? '<p class="trap-rule">→ ' + esc(t.rule) + '</p>' : '');
+      });
+    } else {
+      var ids = questionTraps(q);
+      var picked = cur.entry && cur.entry.tr;
+      html += '<div class="trap-lbl">' + (r === 'shown' ? 'Log it: what was missing?' : 'Which trap caught you?') + '</div>' +
+        '<div class="chips trap-chips">' + ids.concat(['slip', 'unsure']).map(function (id) {
+          return '<button class="chip' + (picked === id ? ' on' : '') + '" data-act="tag" data-trap="' + esc(id) + '">' + esc(trapInfo(id).name) + '</button>';
+        }).join('') + '</div>';
+      if (picked && TRAPS[picked] && TRAPS[picked].rule) html += '<p class="trap-rule">→ ' + esc(TRAPS[picked].rule) + '</p>';
+    }
+    html += '<label class="note-lbl">Why I got it wrong (one line, optional)' +
+      '<input class="note-in" data-act="note" maxlength="200" placeholder="e.g. forgot range stops before 5" value="' + esc(cur.entry ? cur.entry.n : '') + '" autocomplete="off"></label>' +
+      '<p class="trap-meta">Saved to your <a href="#/log">mistake log</a>.</p></div>';
+    return html;
+  }
+
   function renderFeedback() {
     var q = cur.q;
     var r = cur.result;
@@ -2544,22 +2841,26 @@ window.PRACTICE_CONFIG = {
           (r === 'bad' && !cur.blankOk[i] && mine ? '<div class="also">You wrote: <code>' + esc(mine) + '</code></div>' : '') +
           (alts.length > 1 ? '<div class="also">Also accepted: ' + alts.slice(1).map(function (a) { return '<code>' + esc(a) + '</code>'; }).join(', ') + '</div>' : '');
       }).join('');
-    } else if (q.type === 'out') {
+    } else if (q.type === 'out' && !cur.choose) {
       body += '<div class="lbl">Expected output</div>' + codeBlock(q.ans, null, true);
       if (r === 'bad' && cur.values[0].trim()) body += '<div class="lbl">Your answer</div>' + codeBlock(cur.values[0], null, true);
     } else if (r === 'bad') {
-      body += '<div class="lbl">Answer</div><div>' + (q.optCode ? codeBlock(q.opts[q.ans], null, true) : inline(q.opts[q.ans])) + '</div>';
+      var opts = optsOf(q);
+      body += '<div class="lbl">Answer</div><div>' + (q.optCode || cur.choose ? codeBlock(opts[0], null, true) : inline(opts[0])) + '</div>';
     }
-    var override = (r === 'bad' && q.type !== 'mcq')
+    var override = (r === 'bad' && q.type !== 'mcq' && !cur.choose)
       ? '<button class="override" data-act="override">My answer is equivalent — count it as correct</button>' : '';
+    var when = whenText(prog(q.id));
     return '<div class="fb ' + r + '" role="status"><div class="fb-head">' + head + '</div>' +
-      (body ? '<div class="fb-body">' + body + '</div>' : '') + override + '</div>' +
+      (body ? '<div class="fb-body">' + body + '</div>' : '') + override +
+      (when ? '<div class="fb-when">' + esc(when) + '</div>' : '') + '</div>' +
+      renderTrapPanel() +
       '<div class="explain"><h3>Explanation</h3><div class="prose">' + md(q.exp) + '</div></div>';
   }
 
   function actionButtons() {
     if (!cur.done) {
-      if (cur.q.type === 'mcq') {
+      if (cur.order) {
         return '<button class="btn" data-act="reveal">Show answer</button><button class="btn" data-act="skip">Skip →</button>';
       }
       return '<button class="btn" data-act="reveal">Show answer</button><button class="btn primary grow" data-act="check">Check</button>';
@@ -2567,15 +2868,31 @@ window.PRACTICE_CONFIG = {
     return '<button class="btn" data-act="retry">Try again</button><button class="btn primary grow" data-act="next">Next →</button>';
   }
 
+  function givenText() {
+    var q = cur.q;
+    if (cur.order) return cur.picked != null ? optsOf(q)[cur.picked] : '';
+    if (q.type === 'fib') return cur.values.map(function (v, i) { return (CIRCLED[i + 1] || i + 1) + ' ' + v; }).join('   ');
+    return cur.values[0];
+  }
+
   function record(ok, how) {
     var q = cur.q;
     var p = store.p[q.id] || (store.p[q.id] = { n: 0, c: 0 });
+    cur.before = { box: p.box, due: p.due };
+    schedule(p, ok ? 'ok' : 'bad');
     p.n++;
     if (ok) p.c++;
     p.last = ok ? 'ok' : (how || 'bad');
     p.t = Date.now();
     var d = today();
     store.days[d] = (store.days[d] || 0) + 1;
+    if (!ok) {
+      cur.traps = how === 'shown' ? [] : matchTraps(q, { choice: cur.order ? cur.picked : null, text: cur.values[0], values: cur.values });
+      cur.entry = addLog(q, how === 'shown' ? '' : givenText(), how || 'bad', cur.traps);
+      // Ask it again after three more questions, while the correction is fresh.
+      session.queue = (session.queue || []).filter(function (r) { return r.id !== q.id; });
+      session.queue.push({ id: q.id, at: session.done + 4 });
+    }
     save();
     session.done++;
     if (ok) session.right++;
@@ -2611,7 +2928,7 @@ window.PRACTICE_CONFIG = {
     var q = cur.q;
     if (q.type === 'fib') {
       document.querySelectorAll('input.ans-blank').forEach(function (el) { cur.values[+el.dataset.b - 1] = el.value; });
-    } else if (q.type === 'out') {
+    } else if (q.type === 'out' && !cur.choose) {
       var t = document.querySelector('textarea.ans-out');
       if (t) cur.values[0] = t.value;
     }
@@ -2619,13 +2936,98 @@ window.PRACTICE_CONFIG = {
   function goNext() {
     var next = pickNext(session.mode, cur && cur.q.id);
     if (!next) {
-      toast(session.mode === 'mistakes' ? 'No mistakes left — nice!' : 'Nothing left in this set');
+      toast(session.mode === 'mistakes' ? 'No mistakes left — nice!' : session.mode === 'review' ? 'All reviews done for now' : 'Nothing left in this set');
       go('#/');
       return;
     }
     history.replaceState(null, '', '#/q/' + encodeURIComponent(next.id));
     route();
   }
+
+  /* =====================================================================
+     MISTAKE LOG — every wrong or revealed answer, grouped by trap
+     ===================================================================== */
+  var logView = { show: 'open', limit: 60 };
+  function answerText(q) {
+    if (q.type === 'fib') return q.blanks.map(function (b, i) { return (CIRCLED[i + 1] || i + 1) + ' ' + b[0]; }).join('   ');
+    return q.type === 'mcq' ? q.opts[0] : q.ans;
+  }
+  function fmtDate(t) {
+    var d = new Date(t);
+    return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) + ' ' +
+      String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+  }
+  function logEntries() {
+    return store.log.map(function (e, i) { return { e: e, i: i }; }).filter(function (x) {
+      if (!BY_ID[x.e.id]) return false;
+      return logView.show === 'all' || (logView.show === 'open' ? !x.e.fx : !!x.e.fx);
+    }).reverse();
+  }
+  function trapRow(t) {
+    var info = t.id === 'untagged' ? { name: 'not tagged yet', rule: 'Open the entry below and pick the trap that caught you.' } : trapInfo(t.id);
+    var n = t.id === 'untagged' ? 0 : QS.filter(function (q) { return testsTrap(q, t.id); }).length;
+    return '<button class="trap-row" data-act="drill" data-trap="' + esc(t.id) + '"' + (n ? '' : ' disabled') + '>' +
+      '<span class="trap-n">' + t.n + '×</span><span class="trap-main"><b>' + esc(info.name) + '</b>' +
+      (info.rule ? '<small>' + esc(info.rule) + '</small>' : '') + '</span>' +
+      '<span class="trap-go">' + (n ? 'Drill ' + n + ' →' : '') + '</span></button>';
+  }
+  function renderLog() {
+    var all = logEntries();
+    var counts = trapCounts(all.map(function (x) { return x.e; }));
+    var qn = Object.keys(all.reduce(function (m, x) { m[x.e.id] = 1; return m; }, {})).length;
+    var html = '<header class="topbar"><div class="topbar-in">' +
+      '<button class="icon-btn" data-act="home" aria-label="Back">' + ICON.back + '</button>' +
+      '<div class="qbar-title">Mistake log</div>' +
+      '<button class="icon-btn" data-act="theme" aria-label="Toggle dark mode">' + (isDark() ? ICON.sun : ICON.moon) + '</button>' +
+      '</div></header><main class="wrap home log">';
+    html += '<p class="sync-note log-intro">Every wrong or revealed answer is logged here with the trap behind it. ' +
+      'Read the rule, retry the question, then mark it <b>understood</b>. The questions also come back on their own through <b>Review due</b>.</p>';
+    html += '<div class="seg log-seg" role="group">' + [['open', 'Open'], ['fixed', 'Understood'], ['all', 'All']].map(function (o) {
+      return '<button data-act="log-show" data-v="' + o[0] + '" class="' + (logView.show === o[0] ? 'on' : '') + '">' + o[1] + '</button>';
+    }).join('') + '</div>';
+    if (!all.length) {
+      html += '<div class="plist"><div class="empty">' + (logView.show === 'open' ? 'No open mistakes. Wrong answers are logged here automatically.' : 'Nothing here yet.') + '</div></div>';
+    } else {
+      html += '<section class="card traps-card"><h2>By trap · ' + all.length + ' mistake' + (all.length === 1 ? '' : 's') +
+        ' on ' + qn + ' question' + (qn === 1 ? '' : 's') + '</h2>' + counts.map(trapRow).join('') + '</section>';
+      html += all.slice(0, logView.limit).map(function (x) {
+        var e = x.e, q = BY_ID[e.id];
+        var t = e.tr ? trapInfo(e.tr) : null;
+        var p = prog(e.id);
+        var now = p && p.last === 'ok' ? '<span class="log-now ok">✓ right last time · box ' + boxOf(e.id) + '</span>' : '<span class="log-now bad">✗ not fixed yet</span>';
+        return '<article class="card log-entry' + (e.fx ? ' fixed' : '') + '">' +
+          '<div class="log-head"><a href="#/q/' + encodeURIComponent(e.id) + '" data-act="open" data-id="' + e.id + '">' + esc(q.t) + '</a>' +
+          '<span>' + esc(groupName(q)) + ' · ' + esc(q.topic) + ' · ' + fmtDate(e.t) + '</span></div>' +
+          '<div class="log-ans"><div><span class="lbl">You</span><code>' + esc(e.how === 'shown' ? '(revealed the answer)' : e.g || '(blank)') + '</code></div>' +
+          '<div><span class="lbl">Answer</span><code>' + esc(answerText(q)) + '</code></div></div>' +
+          (t ? '<div class="log-trap"><b>Trap: ' + esc(t.name) + '</b>' + (e.auto ? ' <small>(matched from your answer)</small>' : '') +
+            (t.rule ? '<p>→ ' + esc(t.rule) + '</p>' : '') + '</div>'
+            : '<div class="log-trap untagged">No trap tagged yet. Retry it and pick the one that caught you.</div>') +
+          '<textarea class="log-note" data-i="' + x.i + '" rows="1" placeholder="Why I got it wrong…">' + esc(e.n || '') + '</textarea>' +
+          '<div class="log-foot">' + now + '<span class="log-btns">' +
+            '<a class="link-btn" href="#/q/' + encodeURIComponent(e.id) + '" data-act="open" data-id="' + e.id + '">Retry</a>' +
+            '<button class="link-btn" data-act="log-fix" data-i="' + x.i + '">' + (e.fx ? 'Reopen' : 'Mark understood') + '</button>' +
+            '<button class="link-btn muted" data-act="log-del" data-i="' + x.i + '">Delete</button>' +
+          '</span></div></article>';
+      }).join('');
+      if (all.length > logView.limit) html += '<button class="btn more" data-act="log-more">Show more (' + (all.length - logView.limit) + ' left)</button>';
+    }
+    html += '<div class="sync-btns log-export"><button class="btn" data-act="log-copy"' + (store.log.length ? '' : ' disabled') + '>Copy log as text</button></div>' +
+      '<p class="sync-note">The log is saved in this browser and travels with the sync code.</p></main>';
+    app.innerHTML = html;
+  }
+  function logAsText() {
+    var rows = store.log.filter(function (e) { return BY_ID[e.id]; }).map(function (e) {
+      var q = BY_ID[e.id];
+      return '- [' + (e.fx ? 'x' : ' ') + '] ' + e.id + ' ' + q.t + ' (' + fmtDate(e.t) + ')\n' +
+        '    you: ' + (e.how === 'shown' ? '(revealed)' : (e.g || '(blank)').replace(/\n/g, ' / ')) + '\n' +
+        '    answer: ' + String(answerText(q)).replace(/\n/g, ' / ') + '\n' +
+        (e.tr ? '    trap: ' + trapInfo(e.tr).name + (TRAPS[e.tr] ? ' -> ' + TRAPS[e.tr].rule : '') + '\n' : '') +
+        (e.n ? '    note: ' + e.n + '\n' : '');
+    });
+    return 'CS1010E practice mistake log\n\n' + rows.join('');
+  }
+
 
   /* =====================================================================
      ROUTING & EVENTS
@@ -2640,6 +3042,9 @@ window.PRACTICE_CONFIG = {
     if (q) {
       if (!cur || cur.q !== q || cur.stale) openQuestion(q);
       else renderQuestion();
+    } else if (location.hash === '#/log') {
+      cur = null;
+      renderLog();
     } else {
       cur = null;
       renderHome();
@@ -2656,7 +3061,7 @@ window.PRACTICE_CONFIG = {
       case 'theme':
         store.theme = isDark() ? 'light' : 'dark';
         save(); applyTheme();
-        if (cur) { readInputs(); renderQuestion(); } else renderHome();
+        if (cur) { readInputs(); renderQuestion(); } else if (location.hash === '#/log') renderLog(); else renderHome();
         break;
       case 'lec': {
         var l = +el.dataset.v;
@@ -2693,11 +3098,14 @@ window.PRACTICE_CONFIG = {
       case 'more':
         shown += PAGE; renderHome();
         break;
-      case 'start': {
-        session = { mode: el.dataset.mode, done: 0, right: 0, recent: [] };
+      case 'start':
+      case 'drill': {
+        session = { mode: act === 'drill' ? 'trap' : el.dataset.mode, done: 0, right: 0, recent: [], queue: [] };
+        if (act === 'drill') session.trap = el.dataset.trap;
         saveSession();
         var first = pickNext(session.mode, null);
         if (first) go('#/q/' + encodeURIComponent(first.id));
+        else toast('No questions in this set');
         break;
       }
       case 'open':
@@ -2739,7 +3147,7 @@ window.PRACTICE_CONFIG = {
       case 'pick':
         if (cur.done) return;
         cur.picked = +el.dataset.i;
-        finish(cur.picked === cur.q.ans ? 'ok' : 'bad');
+        finish(cur.picked === 0 ? 'ok' : 'bad');
         break;
       case 'check':
         check();
@@ -2761,12 +3169,63 @@ window.PRACTICE_CONFIG = {
         break;
       case 'override': {
         var pp = store.p[cur.q.id];
-        if (pp) { pp.c++; pp.last = 'ok'; save(); }
+        if (pp) {
+          pp.c++;
+          // Undo the wrong-answer scheduling and the log entry: it was right after all.
+          pp.box = cur.before.box; pp.due = cur.before.due;
+          schedule(pp, 'ok');
+          pp.last = 'ok';
+          if (cur.entry) { store.log.splice(store.log.indexOf(cur.entry), 1); cur.entry = null; }
+          cur.traps = [];
+          save();
+        }
+        session.queue = (session.queue || []).filter(function (r) { return r.id !== cur.q.id; });
         session.right++; saveSession();
         cur.result = 'ok';
         if (cur.blankOk) cur.blankOk = cur.blankOk.map(function () { return true; });
         renderQuestion();
         toast('Counted as correct');
+        break;
+      }
+      case 'log-show':
+        logView.show = el.dataset.v; logView.limit = 60; renderLog();
+        break;
+      case 'log-more':
+        logView.limit += 60; renderLog();
+        break;
+      case 'log-fix': {
+        var lf = store.log[+el.dataset.i];
+        if (lf) { lf.fx = !lf.fx; save(); renderLog(); toast(lf.fx ? 'Marked understood' : 'Reopened'); }
+        break;
+      }
+      case 'log-del':
+        if (window.confirm('Delete this entry from your mistake log?')) { store.log.splice(+el.dataset.i, 1); save(); renderLog(); }
+        break;
+      case 'log-copy': {
+        var txt = logAsText();
+        copyText(txt).then(function () { toast('Mistake log copied'); }, function () {
+          openModal('<h3>Mistake log</h3><textarea class="sync-text" readonly>' + esc(txt) + '</textarea>' +
+            '<div class="modal-btns"><button class="btn" data-m="close">Close</button><button class="btn primary" data-m="copy">Copy</button></div>');
+        });
+        break;
+      }
+      case 'guess': {
+        var pg = store.p[cur.q.id];
+        if (pg) { pg.box = cur.before.box; pg.due = cur.before.due; schedule(pg, 'guess'); save(); }
+        cur.guessed = true;
+        renderQuestion();
+        toast('It will come back tomorrow');
+        break;
+      }
+      case 'tag': {
+        if (!cur.entry) return;
+        cur.entry.tr = cur.entry.tr === el.dataset.trap ? '' : el.dataset.trap;
+        save();
+        var keep = document.querySelector('input.note-in');
+        if (keep) cur.entry.n = keep.value;
+        renderQuestion();
+        var box = document.querySelector('.trapbox');
+        if (box) box.scrollIntoView({ block: 'nearest' });
         break;
       }
       case 'focus-blank': {
@@ -2813,6 +3272,11 @@ window.PRACTICE_CONFIG = {
       }
     } else if (el.matches('textarea.ans-out')) {
       cur.values[0] = el.value;
+    } else if (el.matches('input.note-in')) {
+      if (cur && cur.entry) { cur.entry.n = el.value; clearTimeout(save.t); save.t = setTimeout(save, 300); }
+    } else if (el.matches('textarea.log-note')) {
+      var le = store.log[+el.dataset.i];
+      if (le) { le.n = el.value; clearTimeout(save.t); save.t = setTimeout(save, 300); }
     } else if (el.matches('input.search')) {
       store.f.search = el.value;
       save();
@@ -2841,11 +3305,11 @@ window.PRACTICE_CONFIG = {
 
   document.addEventListener('keydown', function (e) {
     if (!cur || e.target.matches('input, textarea')) return;
-    if (!cur.done && cur.q.type === 'mcq' && /^[a-hA-H1-8]$/.test(e.key)) {
+    if (!cur.done && cur.order && /^[a-hA-H1-8]$/.test(e.key)) {
       var pos = /\d/.test(e.key) ? +e.key - 1 : e.key.toUpperCase().charCodeAt(0) - 65;
       if (pos < cur.order.length) {
         cur.picked = cur.order[pos];
-        finish(cur.picked === cur.q.ans ? 'ok' : 'bad');
+        finish(cur.picked === 0 ? 'ok' : 'bad');
       }
     } else if (cur.done && (e.key === 'Enter' || e.key === 'ArrowRight' || e.key === 'n')) {
       goNext();

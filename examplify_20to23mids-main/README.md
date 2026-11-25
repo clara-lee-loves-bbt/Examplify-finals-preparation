@@ -46,28 +46,86 @@ and it does not touch the Examplify exam clone. Open it from the picker
   *My answer is equivalent* to count it. Output answers ignore spacing around
   brackets and commas, and line breaks. An error is answered by its name, e.g.
   `TypeError`.
-- **Shuffle practice** draws from your current filters and favours questions
-  you have not tried and ones you got wrong. *Redo mistakes* and *Flagged* drill
-  just those. Progress, accuracy and a day streak are kept in the browser's
-  `localStorage`.
+- **Lecture syntax only.** Every line of code a question shows, every
+  accepted fill-in answer and every wrong option uses only syntax from the
+  lecture 2–11 slides: no `break`/`continue`, `sorted`, `enumerate`, `zip`,
+  sets, string methods, `try`, `sep=`, `pass` (the slides write `...`) or
+  magic methods beyond `__init__`, `__str__` and `__add__`. The checker
+  enforces this.
+- **Every question tests a named trap.** The answer key labels each question
+  with the trap it is built to catch (e.g. *range stops before its stop
+  value*, *`.copy()` is shallow*, *only the first true branch of if/elif
+  runs*). It also labels **every wrong option** with the trap that produces
+  it: 91 traps in all, each with an *If …, then …* rule.
+- **Trap feedback.** A wrong answer that matches a known wrong option (an MCQ
+  option, a typed output or a fill-in) names the trap at once: *⚠ You fell
+  into this trap*, why your answer comes from it, and the rule. If your answer
+  is new, you tag the trap yourself (or *careless slip* / *didn't know it
+  yet*) and can add a one-line note. After answering, every MCQ option shows
+  the trap it was built for.
+- **Mistake log** (`#/log`, *📓 Mistake log* on the home page). Every wrong or
+  revealed answer is logged with your answer, the right one, the trap, the rule
+  and your note. It is grouped *by trap* with counts, so you can see your
+  weak spots. *Drill* runs every question built on that trap; *Retry* opens
+  the question; *Mark understood* closes the entry. *Copy log as text* exports
+  it. *Your top traps* on the home page shows the five most frequent ones.
+- **Spaced review for retention.** Each question sits in a review box 0–5. A
+  right answer moves it up and pushes the next review out (1, 3, 7, 16, 35
+  days). A wrong or revealed answer drops it to box 0, and it is asked again
+  **a few questions later in the same session**, then again when due.
+  *I guessed* after a right answer sends it back tomorrow. **Review due** is
+  the main button whenever something is due, and it interleaves lectures. The
+  list marks due questions and *retained* counts box 3 and above.
+- **Getting through every question.** *✦ Unseen* serves only questions you
+  have never tried (interleaved), so you can work through all 352. *Shuffle*
+  draws from your filters and favours unseen and wrong ones. *Redo mistakes*
+  and *Flagged* drill just those.
+- **Type or choose.** *Output questions: Type the output* (default; recalling
+  is what sticks) or *Choose from options*, a quicker on-the-go mode that
+  offers the answer with its trap-labelled wrong outputs.
 - **Sync across devices.** *Copy sync code* (or *Share code…* on phones)
-  turns your progress into a short text code. *Paste sync code* on the other
-  device **merges** it in rather than overwriting. Attempt and solve counts
-  take the larger value, the most recent result wins, flags are kept and the
-  day history is combined. Pasting the same code twice changes nothing. Sync
-  both ways to bring two devices fully in step.
+  turns your progress (review boxes and mistake log included) into a short
+  text code. *Paste sync code* on the other device **merges** it in rather
+  than overwriting. Attempt and solve counts take the larger value, the most
+  recent result wins (with its review schedule), flags and log entries are
+  kept from both sides, and the day history is combined. Pasting the same code
+  twice changes nothing. Old codes still import. Sync both ways to bring two
+  devices fully in step.
 - **Live copy:** <https://clara-lee-loves-bbt.github.io/Examplify-finals-preparation/examplify_20to23mids-main/practice.html>
   (GitHub Pages from `main`. The repo root has a `.nojekyll` file so the `{{n}}`
   blank markers are served exactly as written.)
 - Code is syntax-highlighted and long lines wrap with a hanging indent, so
   nothing needs horizontal scrolling. Light and dark themes are supported.
 
-Sources live in `practice/` (`index.html`, `practice.css`, `practice.js`,
-`questions/*.js`). `node build.js` bundles them into `practice.html`.
-`node tools/verify-practice.js` checks every question's structure and runs
-each answer through Python. It checks every output answer, every runnable MCQ
-key, every accepted fill-in answer (against its tests) and the extra asserts
-some questions carry.
+Sources live in `practice/`. `questions/*.js` hold only what a question
+shows. The **answers are in a separate file per lecture**, `answers/*.js`:
+the key, accepted answers, tests, explanation, the question's trap, and every
+wrong option with its trap. `answers/traps.js` is the trap catalogue.
+`node build.js` bundles everything into `practice.html`.
+
+**`python tools/check_practice.py`** runs every question and confirms the
+correct answer **and each wrong option** (it reads the `.js` files through
+`node`). It checks that:
+
+- each output answer and runnable MCQ key is what the code prints;
+- each wrong option gives a different answer, as the app would mark it, so
+  no wrong option can be marked right;
+- each wrong option labelled with a mutation (`mut: 'range-stop:0'`) is
+  re-derived: the code is rewritten the way the trap misreads it (*range
+  includes its stop*), run, and must print exactly that wrong option.
+  `tools/trapkit.py` holds the traps and these rewrites;
+- each accepted fill-in answer passes its test, and each wrong fill fails it;
+- the extra asserts some questions carry still pass;
+- concept-only questions give a written reason for every wrong option;
+- the structure is sound, and all code, answers and options use only the
+  lecture 2–11 syntax.
+
+The last run made 999 Python runs and confirmed 823 wrong options, 368 of
+them re-derived from their trap. It also found and fixed seven tests that a
+wrong fill could pass (L3-23, L4-44, L5-39, L8-09, L9-25, L9-28, and
+L10-02's missing function). After changing `TRAPS` in `trapkit.py`, run it
+with `--write-traps` to regenerate `answers/traps.js`. No question was taken
+from the AY 2025/26 final paper; it was not opened for this work.
 
 ## Tutorials & assignments practice (new page)
 
@@ -266,7 +324,8 @@ index.html              same app, multi-file version
 styles.css
 app.js
 build.js                inlines each page + css + js -> examplify/practice/tutorials/mistakes.html
-practice/               lecture bank (index.html, practice.css, practice.js, questions/)
+practice/               lecture bank (index.html, practice.css, practice.js,
+                        questions/ = prompts, answers/ = keys + trap labels)
 tutorials/              tutorial & assignment bank (index.html, questions/)
 mistakes/               mistakes study page (index.html, mistakes.css, mistakes.js)
 mistakes.pdf            printed mistakes log — rebuild with tools/make-mistakes-pdf.js
@@ -286,6 +345,8 @@ data/exam-paper-d.js
 data/exam-midterm.js
 tools/extract-pdfs.py   re-extract the PDFs to text (needs pymupdf)
 tools/validate-data.js  sanity-check the question data
+tools/check_practice.py run every practice question, its key and each wrong option
+tools/trapkit.py        trap catalogue + the code rewrites that re-derive wrong options
 ```
 
 ## Rebuilding and checking
@@ -296,7 +357,7 @@ After editing `index.html`, `styles.css`, `app.js` or anything in `data/`:
 node build.js                    # rebuild examplify, practice, tutorials and mistakes.html
 node tools/validate-data.js      # verify every paper's data and the mistakes log
 node tools/make-mistakes-pdf.js  # re-print mistakes.pdf (needs Chrome or Edge)
-node tools/verify-practice.js    # verify the lecture practice bank (runs Python)
+python tools/check_practice.py  # run every practice question, its key and each wrong option
 node tools/verify-tutorials.js   # verify the tutorial/assignment bank (runs Python)
 ```
 

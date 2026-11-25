@@ -408,3 +408,65 @@ textarea.sync-text:not([readonly]) { font-size: 16px; }
   .stats { grid-template-columns: repeat(2, 1fr); }
   .code { font-size: 12.5px; }
 }
+
+/* ---------------- retention: review, traps, mistake log ---------------- */
+.retain-note { font-size: 12.5px; color: var(--muted); margin: -6px 2px 14px; }
+.btn.wide { grid-column: 1 / -1; }
+a.btn { text-decoration: none; }
+.flabel-hint { font-size: 11.5px; color: var(--muted); font-weight: 500; }
+.prow-sub .due { color: var(--accent-text); font-weight: 600; }
+
+.traps-card { padding-bottom: 6px; }
+.trap-row {
+  display: grid; grid-template-columns: 40px 1fr auto; gap: 10px; align-items: center; width: 100%;
+  text-align: left; border: 0; border-top: 1px solid var(--line); background: none; color: inherit; padding: 10px 0;
+}
+.traps-card h2 + .trap-row, .traps-card .sync-note + .trap-row { border-top: 0; }
+.trap-row[disabled] { opacity: 1; }
+.trap-n { font-weight: 700; color: var(--bad); font-variant-numeric: tabular-nums; text-align: center; }
+.trap-main b { display: block; font-size: 14.5px; }
+.trap-main small { display: block; color: var(--muted); font-size: 12.5px; margin-top: 2px; line-height: 1.35; }
+.trap-go { color: var(--accent-text); font-weight: 600; font-size: 13px; white-space: nowrap; }
+
+.opt-trap { display: block; margin-top: 6px; font-size: 12px; font-weight: 600; color: var(--muted); }
+.opt.wrong .opt-trap { color: var(--bad); }
+
+.fb-when { margin-top: 8px; font-size: 13px; color: var(--muted); }
+.trapbox { border-radius: 12px; padding: 12px 14px; margin: 0 0 12px; border: 1px solid var(--line); background: var(--card); }
+.trapbox.bad { border-color: var(--warn-line); background: var(--warn-bg); }
+.trapbox > b { font-size: 15px; display: block; }
+.trapbox p { margin: 4px 0 0; font-size: 14px; }
+.trap-lbl { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
+.trapbox.bad .trap-lbl { color: var(--warn); }
+.trap-rule { color: var(--ink-2); font-weight: 600; }
+.trap-meta { font-size: 12.5px; color: var(--muted); }
+.trap-meta a { color: var(--accent-text); }
+.trap-chips { margin: 2px 0 4px; }
+.trap-chips .chip { min-height: 32px; font-size: 13px; }
+.link-btn { border: 0; background: none; color: var(--accent-text); font-weight: 600; padding: 6px 0 2px; font-size: 14px; text-decoration: underline; cursor: pointer; }
+.link-btn.muted { color: var(--muted); }
+.note-lbl { display: block; font-size: 12.5px; color: var(--muted); margin-top: 10px; }
+.note-in, .log-note {
+  display: block; width: 100%; margin-top: 4px; border: 1px solid var(--line); background: var(--card);
+  border-radius: 8px; padding: 8px 10px; font-size: 16px; color: var(--ink); font-family: inherit; resize: vertical;
+}
+
+.log-intro { margin-top: 14px; }
+.log-seg { margin-bottom: 14px; }
+.log-entry { padding: 12px 14px; }
+.log-entry.fixed { opacity: .7; }
+.log-head a { font-weight: 700; color: var(--ink); text-decoration: none; font-size: 15px; }
+.log-head span { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+.log-ans { display: grid; gap: 6px; margin: 10px 0 8px; font-size: 13.5px; }
+.log-ans .lbl { display: inline-block; min-width: 58px; font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; }
+.log-ans code { white-space: pre-wrap; word-break: break-word; background: var(--code-bg); border-radius: 6px; padding: 1px 6px; }
+.log-trap { font-size: 14px; border-left: 3px solid var(--warn-line); padding-left: 10px; margin: 6px 0; }
+.log-trap small { color: var(--muted); font-weight: 500; }
+.log-trap p { margin: 3px 0 0; color: var(--ink-2); font-size: 13.5px; }
+.log-trap.untagged { color: var(--muted); border-left-color: var(--line); }
+.log-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+.log-btns { display: flex; gap: 14px; }
+.log-now { font-size: 12.5px; font-weight: 600; }
+.log-now.ok { color: var(--ok); }
+.log-now.bad { color: var(--bad); }
+.log-export { margin-top: 12px; }
