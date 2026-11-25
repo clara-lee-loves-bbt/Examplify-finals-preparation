@@ -133,6 +133,7 @@
       '<div class="w"><span class="i">✗</span><span>' + inline(m.wrong) + '</span></div>' +
       '<div class="r"><span class="i">✓</span><span>' + inline(m.right) + '</span></div>' +
       '<div class="rule"><span class="i">→</span><span>' + inline(m.rule) + '</span></div>' +
+      (m.note ? '<div class="extra"><span class="i">✎</span><span>' + inline(m.note) + '</span></div>' : '') +
       '</div></div></article>';
     return h;
   }

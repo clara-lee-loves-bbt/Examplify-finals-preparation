@@ -990,5 +990,6 @@ a.picker-tool-btn { text-decoration: none; display: inline-flex; align-items: ce
 .mistake-note-k { font-size: 11.5px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: #8496A3; padding-top: 1px; }
 .mistake-note.why .mistake-note-k { color: var(--bad); }
 .mistake-note.tip .mistake-note-k { color: var(--ok); }
+.mistake-note.extra { border-top: 1px dashed #D5DEE5; padding-top: 6px; }
 .mistake-note-v { color: #2F4656; }
 @media (max-width: 640px) { .mistake-note { grid-template-columns: 1fr; gap: 2px; } }

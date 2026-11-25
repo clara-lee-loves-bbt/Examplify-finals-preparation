@@ -997,6 +997,7 @@ a.picker-tool-btn { text-decoration: none; display: inline-flex; align-items: ce
 .mistake-note-k { font-size: 11.5px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: #8496A3; padding-top: 1px; }
 .mistake-note.why .mistake-note-k { color: var(--bad); }
 .mistake-note.tip .mistake-note-k { color: var(--ok); }
+.mistake-note.extra { border-top: 1px dashed #D5DEE5; padding-top: 6px; }
 .mistake-note-v { color: #2F4656; }
 @media (max-width: 640px) { .mistake-note { grid-template-columns: 1fr; gap: 2px; } }
 </style>
@@ -7855,7 +7856,8 @@ registerExam({
 /* Personal mistakes log for the final-exam papers.
 
    Updated 2026-11-23 from examplify-attempts-2026-11-23.json: AY 2019/20,
-   2020/21, 2021/22, 2022/23 and 2024/25 finals. Every in-scope question that
+   2020/21, 2021/22, 2022/23 and 2024/25 finals. AY 2025/26 added 2026-11-25
+   from examplify-attempts-2026-11-25.json (13 wrong answers, none out of scope). Every in-scope question that
    was answered wrongly or left blank is listed; questions tagged totally or
    crucially out of the lecture 1-11 scope are left out. Each key was re-checked
    by running the code, and every fill-in answer was run inside its skeleton,
@@ -7874,10 +7876,11 @@ registerExam({
    wrong  — the belief that led to the answer, stated as you held it
    right  — what is actually true (the refutation)
    rule   — one "If …, then …" trigger to recall in the exam
+   note   — optional extra to remember (e.g. a short summary list)
    This file only adds notes; it never reads or writes saved attempts. */
 registerMistakes({
-  compiled: '2026-11-23',
-  source: 'examplify-attempts-2026-11-23.json',
+  compiled: '2026-11-25',
+  source: 'examplify-attempts-2026-11-23.json + examplify-attempts-2026-11-25.json',
 
   patterns: [
     { title: 'self.method() runs the object\'s own class version',
@@ -7898,6 +7901,9 @@ registerMistakes({
     { title: 'Read the types: str vs int, element vs sequence',
       refs: ['final-2223:8', 'final-2223:13', 'final-2223:18', 'final-2122:5', 'final-2021:4'],
       text: 'Strings compare and add as text, an index must be an int, indexing a tuple gives an element (not a tuple), and parentheses alone do not make a tuple.' },
+    { title: '2D index arithmetic: check one element',
+      refs: ['final-2526:16', 'final-2526:17', 'final-2526:18', 'final-1920:8'],
+      text: 'Row-major index is `r * cols + c`; a flat `i` is row `i // cols`, column `i % cols`. For rotations and flips, take the example and check where its first output row comes from before choosing.' },
     { title: 'Time',
       refs: ['final-2122:36', 'final-2122:44', 'final-2425:32'],
       text: '20 min on a 2-mark MCQ, 12 min on a 6-mark fill-in. Cap a question at ~3 min per 2 marks, flag it, move on.' }
@@ -8267,7 +8273,81 @@ registerMistakes({
       title: 'Count with filter + len',
       wrong: 'Put `+=` inside a `reduce` call.',
       right: 'Assignments are not expressions (SyntaxError). Use `len(list(filter(lambda x: x[1] >= mark, data)))`.',
-      rule: 'If counting matches in one line, then `len(list(filter(pred, data)))`; "at least" is `>=`.' }
+      rule: 'If counting matches in one line, then `len(list(filter(pred, data)))`; "at least" is `>=`.' },
+
+    /* ======================================================== AY 2025/26 */
+    { paper: 'final-2526', n: 4, lec: 3, kind: 'wrong', type: 'concept', given: 'E',
+      title: 'No `return` means `None`',
+      wrong: '`def f(x): x * x + 1` behaves like the lambda, because the body is the same expression.',
+      right: 'A lambda returns its expression automatically; a `def` returns only what follows `return`. E computes `x * x + 1` and throws it away, so `f(3)` is `None`. A works: `y ** 2` is `y * y` and the parameter name does not matter.',
+      rule: 'If a `def` has no `return`, then the call gives `None`, whatever the body computes.' },
+    { paper: 'final-2526', n: 9, lec: 6, kind: 'wrong', type: 'concept', given: 'B',
+      title: 'One list shared by every call',
+      wrong: 'Each call to `mysteryA` gets a fresh `acc`, so it prints `[1] [2] [3]`.',
+      right: '`acc` is the same list object as `L`, so the appends pile up: `[1] [1, 2] [1, 2, 3]`.',
+      rule: 'If a function mutates a list parameter, then the caller\'s list changes and keeps every earlier change.' },
+    { paper: 'final-2526', n: 10, lec: 7, kind: 'wrong', type: 'trace', given: 'D',
+      title: 'A full-range swap undoes itself',
+      wrong: 'Swapping `L[i]` with `L[len(L)-i-1]` for every `i` reverses the list.',
+      right: 'The loop covers the whole range, so every pair is swapped twice and `L` ends up unchanged. `Lcopy` is a shallow copy holding the same element objects, so `id(L[0]) == id(Lcopy[0])`: answer A. To reverse, loop over `range(len(L) // 2)` only.',
+      rule: 'If an in-place swap loop runs over the full range, then check whether the second half swaps everything back.',
+      note: 'Shallow copies: all of these make a new outer list (`id(L) != id(Lcopy)`) but keep the same element objects (`id(L[0]) == id(Lcopy[0])`): `L.copy()`, `L[:]`, `list(L)`, `copy.copy(L)`, `L + []` or `L * 1`, and `[x for x in L]`.' },
+    { paper: 'final-2526', n: 11, lec: 5, kind: 'wrong', type: 'trace', given: 'B',
+      title: 'Recursion reaches every level',
+      wrong: 'Only the top level is summed, so just the first `1` counts.',
+      right: 'The `sum(...)` recurses into every nested tuple. Positive ints count; negatives, `0` and `"x"` give 0. So 1 + 3 + 4 = 8.',
+      rule: 'If a recursive function sums over every element, then list every leaf it reaches before adding.' },
+    { paper: 'final-2526', n: 16, lec: 9, kind: 'wrong', type: 'concept', given: 'D',
+      title: 'Flat index is `r * Mcols + c`',
+      wrong: 'The loops go column by column, so the index is `c * Mrows + r`.',
+      right: 'The index decides the layout, not the loop order. The output must be row by row, so `(r, c)` goes to `r * Mcols + c`. D gives `[3, 4, 2, 5, 1, 6]`.',
+      rule: 'If you map `(r, c)` to a 1D index, then multiply the row by the number of columns, whatever order the loops run in.' },
+    { paper: 'final-2526', n: 17, lec: 9, kind: 'wrong', type: 'concept', given: 'B',
+      title: 'Divide by the row length `C`',
+      wrong: '`i // R` and `i % R` give the row and column.',
+      right: 'Each row holds `C` items, so `i` is in row `i // C`, column `i % C`. Dividing by `R` raises `IndexError` here.',
+      rule: 'If you split a flat index into (row, col), then divide and mod by the number of columns.' },
+    { paper: 'final-2526', n: 18, lec: 9, kind: 'wrong', type: 'trace', given: 'E',
+      title: 'Counter-clockwise, not clockwise',
+      wrong: '`M[Mrows - 1 - j][i]` rotates left.',
+      right: 'That reads each column bottom-up, which is a clockwise turn: `[[4, 1], [5, 2], [6, 3]]`. Counter-clockwise reads the columns right to left, top-down: `M[j][Mcols - 1 - i]`.',
+      rule: 'If you must pick a rotation, then check which input values form the output\'s first row in the example.' },
+    { paper: 'final-2526', n: 24, lec: 3, kind: 'wrong', type: 'concept',
+      given: ["lambda c: 'A' <= c <= 'Z'", 'lambda c: ord(c)'],
+      title: '`map` changes, `filter` selects',
+      wrong: 'The A–Z test goes in the `map` blank and `ord` in the `filter` blank.',
+      right: 'In `map(f, filter(g, s))` the filter runs first and needs the yes/no test; `map` then applies `ord` to what is left. Swapped, the filter keeps everything (`ord` is never 0) and `map` gives True/False.',
+      rule: 'If you see `map(f, filter(g, xs))`, then `g` is the test and `f` is the change applied to the survivors.' },
+    { paper: 'final-2526', n: 25, lec: 7, kind: 'wrong', type: 'concept',
+      given: ['()', 'flatten_tuple(head) + flatten_tuple(tail)', 'flat_head'],
+      title: 'Flatten the head, then join the flattened tail',
+      wrong: 'Flatten the tail inside `flat_head`, then just return `flat_head`.',
+      right: '`flat_head` covers only the head; when the head is not a tuple it is `(head,)` and the tail is lost. ② is `flatten_tuple(head)`, ③ is `flat_head + flatten_tuple(tail)`. (Blank 1 was right.)',
+      rule: 'If a value is built inside a conditional expression, then the `return` must still handle the tail on every path.' },
+    { paper: 'final-2526', n: 26, lec: 5, kind: 'wrong', type: 'concept',
+      given: ["''", 'S[0] + remove_dup(S[1:])', 'remove_dup(S[1:])'],
+      title: 'Base case returns `S`; drop the duplicate',
+      wrong: 'Return `\'\'` for length ≤ 1; on a duplicate keep `S[0]`, otherwise skip it.',
+      right: 'A string of length 0 or 1 already has no duplicates, so return `S` (`\'\'` loses the last character). On a duplicate drop `S[0]`: `remove_dup(S[1:])`; otherwise keep it: `S[0] + remove_dup(S[1:])`.',
+      rule: 'If you write a base case, then test it on a 1-character input: the answer must still contain that character.' },
+    { paper: 'final-2526', n: 27, lec: 7, kind: 'wrong', type: 'concept',
+      given: ['S.append([i] * D[i])'],
+      title: '`append` adds one item; `+=` adds each',
+      wrong: '`S.append([i] * D[i])` adds `D[i]` copies of `i`.',
+      right: '`append` adds the whole list as a single element, giving `[[5], [7, 7, 7], …]`, and the question bans method calls anyway. Use `S += [i] * D[i]`.',
+      rule: 'If you need to add several items to a list, then use `+=`, not `append`.' },
+    { paper: 'final-2526', n: 28, lec: 10, kind: 'wrong', type: 'concept',
+      given: ['L[0]', 'L[1:]'],
+      title: 'Insert into a sorted tail',
+      wrong: '`do_what(L[0], L[1:])` sorts the list.',
+      right: '`do_what` inserts `x` into a list that is already sorted, so the tail must be sorted first: `do_what(L[0], what_sort(L[1:]))`. (Blank 1 was right.)',
+      rule: 'If a helper assumes sorted input, then the recursive call must produce that sorted input.' },
+    { paper: 'final-2526', n: 29, lec: 6, kind: 'wrong', type: 'concept',
+      given: ['L[i] * 2 if i < len(L) - 1 else L[0] * 2'],
+      title: 'Count how many times each element is doubled',
+      wrong: 'Each element is doubled once, and the last one wraps round to `L[0]`.',
+      right: 'Round `i` doubles positions `0` to `i-1`, for `i` from `n-1` down to 1. So position `i` is doubled `n-1-i` times: `L[i] * 2 ** (len(L) - i - 1)`.',
+      rule: 'If you turn nested loops into a formula, then count how many times the inner loop touches each position.' }
   ]
 });
 </script>
@@ -9196,7 +9276,7 @@ registerMistakes({
   /* You thought / Actually / Rule — the same three lines as the mistakes page. */
   function mistakeNotes(m) {
     var box = el('div', 'mistake-notes');
-    [['You thought', m.wrong, 'why'], ['Actually', m.right, 'what'], ['Rule', m.rule, 'tip']].forEach(function (row) {
+    [['You thought', m.wrong, 'why'], ['Actually', m.right, 'what'], ['Rule', m.rule, 'tip'], ['Remember', m.note, 'extra']].forEach(function (row) {
       if (!row[1]) return;
       var line = el('div', 'mistake-note ' + row[2]);
       line.appendChild(el('span', 'mistake-note-k', row[0]));

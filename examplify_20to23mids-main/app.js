@@ -921,7 +921,7 @@
   /* You thought / Actually / Rule — the same three lines as the mistakes page. */
   function mistakeNotes(m) {
     var box = el('div', 'mistake-notes');
-    [['You thought', m.wrong, 'why'], ['Actually', m.right, 'what'], ['Rule', m.rule, 'tip']].forEach(function (row) {
+    [['You thought', m.wrong, 'why'], ['Actually', m.right, 'what'], ['Rule', m.rule, 'tip'], ['Remember', m.note, 'extra']].forEach(function (row) {
       if (!row[1]) return;
       var line = el('div', 'mistake-note ' + row[2]);
       line.appendChild(el('span', 'mistake-note-k', row[0]));
